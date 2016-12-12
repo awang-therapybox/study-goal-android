@@ -1,0 +1,443 @@
+<resources>
+    <string name="me">Fi</string>
+    <string name="activity_details">Manylion Actifedd</string>
+    <string name="module">Modiwl</string>
+    <string name="activity_type">Math y Actifedd</string>
+    <string name="activity">Actifedd</string>
+    <string name="time_spent">Amser Gwario</string>
+    <string name="edit">Golygu</string>
+    <string name="delete">Dileu</string>
+    <string name="notes">Nodiadau</string>
+    <string name="note">Nodyn</string>
+    <string name="trophies_available">Tlysau ar gael</string>
+    <string name="my_trophies">Tlysau wedi cael ei ennill</string>
+    <string name="choose_your_institute">Dewis eich Sefydliad</string>
+    <string name="tap_to_select">Tapiwch i ddewis</string>
+    <string name="search">Chwilio</string>
+    <string name="settings">Gosodiadau</string>
+    <string name="yes">Ie</string>
+    <string name="no">Na</string>
+    <string name="please_set_a_time_for_your_stretch_target">Mae angen amser ar gyfer eich targed ymestyn</string>
+    <string name="empty_feed_page_message">Croeso i Jisc.\nBydd y tudalen yma yn cynnwys eich porthiannau</string>
+    <string name="hide_friend">Cyddio Ffrind</string>
+    <string name="hide_post">Cyddio Post</string>
+    <string name="delete_friend">Dileu Ffrind</string>
+    <string name="reset_your_password">Adnewyddu Cyfrinair</string>
+    <string name="it_is_often_forgotten">it_is_often_forgotten</string>
+    <string name="enter_your_email_address">MewnbynnuÂ eich cyfeiriad Ebost</string>
+    <string name="send_request">Gyrru Cais</string>
+    <string name="unhide">Dadguddio</string>
+    <string name="hide">Cyddio</string>
+    <string name="friend_request">Cais Ffrind</string>
+    <string name="everything">Popeth</string>
+    <string name="my_result">Fy canlyniad</string>
+    <string name="my_course_engagement">Fy ymrwymiad cwrs</string>
+    <string name="send">Gyrru</string>
+    <string name="activity_log">Log Actifeddau</string>
+    <string name="confirm">Cadarnhau</string>
+    <string name="pending_request">Cais yn Aros</string>
+    <string name="received_request">Cais wedi ei dderbyn</string>
+    <string name="friends">Ffrindiau</string>
+    <string name="people_on_your_course">Pobl ar fy cwrs</string>
+    <string name="select_home_screen">Dewis scrin cartref</string>
+    <string name="all_activities">Holl Actifeddau</string>
+    <string name="empty_log_page_message">Croeso i Jisc.\nBydd modd cofrestru eich actifedd drwy pwyso\'r botwm \"+\"</string>
+    <string name="hour">awr</string>
+    <string name="hours">oriau</string>
+    <string name="minute">munud</string>
+    <string name="minutes">munudau</string>
+    <string name="start">Dechrau</string>
+    <string name="stop">Gorffen</string>
+    <string name="pause">Saib</string>
+    <string name="resume">Ailddechrau</string>
+    <string name="date">Dyddiad</string>
+    <string name="save">Cadw</string>
+    <string name="average">Cyfartaledd</string>
+    <string name="time">Amser</string>
+    <string name="choose_module_and_activity">Dewis Modiwl a Actifedd</string>
+    <string name="choose_activity">Dewis Actifedd</string>
+    <string name="reminder_to_take_breather_after">Atgoffiad i Gymryd Seibiant Arol</string>
+    <string name="my_friends">Fy Ffrindiau</string>
+    <string name="home_screen">Sgrin Cartref</string>
+    <string name="trophies">Tlysau</string>
+    <string name="language">Iaith</string>
+    <string name="course_engagement">Ymrwymiad y Cwrs</string>
+    <string name="this_week">Wythnos yma</string>
+    <string name="overall">Cyflawn</string>
+    <string name="attainment">Cymhwyster</string>
+    <string name="graphs">Gosodiadau</string>
+    <string name="activity_points">Pwyntiau Actifedd</string>
+    <string name="period">Cyfnod</string>
+    <string name="compare_to">Cymharu i</string>
+    <string name="compare_engagement">Cymharu Ymrwymiad</string>
+    <string name="set">Creu</string>
+    <string name="_for">Ar gyfer</string>
+    <string name="every">Pob</string>
+
+    <string name="day">Dydd</string>
+    <string name="week_week">Wythnos</string>
+    <string name="month">Mis</string>
+
+    <string name="in">Mewn</string>
+    <string name="because">Oherwydd</string>
+    <string name="add_a_reason_to_keep_this_target">Adio rheswm i gadw\'r targed yma</string>
+    <string name="empty_target_page_message">Croeso i Jisc.\nBydd modd ychwanegu eich targedau drwy pwyso\'r botwm \"+\".</string>
+    <string name="target_reached">Targed wedi eu gyraedd!</string>
+    <string name="set_stretch_goal">Trefnu gol ymestyn</string>
+    <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="accept_the_terms_and_conditions">Derbyn termau ac amodau</string>
+    <string name="terms"> </string>
+
+    <string name="ok">Iawn</string>
+
+    <string name="are_you_sure_you_want_to_delete_this_activity_log">Ydych yn siwrÂ o eisiau dileu yr log actifedd yma?</string>
+    <string name="confirmation">Cadarnhad</string>
+    <string name="record_deleted_successfully">Cofnod wedi ei dileu yn llwyddiannus!</string>
+    <string name="something_went_wrong">Rhywbeth wedi mynd yn anghywir</string>
+    <string name="add">Adio</string>
+    <string name="report_activity">Start Activity Now (Timed)</string>
+    <string name="log_activity">Logio Actifeddau Diweddar</string>
+    <string name="log_recent_activity">Cofnodi Actifedd wedi ei Cwblhau</string>
+
+    <string name="just_a_moment_ago">YchydigÂ eiliad yn ol</string>
+    <string name="on">Ar</string>
+
+    <string name="engagement">ymrwymiad</string>
+
+    <string name="deleted_successfully">Dileu yn Llwyddiannus</string>
+
+    <string name="last_week_engagement">Wythnos Diwethaf ymrwymiad</string>
+    <string name="last_month_engagement">30 diwrnod dwethaf ymrwymiad</string>
+    <string name="Overall_engagement">Cyflawn ymrwymiad</string>
+
+    <string name="feed">Porthiant Actifedd</string>
+    <string name="stats">Ystadegau</string>
+    <string name="log">Log</string>
+    <string name="target">Targed</string>
+    <string name="logout">Logout</string>
+    <string name="student_id">Rhif Myfyriwr</string>
+
+    <string name="post_hidden_message">Post hidden successfully</string>
+    <string name="failed_to_hide_message">Failed to hide post</string>
+
+    <string name="minute_ago">munud yn ol</string>
+    <string name="minutes_ago">minutes ago</string>
+    <string name="hour_ago">hour ago</string>
+    <string name="hours_ago">awr yn ol</string>
+
+    <string name="friend_unhidden_successfully">Ffrind ddim wedi eu Cyddio</string>
+    <string name="friend_hidden_successfully">Ffrind wedi eu Cyddio</string>
+    <string name="failed_to_unhide_friend">Mae nam wedi digwydd - rhaid treial eto</string>
+    <string name="failed_to_hide_friend">Mae nam wedi digwydd - rhaid treial eto</string>
+    <string name="friend_privacy_settings">Gosodiadau preifatrwydd ffrind</string>
+    <string name="what_would_you_like_student_to_see">Be fyswch yn hoffi i %s ei weld?</string>
+    <string name="what_would_you_like_friend_to_see">Be fysech yn hoffi eich ffrind i weld?</string>
+    <string name="failed_tochangefriend">Mae nam wedi digwydd - rhaid treial eto</string>
+    <string name="successfully_tochangefriend">Successfully managed to change friend settings</string>
+
+    <string name="are_you_sure_you_want_to_delete_this_friend">Ydych yn siwr o eisiau dileu y ffrind yma?</string>
+    <string name="friend_deleted_successfully">Cais ffrind wedi eiÂ ddileu yn llwyddiannus!</string>
+    <string name="not_deleted_friend_message">Mae nam wedi digwydd - rhaid treial eto</string>
+    <string name="fail_to_accept_friend_request">Mae nam wedi digwydd - rhaid treial eto</string>
+    <string name="no_friend_requests">Does dim ceisiadau ffrind newydd gyda chi ar y foment.</string>
+    <string name="not_deleted_friend_request_message">Mae nam wedi digwydd - rhaid treial eto</string>
+
+    <string name="confirm_delete_message">Are you sure you want to delete?</string>
+    <string name="friend_request_sent_successfully">Cais ffrind wedi ei yrru yn llwyddiannus!</string>
+    <string name="fail_sendFriendRequest">Mae nam wedi digwydd - rhaid treial eto</string>
+
+    <string name="cancel_pending_request">Canslo cais sydd ar aros</string>
+    <string name="fail_cancelFriendRequest">Mae nam wedi digwydd - rhaid treial eto</string>
+
+    <string name="any_module">Unrhyw Fodiwl</string>
+    <string name="and">ac</string>
+    <string name="target_deleted_successfully">Targed wedi ei Dileu\'n Llwyddiannus</string>
+    <string name="fail_to_delete_target_message">Mae nam wedi digwydd - rhaid treial eto</string>
+
+    <string name="no_user_with_this_email">Dim defnyddiwr gyda\'r ebost yma</string>
+    <string name="not_found">Dim i\'w gael</string>
+
+    <string name="please_enter_a_valid_email_address">Rhaid defnyddio cyfeiriad ebost dilys</string>
+    <string name="invalid_email">Mae nam wedi digwydd - rhaid treial eto</string>
+    <string name="fail">Mae nam wedi digwydd - rhaid treial eto</string>
+    <string name="fail_to_delete_from_activity_history">Mae nam wedi digwydd - rhaid treial eto</string>
+
+    <string name="remember_me">Cofio fi</string>
+
+    <string name="sent_from">Wedi cael ei gyrru gan.</string>
+
+    <string name="add_target">Adio Targed</string>
+    <string name="edit_target">Adnewyddu Targed</string>
+
+    <string name="choose_source">Dewis Ffynhonnell</string>
+    <string name="library">Llyfrgell</string>
+    <string name="camera">Camera</string>
+
+    <string name="english">Saesneg</string>
+    <string name="welsh">Cymraeg</string>
+
+
+    <string name="edit_activity">Golygu</string>
+    <string name="edit_recent_activity">Golygu</string>
+    <string name="choose_activity_type">Math Actifedd</string>
+    <string name="activity_resumed">Ailddechreuodd</string>
+    <string name="activity_paused">Actifedd wedi ei seibio</string>
+    <string name="select_source">Select source</string>
+
+    <string name="silver">Arian</string>
+    <string name="gold">Aur</string>
+    <string name="monday">Dydd Llun</string>
+    <string name="tuesday">Dydd Mawrth</string>
+    <string name="wednesday">Dydd Mercher</string>
+    <string name="thursday">Dydd Iau</string>
+    <string name="friday">Dydd Gwener</string>
+    <string name="saturday">Dydd Sadwrn</string>
+    <string name="sunday">Dydd Sadwrn</string>
+    <string name="mon">Llun</string>
+    <string name="tue">Maw</string>
+    <string name="wed">Mer</string>
+    <string name="thu">Iau</string>
+    <string name="fri">Gwen</string>
+    <string name="sat">Sad</string>
+    <string name="sun">Sul</string>
+
+    <string name="daily">Daily</string>
+    <string name="Weekly">Weekly</string>
+    <string name="monthly">Monthly</string>
+    <string name="choose_interval">Dewis egwyl</string>
+    <string name="choose_module">Dewis Modiwl</string>
+    <string name="fail_to_edit_target_insuficient_time">Mae nam wedi digwydd - rhaid treial eto</string>
+    <string name="fail_to_add_target_insufficient_time">Mewngofnodwch amser targed</string>
+    <string name="target_same_parameters">Mae targed hefo\'r un gwybodaeth wedi cael ei gosod yn barod</string>
+    <string name="my_friends_title">Fy Ffrindiau</string>
+    <string name="my_requests_title">Ceisiadau Newydd</string>
+    <string name="select_home_string">Dewis scrin cartref</string>
+
+    <string name="no_module">Dim Modiwl</string>
+    <string name="you_must_spend_time_to_edit_activity">Mewngofnodi amser wedi cael ei wario</string>
+    <string name="activity_has_been_edited">Actifedd wedi ei olygu yn llwyddiannus!</string>
+    <string name="spend_more_time_to_submit_activity">You must have spent at least 1 minute doing the activity in order to submit it</string>
+
+    <string name="jan">Jan</string>
+    <string name="feb">Feb</string>
+    <string name="mar">Mar</string>
+    <string name="apr">Apr</string>
+    <string name="may">May</string>
+    <string name="jun">Jun</string>
+    <string name="jul">Jul</string>
+    <string name="aug">Aug</string>
+    <string name="sep">Sep</string>
+    <string name="oct">Oct</string>
+    <string name="nov">Nov</string>
+    <string name="dec">Dec</string>
+
+    <string name="_1st">1st</string>
+    <string name="_2nd">2nd</string>
+    <string name="_3rd">3rd</string>
+    <string name="_th">th</string>
+
+    <string name="report_feature_bug">Cofnodi Nodwedd/Nam</string>
+
+    <string name="addtarget_for">Ar gyfer</string>
+    <string name="addtarget_every">Pob</string>
+    <string name="addtarget_in">Mewn</string>
+
+    <string name="action_settings">Gosodiadau</string>
+    <string name="login_password_hint">Cyfrinair</string>
+    <string name="login_email_hint">Ebost</string>
+    <string name="login_logintoyouraccount">Mewngofnodi i\'ch cyfrif</string>
+    <string name="login_chooseinstitution">Dewis eich Sefydliad</string>
+    <string name="login_title">Study Goal</string>
+    <string name="login_login_btn">Mewngofnodi</string>
+    <string name="login_tap_to_select">Tapiwch i ddewis</string>
+    <string name="log_view_activities">Gweld Actifeddau</string>
+    <string name="log_log_activity">Log Activity</string>
+    <string name="log_new_activity">Actifedd Newydd</string>
+    <string name="new_activity_module">Module</string>
+    <string name="new_activity_activity_type">Math y Actifedd</string>
+    <string name="new_activity_choose_activity">Dewis Actifedd</string>
+    <string name="new_activity_reminder">Atgoffiad i Gymryd Seibiant Arol</string>
+    <string name="activity_history">Activity History</string>
+    <string name="log_recent">Logio Diweddar</string>
+    <string name="write_a_note">Write a note…</string>
+    <string name="addtarget_because">Oherwydd</string>
+    <string name="stretch_target">Stretch Target</string>
+    <string name="time_period">Dewis Myfyriwr/wraig</string>
+    <string name="last_day">Last Day</string>
+    <string name="last_week">Wythnos Diwethaf</string>
+    <string name="last_month">Last Month</string>
+    <string name="Overall">Cyflawn</string>
+    <string name="anymodule">Pob gweithgaredd</string>
+    <string name="last_7_days">7Â diwrnod dwethaf</string>
+    <string name="no_one">Dim un</string>
+    <string name="last_30_days">30 diwrnod dwethaf</string>
+    <string name="engagement_graph">Graph Ymrwymiad</string>
+    <string name="last_24_hours">24 awr diwethaf</string>
+    <string name="xyz_gmail_com">xyz@gmail.com</string>
+    <string name="email_notregistered">Email address not registered</string>
+    <string name="for_text">Ar gyfer</string>
+    <string name="top">Brig</string>
+    <string name="feed_menu">Porthiant</string>
+    <string name="stats_menu">Ystadegau</string>
+    <string name="log_menu">Log</string>
+    <string name="target_menu">Targed</string>
+    <string name="saved_successfully">Wedi Cadw</string>
+    <string name="no_internet">Gwirio Rhyngrwyd</string>
+
+    <string name="please_search_for_friend">Edrych gyda ebost</string>
+    <string name="session_expired_title">Edrych am ffrind gyda cyfeiriad ebost</string>
+
+    <string name="logout_menu">Logout</string>
+    <string name="facebook_not_implemented">Facebook not implemented at this moment</string>
+
+    <string name="deleted_friend_message">Friend has been removed from your list</string>
+    <string name="hide_friend_message">Friend has been hidden</string>
+    <string name="session_expired_message">Mae eich sesiwn wedi gorffen. Bydd rhaid ail-ymuno a\'r system i barhau</string>
+
+    <string name="what_would_you_want_to_see">What would you like</string>
+    <string name="to_see">to see?</string>
+    <string name="activity_details_title">Activity Details</string>
+    <string name="target_edited">Targed wedi ei olygu yn llwyddiannus!</string>
+    <string name="posted_message">Neges wedi a Bostio\'n Llwyddiannus!</string>
+    <string name="fail_to_post_message">Failed to post message! Please try again later.</string>
+
+    <string name="requests">Requests</string>
+
+    <string name="all_friends_list">Holl Ffrindiau</string>
+
+    <string name="language_title">Iaith</string>
+    <string name="setup_language">"Dewis iaith</string>
+
+    <string name="success_delete_activity">Successfully deleted activity</string>
+    <string name="fail_delete_activity">Failed to delete activity from history, please try again later</string>
+    <string name="log_title">Log</string>
+    <string name="running_activity">Actifedd yn Rhedeg</string>
+    <string name="new_activity">Actifedd Newydd</string>
+
+    <string name="no_module_selected">Does dim modiwl gyda chi</string>
+
+    <string name="report_activity_title">Actifedd Newydd</string>
+    <string name="activity_canceled_due_to_short_time">Actifedd wedi ei ganslo oherwydd amser prin wedi treulio arno</string>
+    <string name="activity_stopped">Actifedd wedi\'u Hatal</string>
+    <string name="activity_started">Actifedd ar Dechrau</string>
+    <string name="top10">10 Uchaf</string>
+    <string name="settings_title">Gosodiadau</string>
+    <string name="stats_title">Ystadegau</string>
+    <string name="you_are_in_top">Rydych yn y @@% o\'r brig</string>
+    <string name="please_select_module">Please select the module in which you’d like to compare your engagement level to other students</string>
+    <string name="target_title">Targed</string>
+    <string name="deleted_target_message">Successfully deleted target</string>
+    <string name="successfully_set_stretch_target">Targed Ymestyn wedi ei atodi</string>
+    <string name="start_your_new_activity">Dechrau eich Actifedd newydd</string>
+    <string name="another">another</string>
+    <string name="this_text">this</string>
+    <string name="to_meet_stretch_target">to meet your stretch target</string>
+    <string name="set_stretch_target">Set Stretch Target</string>
+    <string name="trophies_won">Tlysau wedi Ennill</string>
+    <string name="trophies_my">My Trophies</string>
+    <string name="trophies_title">Tlysau</string>
+    <string name="lowest_engagement">Ymrwymiad Isel</string>
+    <string name="low_engagement">Ymrwymiad Isel-Ganol</string>
+    <string name="middle_engagement">Ymrwymiad Ganol-Uchel</string>
+    <string name="high_engagement">Ymrwymiad Uchel</string>
+    <string name="very_high_engagement">Ymrwymiad Uchel Iawn</string>
+    <string name="twitter_not_available">Twitter is not installed on this device</string>
+    <string name="profile">Proffil</string>
+    <string name="terms_a_cond">Terms and Conditions</string>
+    <string name="accept_tns">You must accept terms and conditions to log in</string>
+    <string name="please_fill_all_fields">Cwblhewch pob maes a sydd angen</string>
+    <string name="invalid_email_or_password">Invalid Email or Password</string>
+    <string name="press_back_again_to_exit_app">Press back again to exit application</string>
+    <string name="days">days</string>
+    <string name="add_notes">Add Notes</string>
+    <string name="keep_me_signed_in">CadwÂ fi wedi llofnodi mewn</string>
+    <string name="forgot_password">Anghofio Cyfrinair?</string>
+    <string name="i_accept">Derbyn</string>
+    <string name="remind_me_to_take_a_break">Remind me to take a break</string>
+    <string name="confirm_delete_title">Confirm deletion</string>
+
+
+    <string name="confirm_logout_message">Ydych yn siwr eich bod eisio all-gofnodi?</string>
+
+
+    <string name="already_added_activity">You have already logged same activity in past 48 hours</string>
+    <string name="receiving_request">Receiving Request</string>
+    <string name="cancel_pending_title">Confirm Cancellation</string>
+    <string name="jisc_reminder_title">Study Goal - Reminder</string>
+    <string name="dont_forget_break">Don\'t forget to take a break!</string>
+
+    <string name="in_group_study_past">In Group Study</string>
+    <string name="studying">Studying</string>
+    <string name="experimented">Experimented</string>
+    <string name="in_an_exam_past">Mewn Arholiad</string>
+    <string name="in_an_exam_past_2">Mewn Arholiad</string>
+    <string name="prepared_dissertation">Prepared a dissertation</string>
+    <string name="attended_tutorials">Attended Tutorials</string>
+    <string name="study">Study</string>
+
+
+    <string name="target_saved">Targed wedi ei gadw yn llwyddiannus!</string>
+
+    <string name="is_this_a_but_or_a_feature">Nam gyda\'r app ydy hwn, neu cofnod o nodwedd newydd ar gyfer yr app?</string>
+    <string name="which_part">Mewn pa rhan o\'r app mae hwn yn briodol iddo (porthiant, ystadegau, log, target, neu rhywle arall)?</string>
+    <string name="further_detail">Gwybodaeth bellach:</string>
+
+
+    <string name="read">Darllen</string>
+    <string name="write">Ysgrifennu</string>
+    <string name="wrote">Wedi ysgrifennu</string>
+    <string name="researched">Ymchwilio</string>
+    <string name="studied">Adolygwyd</string>
+    <string name="design">Dylunio</string>
+    <string name="designed">Dylunwyd</string>
+    <string name="present">Cyflwyno</string>
+    <string name="presented">Cyflwynwyd</string>
+    <string name="blog">Blog</string>
+
+    <string name="blogged">Blogwyd</string>
+    <string name="revise">Adolygu</string>
+    <string name="revised">Adolygwyd</string>
+    <string name="practice">Ymarfer</string>
+    <string name="practiced">Cwblhau Ymarfer</string>
+    <string name="experiment">Arbrofi</string>
+    <string name="complete_assignment">Gorffen Aseiniad</string>
+    <string name="completed_assignment">Cwblhau Aseiniad</string>
+    <string name="be_in_an_exam">Mewn Arholiad</string>
+    <string name="been_in_an_exam">Cwblhau Arholiad</string>
+    <string name="prepare_a_dissertation">Paratoi traethawd</string>
+    <string name="prepared_a_dissertation">Traethawd wedi ei paratoi</string>
+    <string name="attend_lectures">Mynychu Darlith</string>
+    <string name="attended_lectures">Wedi Mynychu Darlith</string>
+    <string name="attend_seminars">Mynychu Seminar</string>
+    <string name="attended_seminars">Wedi mynychu Seminar</string>
+    <string name="attend_tutorials">Mynychu Tiwtorial</string>
+    <string name="attend_labs">Mynychu Labordy</string>
+    <string name="attended_labs">Wedi mynychu Labordy</string>
+
+    <string name="attending">Mynychu</string>
+    <string name="coursework_exams">Gwaith Cwrs/ Arholiadau</string>
+    <string name="studying_arts">Astudio (Celf)</string>
+    <string name="studying_science">Astudio (Gwyddoniaeth)</string>
+    <string name="attending_labs">Mynychu Labordai</string>
+    <string name="attending_lectures">Mynychu Darlithoedd</string>
+    <string name="attending_seminars">Mynychu Seminar</string>
+    <string name="attending_tutorials">Mynychu Tiwtorial</string>
+    <string name="completing_assignment">Cwblhau</string>
+    <string name="in_an_exam">Mewn Arholiad</string>
+    <string name="preparing_a_dissertation">Paratoi Traethawd</string>
+    <string name="revising">Adolygu</string>
+    <string name="blogging">Blogio</string>
+    <string name="designing">Dylunio</string>
+    <string name="group_study">Astudio mewn Grwp</string>
+    <string name="in_group_study">Astudio mewn Grwp</string>
+    <string name="practicing">Ymarfer</string>
+    <string name="presenting">Cyflwyno</string>
+    <string name="reading">Darllen</string>
+    <string name="writing">Ysgrifennu</string>
+    <string name="experimenting">Arbrofi</string>
+    <string name="research">Ymchwil</string>
+
+    <string name="choose_student">Dewis Myfyriwr/wraig</string>
+    <string name="do_you_want_to_respond_now">Ydych eisiau ymateb nawr?</string>
+
+</resources>

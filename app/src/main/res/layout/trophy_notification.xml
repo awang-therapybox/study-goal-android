@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="250dp"
+    android:background="@color/background_color"
+    android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/default_blue">
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/time_spent"
+            android:textColor="#FFF"
+            android:layout_centerInParent="true"
+            android:textSize="16sp"/>
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:layout_marginTop="40dp">
+        <TextView
+            android:id="@+id/dialog_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="You have earned AN EASTER EGG"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:textColor="@color/dark_grey"
+            android:layout_marginTop="10dp"/>
+        <ImageView
+            android:id="@+id/trophy_image"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/artists_desk_silver_big"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="15dp"/>
+    </RelativeLayout>
+</RelativeLayout>

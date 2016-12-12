@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3791ee</color>
+    <color name="colorPrimaryDark">#3d83cb</color>
+    <color name="light_grey">#a9a9a9</color>
+    <color name="dark_grey">#808080</color>
+    <color name="login_btn_purple">#8864C8</color>
+    <color name="background_color">#FBFBFB</color>
+
+    <color name="text_hint_color">#CACACA</color>
+    <color name="inactive_text">#a4b1c5</color>
+    <color name="login_btn_purple_inactive">#656fa4</color>
+    <color name="light_purple">#C09FF6</color>
+    <color name="light_purple_text">#b097db</color>
+    <color name="default_background_color">#FBFBFB</color>
+    <color name="default_blue">#3791ee</color>
+    <color name="default_red">#ed5154</color>
+    <color name="pink">#c7a1f2</color>
+</resources>
