@@ -165,7 +165,8 @@ public class FriendsSearch extends Fragment {
         search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (actionId == EditorInfo.IME_ACTION_DONE ||
+                        actionId == EditorInfo.IME_ACTION_SEARCH) {
                     adapter.list.clear();
                     if (!Utils.validate_email(search.getText().toString())) {
                         Snackbar.make(DataManager.getInstance().mainActivity.findViewById(R.id.drawer_layout), R.string.please_search_for_friend, Snackbar.LENGTH_LONG).show();

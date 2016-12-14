@@ -2362,14 +2362,12 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-//                URL url = new URL(host + "fn_send_friend_request");
-                URL url = new URL(host + "fn_send_friend_request_by_email");
+                URL url = new URL(host + "fn_send_friend_request");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
-
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -2381,6 +2379,8 @@ public class NetworkManager {
                         urlParameters += "&" + entry.getKey() + "=" + entry.getValue();
                 }
 
+                Log.e("Jisc","Params: "+urlParameters);
+
                 DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
                 wr.writeBytes(urlParameters);
                 wr.flush();
@@ -2389,7 +2389,17 @@ public class NetworkManager {
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
                 if (responseCode != 200) {
-                    Log.e("fn_send_friend_request", "ResponseCode = " + responseCode);
+
+                    InputStream is = new BufferedInputStream(urlConnection.getErrorStream());
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    is.close();
+
+                    Log.e("fn_send_friend_request", "ResponseCode = " + sb.toString());
                     return false;
                 }
                 return true;
@@ -2594,6 +2604,7 @@ public class NetworkManager {
                 ActiveAndroid.beginTransaction();
                 try {
                     new Delete().from(PendingRequest.class).execute();
+
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         PendingRequest item = new PendingRequest();
@@ -2807,20 +2818,22 @@ public class NetworkManager {
                     if (responseCode == 204) {
                         Log.i("getFriends", "No records found");
                         new Delete().from(Friend.class).execute();
-                    } else
+                    } else {
                         Log.e("getFriends", "Code: " + responseCode);
+                    }
                     return false;
                 }
 
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                 StringBuilder sb = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
                     sb.append(line);
                 }
                 is.close();
+
+                Log.e("Jisc","List: "+sb.toString());
 
                 JSONArray jsonArray = new JSONArray(sb.toString());
 

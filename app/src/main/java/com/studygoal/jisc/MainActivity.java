@@ -486,7 +486,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     public void setTitle(String title) {
-        ((TextView) findViewById(R.id.main_screen_title)).setText(title);
+        ((AutoResizeTextView) findViewById(R.id.main_screen_title)).setText(title);
         ((AutoResizeTextView) findViewById(R.id.main_screen_title)).setLines(1);
         ((AutoResizeTextView) findViewById(R.id.main_screen_title)).setTypeface(DataManager.getInstance().oratorstd_typeface);
     }

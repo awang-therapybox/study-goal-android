@@ -59,7 +59,7 @@ public class FriendsSearchAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.friendsearch_item, parent, false);
@@ -95,6 +95,7 @@ public class FriendsSearchAdapter extends BaseAdapter {
                 final Dialog dialog = new Dialog(context);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.friendrequest);
+
                 if(DataManager.getInstance().mainActivity.isLandscape) {
                     DisplayMetrics displaymetrics = new DisplayMetrics();
                     ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -141,26 +142,34 @@ public class FriendsSearchAdapter extends BaseAdapter {
                 dialog.findViewById(R.id.send).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Friend attendant1 = list.get(position);
+
                         HashMap<String, String> params = new HashMap<>();
                         params.put("from_student_id", DataManager.getInstance().user.id);
-                        params.put("to_student_id", attendant.jisc_student_id);
+                        params.put("to_student_id", attendant1.id);
                         params.put("is_result", switch_2.isChecked()?"yes":"no");
                         params.put("is_course_engagement", switch_3.isChecked()?"yes":"no");
                         params.put("is_activity_log", switch_4.isChecked()?"yes":"no");
+
                         if(NetworkManager.getInstance().sendFriendRequest(params)) {
+                            list.remove(attendant1);
                             dialog.dismiss();
                             sendRequest.setVisibility(View.GONE);
                             pendingRequest.setVisibility(View.VISIBLE);
+                            notifyDataSetChanged();
                         } else {
-                            if(DataManager.getInstance().isLandscape)
+                            if(DataManager.getInstance().isLandscape) {
                                 try {
                                     Snackbar.make(((SettingsActivity) context).findViewById(R.id.whole_container), R.string.fail_sendFriendRequest, Snackbar.LENGTH_LONG).show();
                                 } catch (Exception ignored) {
                                     Snackbar.make(DataManager.getInstance().mainActivity.findViewById(R.id.drawer_layout), R.string.fail_sendFriendRequest, Snackbar.LENGTH_LONG).show();
                                 }
-                            else
+                            } else {
                                 Snackbar.make(DataManager.getInstance().mainActivity.findViewById(R.id.drawer_layout), R.string.fail_sendFriendRequest, Snackbar.LENGTH_LONG).show();
+                            }
+                            list.remove(attendant1);
                             dialog.dismiss();
+                            notifyDataSetChanged();
                         }
                     }
                 });

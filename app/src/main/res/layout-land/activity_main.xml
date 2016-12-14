@@ -118,7 +118,7 @@
                         android:layout_centerInParent="true"/>
                 </RelativeLayout>
             </LinearLayout>
-            <TextView
+            <com.lb.auto_fit_textview.AutoResizeTextView
                 android:id="@+id/main_screen_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
