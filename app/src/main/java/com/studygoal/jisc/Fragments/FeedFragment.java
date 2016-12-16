@@ -39,7 +39,6 @@ public class FeedFragment extends Fragment {
         DataManager.getInstance().mainActivity.hideAllButtons();
         DataManager.getInstance().mainActivity.showCertainButtons(1);
 
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -165,10 +164,6 @@ public class FeedFragment extends Fragment {
         NetworkManager.getInstance().getFriends(DataManager.getInstance().user.id);
 
         adapter = new FeedAdapter(DataManager.getInstance().mainActivity, layout);
-//        if(adapter.feedList.size() == 0)
-//            tutorial_message.setVisibility(View.VISIBLE);
-//        else
-//            tutorial_message.setVisibility(View.INVISIBLE);
         recyclerView.setAdapter(adapter);
 
         return mainView;
