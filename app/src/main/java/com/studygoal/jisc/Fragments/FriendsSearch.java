@@ -101,7 +101,7 @@ public class FriendsSearch extends Fragment {
                         Snackbar.make(DataManager.getInstance().mainActivity.findViewById(R.id.drawer_layout), R.string.please_search_for_friend, Snackbar.LENGTH_LONG).show();
                     }
                 } else {
-
+//
                     InputMethodManager imm = (InputMethodManager) FriendsSearch.this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(search.getWindowToken(), 0);
 
