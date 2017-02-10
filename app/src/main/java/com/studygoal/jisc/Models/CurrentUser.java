@@ -33,6 +33,8 @@ public class CurrentUser extends Model {
     public String modified_date;
     @Column(name = "isStaff")
     public boolean isStaff;
+    @Column(name = "isSocial")
+    public boolean isSocial;
 
     public String last_week_activity_points;
     public String overall_activity_points;

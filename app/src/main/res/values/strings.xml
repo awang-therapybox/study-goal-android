@@ -402,6 +402,6 @@
     <string name="login_with_google">login with Google</string>
     <string name="login_with_twitter">login with Twitter</string>
     <string name="facebook_app_id">1841301559462853</string>
-    <string name="facebook_error_email">In order to continue, the app needs EMAIL permission</string>
+    <string name="facebook_error_email">In order to continue, the app needs EMAIL permission.</string>
 
 </resources>

@@ -3819,6 +3819,7 @@ public class NetworkManager {
                 DataManager.getInstance().user.created_date = jsonObject.getString("created_date");
                 DataManager.getInstance().user.modified_date = jsonObject.getString("modified_date");
                 DataManager.getInstance().user.isStaff = true;
+                DataManager.getInstance().user.isSocial = false;
 
                 DataManager.getInstance().user.save();
                 return true;
@@ -3896,6 +3897,112 @@ public class NetworkManager {
                 DataManager.getInstance().user.affiliation = jsonObject.getString("affiliation");
                 DataManager.getInstance().user.profile_pic = jsonObject.getString("profile_pic");
                 DataManager.getInstance().user.staff_id = "";
+                DataManager.getInstance().user.isStaff = false;
+                DataManager.getInstance().user.isSocial = false;
+                DataManager.getInstance().user.modules = jsonObject.getString("modules");
+                DataManager.getInstance().user.created_date = jsonObject.getString("created_date");
+                DataManager.getInstance().user.modified_date = jsonObject.getString("modified_date");
+
+                DataManager.getInstance().user.save();
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
+    /**
+     * loginSocial() - logs in social user
+     *
+     * @return true/false
+     */
+    public Boolean loginSocial(String email, String password) {
+        language = LinguisticManager.getInstance().getLanguageCode();
+        Future<Boolean> futureResult = executorService.submit(new loginSocial(email, password));
+        try {
+            return futureResult.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private class loginSocial implements Callable<Boolean> {
+
+        String email = "";
+        String password = "";
+
+        loginSocial(String e, String p) {
+            email = e;
+            password = p;
+        }
+
+        @Override
+        public Boolean call() {
+            try {
+                URL url = new URL(host + "fn_social_login");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("POST");
+
+                urlConnection.setDoInput(true);
+                urlConnection.setDoOutput(true);
+
+                String urlParameters = "language=" + LinguisticManager.getInstance().getLanguageCode() +
+                                        "&social_id="+password+
+                                        "&email="+email+
+                                        "&full_name=test"+
+                                        "&institution=1";
+
+                DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+                wr.writeBytes(urlParameters);
+                wr.flush();
+                wr.close();
+
+                int responseCode = urlConnection.getResponseCode();
+                forbidden(responseCode);
+                if (responseCode != 200) {
+                    InputStream is = new BufferedInputStream(urlConnection.getErrorStream());
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    is.close();
+
+                    Log.e("JISC",""+sb.toString());
+
+
+                    return false;
+                }
+
+                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                is.close();
+
+                JSONObject jsonObject = new JSONObject(sb.toString());
+                Log.e("JISC",""+jsonObject.toString());
+
+
+                new Delete().from(CurrentUser.class).execute();
+                DataManager.getInstance().user = new CurrentUser();
+                DataManager.getInstance().user.id = jsonObject.getInt("id") + "";
+                DataManager.getInstance().user.jisc_student_id = jsonObject.getString("jisc_student_id");
+                DataManager.getInstance().user.pid = jsonObject.getString("pid");
+                DataManager.getInstance().user.name = jsonObject.getString("name");
+                DataManager.getInstance().user.email = jsonObject.getString("email");
+                DataManager.getInstance().user.eppn = jsonObject.getString("eppn");
+                DataManager.getInstance().user.affiliation = jsonObject.getString("affiliation");
+                DataManager.getInstance().user.profile_pic = jsonObject.getString("profile_pic");
+                DataManager.getInstance().user.staff_id = "";
+                DataManager.getInstance().user.isStaff = false;
+                DataManager.getInstance().user.isSocial = true;
                 DataManager.getInstance().user.modules = jsonObject.getString("modules");
                 DataManager.getInstance().user.created_date = jsonObject.getString("created_date");
                 DataManager.getInstance().user.modified_date = jsonObject.getString("modified_date");
@@ -3949,8 +4056,7 @@ public class NetworkManager {
                     return false;
                 }
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                 StringBuilder sb = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -4057,7 +4163,6 @@ public class NetworkManager {
 
         @Override
         public String call() {
-
             try {
                 HttpsURLConnection urlConnection;
                 URL url = new URL("https://app.analytics.alpha.jisc.ac.uk/idps");
@@ -4160,8 +4265,7 @@ public class NetworkManager {
                 }
 
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                 StringBuilder sb = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -4258,8 +4362,7 @@ public class NetworkManager {
                 }
 
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                 StringBuilder sb = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -4380,5 +4483,4 @@ public class NetworkManager {
             return false;
         }
     }
-
 }

@@ -22,13 +22,21 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
             android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="20dp"
+                android:src="@drawable/fb_icon"/>
 
             <TextView
                 android:id="@+id/login_with_facebook"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
+                android:layout_gravity="center_vertical"
                 android:textColorHint="@color/text_hint_color"
                 android:textColor="@color/dark_grey"
                 android:hint="@string/login_with_facebook" />
@@ -38,12 +46,21 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
             android:orientation="horizontal">
 
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="20dp"
+                android:src="@drawable/gp_icon"/>
+
             <TextView
+                android:id="@+id/login_with_google"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
+                android:layout_gravity="center_vertical"
                 android:textColorHint="@color/text_hint_color"
                 android:textColor="@color/dark_grey"
                 android:hint="@string/login_with_google" />
@@ -55,9 +72,17 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="20dp"
+                android:src="@drawable/tw_icon"/>
+
             <TextView
+                android:id="@+id/login_with_twitter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:textSize="15sp"
                 android:textColorHint="@color/text_hint_color"
                 android:textColor="@color/dark_grey"
