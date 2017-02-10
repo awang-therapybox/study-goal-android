@@ -18,15 +18,17 @@ public class InstitutionsAdapter extends BaseAdapter {
 
     public List<Institution> institutions;
     LayoutInflater inflater;
+    Context context;
 
     public InstitutionsAdapter(Context c) {
+        context = c;
         institutions = new ArrayList<>();
         inflater = LayoutInflater.from(c);
     }
 
     @Override
     public int getCount() {
-        return institutions.size();
+        return institutions.size()+1;
     }
 
     @Override
@@ -45,11 +47,21 @@ public class InstitutionsAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.institution_item, viewGroup, false);
         }
 
-        TextView name = (TextView) view.findViewById(R.id.name);
-        name.setTypeface(DataManager.getInstance().myriadpro_regular);
-        name.setText(institutions.get(i).name);
+        if(i < institutions.size()) {
+            TextView name = (TextView) view.findViewById(R.id.name);
+            name.setTypeface(DataManager.getInstance().myriadpro_regular);
+            name.setText(institutions.get(i).name);
+            name.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 
-        view.setTag(institutions.get(i));
+            view.setTag(institutions.get(i));
+        } else {
+            TextView name = (TextView) view.findViewById(R.id.name);
+            name.setTypeface(DataManager.getInstance().myriadpro_bold);
+            name.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            name.setText(context.getString(R.string.institution_no_listed));
+
+            view.setTag("no institution");
+        }
 
         return view;
     }

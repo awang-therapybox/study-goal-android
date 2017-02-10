@@ -40,7 +40,6 @@ public class LoginActivity extends Activity {
 
     private TextView choose_institution;
     private WebView webView;
-    boolean isStaff;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,6 +141,15 @@ public class LoginActivity extends Activity {
             list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                    if(view.getTag().equals("no institution")) {
+
+                        Intent newIntent = new Intent(LoginActivity.this, SocialActivity.class);
+                        LoginActivity.this.startActivity(newIntent);
+                        LoginActivity.this.finish();
+                        return;
+                    }
+
                     showProgressBar();
 
                     if (getCurrentFocus() != null) {
@@ -152,7 +160,6 @@ public class LoginActivity extends Activity {
                     webView.loadUrl("about:blank");
 
                     final Institution institution = (Institution) view.getTag();
-
 
                     String url = "https://sp.data.alpha.jisc.ac.uk/Shibboleth.sso/Login?entityID=https://" +
                             institution.url + "&target=https://sp.data.alpha.jisc.ac.uk/secure/auth.php?u=" +

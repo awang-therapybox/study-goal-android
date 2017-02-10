@@ -967,7 +967,7 @@ public class NetworkManager {
             return future.get();
         } catch (Exception e) {
             e.printStackTrace();
-            return new ArrayList<ED>();
+            return new ArrayList<>();
         }
     }
 
@@ -3808,6 +3808,7 @@ public class NetworkManager {
                 DataManager.getInstance().user = new CurrentUser();
                 DataManager.getInstance().user.id = jsonObject.getInt("id") + "";
                 DataManager.getInstance().user.staff_id = jsonObject.getString("staff_id");
+                DataManager.getInstance().user.jisc_student_id = jsonObject.getString("staff_id");
                 DataManager.getInstance().user.pid = jsonObject.getString("pid");
                 DataManager.getInstance().user.name = jsonObject.getString("name");
                 DataManager.getInstance().user.email = jsonObject.getString("email");
@@ -3894,6 +3895,7 @@ public class NetworkManager {
                 DataManager.getInstance().user.eppn = jsonObject.getString("eppn");
                 DataManager.getInstance().user.affiliation = jsonObject.getString("affiliation");
                 DataManager.getInstance().user.profile_pic = jsonObject.getString("profile_pic");
+                DataManager.getInstance().user.staff_id = "";
                 DataManager.getInstance().user.modules = jsonObject.getString("modules");
                 DataManager.getInstance().user.created_date = jsonObject.getString("created_date");
                 DataManager.getInstance().user.modified_date = jsonObject.getString("modified_date");
@@ -4099,6 +4101,7 @@ public class NetworkManager {
                         institution.ukprn = jsonObject.getJSONObject(key).getInt("ukprn");
                         institution.save();
                     }
+
                     ActiveAndroid.setTransactionSuccessful();
                 } finally {
                     ActiveAndroid.endTransaction();
@@ -4238,6 +4241,19 @@ public class NetworkManager {
                         new Delete().from(Module.class).execute();
                     } else
                         Log.e("getModules", "Code: " + responseCode);
+
+                    InputStream is = new BufferedInputStream(urlConnection.getErrorStream());
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(
+                            is, "iso-8859-1"), 8);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    is.close();
+
+                    Log.e("Jisc",sb.toString());
+
                     return false;
                 }
 

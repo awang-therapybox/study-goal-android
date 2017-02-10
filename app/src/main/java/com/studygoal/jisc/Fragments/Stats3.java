@@ -45,12 +45,18 @@ import com.studygoal.jisc.Models.Module;
 import com.studygoal.jisc.R;
 import com.studygoal.jisc.Utils.Utils;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
+import java.util.regex.Matcher;
 
 public class Stats3 extends Fragment {
 
@@ -374,13 +380,18 @@ public class Stats3 extends Fragment {
                     lineChart.setVisibility(View.INVISIBLE);
                     barchart.setVisibility(View.VISIBLE);
                     ((ImageView)v).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.line_graph));
+
                 }else{
                     lineChart.setVisibility(View.VISIBLE);
                     barchart.setVisibility(View.INVISIBLE);
                     ((ImageView)v).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.bar_graph));
                 }
+
+                getData();
             }
         });
+
+        mainView.findViewById(R.id.change_graph_btn).performClick();
 
         return mainView;
     }
@@ -404,7 +415,26 @@ public class Stats3 extends Fragment {
         } else if (compareTo.getText().toString().contains("Average")){
             compareType = "average";
         }
-        if (module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && compareTo.getText().toString().equals(getString(R.string.no_one)) && period.getText().toString().equals("Overall")) {
+
+        if(DataManager.getInstance().user.isStaff) {
+            //generate 10 random data set
+
+            list = new ArrayList<>();
+            for(int i=0;i<10;i++) {
+                ED item = new ED();
+                item.hour = ""+ (Math.abs(new Random().nextInt()) % 24);
+                item.activity_points = Math.abs(new Random().nextInt()) % 100;
+
+                list.add(item);
+            }
+
+            Collections.sort(list, new Comparator<ED>() {
+                @Override
+                public int compare(ED s1, ED s2) {
+                    return Integer.parseInt(s2.hour) - Integer.parseInt(s1.hour);
+                }
+            });
+        } else if (module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && compareTo.getText().toString().equals(getString(R.string.no_one)) && period.getText().toString().equals("Overall")) {
             list = NetworkManager.getInstance().get_ED();
         }else if(module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && !compareTo.getText().toString().equals(getString(R.string.no_one))){
             list = NetworkManager.getInstance().get_ED_for_time_period_module_and_compareTo_allActivity(DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase(),compareValue,compareType);
@@ -433,10 +463,11 @@ public class Stats3 extends Fragment {
     }
 
     private void setData() {
+
         ArrayList<String> xVals = new ArrayList<>();
 
-        if (compareTo.getText().toString().equals(getString(R.string.no_one))) {
-            if (period.getText().toString().equals(getString(R.string.last_24_hours))) {
+        if (compareTo.getText().toString().equals(getString(R.string.no_one)) || DataManager.getInstance().user.isStaff) {
+            if (period.getText().toString().equals(getString(R.string.last_24_hours)) || DataManager.getInstance().user.isStaff) {
 
                 ViewGroup.LayoutParams params_main = chart_layout.getLayoutParams();
                 params_main.width = Utils.dpToPx((int) ((list.size() + 2) * 78.57142857));
@@ -448,11 +479,12 @@ public class Stats3 extends Fragment {
 
                 String name = getString(R.string.me);
                 ArrayList<Entry> vals1 = new ArrayList<>();
-
+                ArrayList<BarEntry> vals2 = new ArrayList<>();
 
                 for (int i = 0; i < list.size(); i++) {
                     vals1.add(new Entry(list.get(i).activity_points, xVals.size()));
                     xVals.add(list.get(i).hour);
+                    vals2.add(new BarEntry(list.get(i).activity_points, xVals.size()));
                 }
 
                 vals1.add(new Entry(0, xVals.size()));
@@ -478,8 +510,34 @@ public class Stats3 extends Fragment {
                 data.setValueTextSize(14f);
                 data.setDrawValues(false);
 
+                BarDataSet barDataSet = new BarDataSet(vals2,name);
+                barDataSet.setColor(0xFF8864C8);
+                barDataSet.setDrawValues(true);
+                barDataSet.setValueTextSize(15);
+                barDataSet.setValueTextColor(0xFF000000);
+
+                BarData barData = new BarData(xVals,barDataSet);
+                barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
+                barData.setValueTextSize(15f);
+                barData.setDrawValues(true);
+
+                barchart.getAxisLeft().setDrawGridLines(false);
+                barchart.getXAxis().setDrawGridLines(false);
+                barchart.setDrawValueAboveBar(true);
+                barchart.setDrawBorders(false);
+                barchart.setBackgroundColor(Color.TRANSPARENT);
+                barchart.setDrawGridBackground(false);
+                barchart.setMaxVisibleValueCount(vals1.size());
+                barchart.setBackgroundColor(0xFFFFFFFF);
+                barchart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+
                 // set data
                 lineChart.setData(data);
+
+                barchart.setData(barData);
+                barchart.invalidate();
+                barchart.setTouchEnabled(false);
+
             } else if (period.getText().toString().equals(getString(R.string.last_7_days))) {
 
                 ViewGroup.LayoutParams params_main = chart_layout.getLayoutParams();
@@ -712,8 +770,6 @@ public class Stats3 extends Fragment {
                 barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
                 barData.setValueTextSize(50f);
                 barData.setDrawValues(true);
-
-                Log.e("aici aici aici","sjkhdfasjkhsa");
 
                 barchart.getAxisLeft().setDrawGridLines(false);
                 barchart.getXAxis().setDrawGridLines(false);

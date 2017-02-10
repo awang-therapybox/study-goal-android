@@ -396,4 +396,12 @@
 
     <string name="do_you_want_to_respond_now">Do you want to respond now?</string>
 
+    <string name="statistics_admin_view">Statistics given are for demonstration purposes only and not affected by user actions.</string>
+    <string name="institution_no_listed">My institution is not listed here</string>
+    <string name="login_with_facebook">login with Facebook</string>
+    <string name="login_with_google">login with Google</string>
+    <string name="login_with_twitter">login with Twitter</string>
+    <string name="facebook_app_id">1841301559462853</string>
+    <string name="facebook_error_email">In order to continue, the app needs EMAIL permission</string>
+
 </resources>
