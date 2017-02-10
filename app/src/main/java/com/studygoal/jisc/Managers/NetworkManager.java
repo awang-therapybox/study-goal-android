@@ -3749,6 +3749,86 @@ public class NetworkManager {
 
 
     /**
+     * loginStaff() - logs in staff
+     *
+     * @return true/false
+     */
+    public Boolean loginStaff() {
+        language = LinguisticManager.getInstance().getLanguageCode();
+        Future<Boolean> futureResult = executorService.submit(new loginStaff());
+        try {
+            return futureResult.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private class loginStaff implements Callable<Boolean> {
+
+        loginStaff() {
+        }
+
+        @Override
+        public Boolean call() {
+            try {
+                URL url = new URL(host + "fn_staff_login");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("POST");
+                urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
+                urlConnection.setDoInput(true);
+                urlConnection.setDoOutput(true);
+
+                String urlParameters = "language=" + LinguisticManager.getInstance().getLanguageCode();
+
+                DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+                wr.writeBytes(urlParameters);
+                wr.flush();
+                wr.close();
+
+                int responseCode = urlConnection.getResponseCode();
+                forbidden(responseCode);
+                if (responseCode != 200) {
+                    return false;
+                }
+
+                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(
+                        is, "iso-8859-1"), 8);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                is.close();
+
+                JSONObject jsonObject = new JSONObject(sb.toString());
+
+                new Delete().from(CurrentUser.class).execute();
+                DataManager.getInstance().user = new CurrentUser();
+                DataManager.getInstance().user.id = jsonObject.getInt("id") + "";
+                DataManager.getInstance().user.staff_id = jsonObject.getString("staff_id");
+                DataManager.getInstance().user.pid = jsonObject.getString("pid");
+                DataManager.getInstance().user.name = jsonObject.getString("name");
+                DataManager.getInstance().user.email = jsonObject.getString("email");
+                DataManager.getInstance().user.eppn = jsonObject.getString("eppn");
+                DataManager.getInstance().user.affiliation = jsonObject.getString("affiliation");
+                DataManager.getInstance().user.profile_pic = jsonObject.getString("profile_pic");
+                DataManager.getInstance().user.modules = jsonObject.getString("modules");
+                DataManager.getInstance().user.created_date = jsonObject.getString("created_date");
+                DataManager.getInstance().user.modified_date = jsonObject.getString("modified_date");
+                DataManager.getInstance().user.isStaff = true;
+
+                DataManager.getInstance().user.save();
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
+    /**
      * login() - logs in user
      *
      * @return true/false
@@ -3863,7 +3943,6 @@ public class NetworkManager {
                 urlConnection.setRequestMethod("GET");
 
                 int responseCode = urlConnection.getResponseCode();
-//                forbidden(responseCode);
                 if (responseCode != 200) {
                     return false;
                 }
@@ -3879,6 +3958,66 @@ public class NetworkManager {
 
                 JSONObject jsonObject = new JSONObject(sb.toString());
 
+                if (jsonObject.getString("APPSHIB_ID") != JSONObject.NULL && !jsonObject.getString("APPSHIB_ID").contentEquals(""))
+                    return true;
+                else
+                    return false;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
+    /**
+     * checkIfUserRegistered() => checks if the user is registered;
+     *
+     * @return true/false
+     */
+
+    public boolean checkIfStaffRegistered() {
+        Future<Boolean> futureResult = executorService.submit(new checkIfStaffRegistered());
+        try {
+            return futureResult.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    private class checkIfStaffRegistered implements Callable<Boolean> {
+
+        checkIfStaffRegistered() {
+        }
+
+        @Override
+        public Boolean call() {
+
+            try {
+                HttpsURLConnection urlConnection;
+                URL url = new URL("https://sp.data.alpha.jisc.ac.uk/staff");
+                urlConnection = (HttpsURLConnection) url.openConnection();
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
+                urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
+                urlConnection.setRequestMethod("GET");
+
+                int responseCode = urlConnection.getResponseCode();
+                if (responseCode != 200) {
+                    return false;
+                }
+                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(
+                        is, "iso-8859-1"), 8);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                is.close();
+
+                JSONObject jsonObject = new JSONObject(sb.toString());
+                Log.e("Jisc","Staff registered: "+jsonObject.toString());
                 if (jsonObject.getString("APPSHIB_ID") != JSONObject.NULL && !jsonObject.getString("APPSHIB_ID").contentEquals(""))
                     return true;
                 else

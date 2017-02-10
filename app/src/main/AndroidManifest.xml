@@ -32,7 +32,7 @@
             android:value="learninganalitycs31.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="42" />
+            android:value="43" />
         <meta-data
             android:name="AA_MODELS"
             android:value="com.studygoal.jisc.Models.Institution, com.studygoal.jisc.Models.CurrentUser, com.studygoal.jisc.Models.Module,

@@ -76,6 +76,15 @@
                         android:layout_centerVertical="true"/>
                     </RelativeLayout>
             </RelativeLayout>
+            <CheckBox
+                android:id="@+id/choose_staff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"
+                android:text="@string/login_imastaff_member"
+                android:buttonTint="#ffffff"
+                android:textColor="#ffffff"/>
         </LinearLayout>
     <LinearLayout
         android:id="@+id/institutions"
@@ -136,6 +145,7 @@
     </RelativeLayout>
     <WebView
         android:id="@+id/webview"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </RelativeLayout>

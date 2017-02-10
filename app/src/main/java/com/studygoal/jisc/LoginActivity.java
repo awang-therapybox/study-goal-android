@@ -18,6 +18,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -38,6 +40,7 @@ public class LoginActivity extends Activity {
 
     private TextView choose_institution;
     private WebView webView;
+    boolean isStaff;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,21 +170,38 @@ public class LoginActivity extends Activity {
                                     JSONObject jsonObject = new JSONObject(java.net.URLDecoder.decode(json, "UTF-8"));
                                     DataManager.getInstance().set_jwt(jsonObject.getString("jwt"));
 
-                                    if (NetworkManager.getInstance().checkIfUserRegistered()) {
-                                        if (NetworkManager.getInstance().login()) {
-                                            DataManager.getInstance().institution = institutionList.get(position).name;
-                                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                            startActivity(intent);
-                                            LoginActivity.this.finish();
+                                    CheckBox checkBox = (CheckBox) findViewById(R.id.choose_staff);
+                                    if(checkBox.isChecked()) {
+                                        if (NetworkManager.getInstance().checkIfStaffRegistered()) {
+                                            if (NetworkManager.getInstance().loginStaff()) {
+                                                DataManager.getInstance().institution = institutionList.get(position).name;
+                                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                                startActivity(intent);
+                                                LoginActivity.this.finish();
+                                            } else {
+                                                //TODO: complete login staff workflow
+                                            }
                                         } else {
-                                            //TODO: Need more information about the register flow so i can deal with other situations
+                                            //TODO: register staff
                                         }
                                     } else {
-                                        //TODO:REGISTER
-                                        webView.loadUrl("https://sp.data.alpha.jisc.ac.uk/Shibboleth.sso/Login?entityID=https://" + institutionList.get(position).url +
-                                                "&target=https://sp.data.alpha.jisc.ac.uk/secure/register/form.php?u=" + DataManager.getInstance().get_jwt());
+                                        if (NetworkManager.getInstance().checkIfUserRegistered()) {
+                                            if (NetworkManager.getInstance().login()) {
+                                                DataManager.getInstance().institution = institutionList.get(position).name;
+                                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                                startActivity(intent);
+                                                LoginActivity.this.finish();
+                                            } else {
+                                                //TODO: Need more information about the register flow so i can deal with other situations
+                                            }
 
-                                        webView.setVisibility(View.VISIBLE);
+                                        } else {
+                                            //TODO:REGISTER
+                                            webView.loadUrl("https://sp.data.alpha.jisc.ac.uk/Shibboleth.sso/Login?entityID=https://" + institutionList.get(position).url +
+                                                    "&target=https://sp.data.alpha.jisc.ac.uk/secure/register/form.php?u=" + DataManager.getInstance().get_jwt());
+
+                                            webView.setVisibility(View.VISIBLE);
+                                        }
                                     }
                                 } catch (Exception e) {
                                     e.printStackTrace();

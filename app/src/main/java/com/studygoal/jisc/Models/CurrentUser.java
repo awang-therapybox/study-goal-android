@@ -6,6 +6,9 @@ import com.activeandroid.annotation.Table;
 
 @Table(name = "User")
 public class CurrentUser extends Model {
+
+    @Column(name = "staff_id")
+    public String staff_id;
     @Column(name = "uid")
     public String id;
     @Column(name = "jisc_student_id")
@@ -28,6 +31,9 @@ public class CurrentUser extends Model {
     public String created_date;
     @Column(name = "modified_date")
     public String modified_date;
+    @Column(name = "isStaff")
+    public boolean isStaff;
+
     public String last_week_activity_points;
     public String overall_activity_points;
 
