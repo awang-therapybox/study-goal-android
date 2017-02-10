@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "147677483837",
+    "project_id": "jiscdevtest"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:147677483837:android:371d04b030661d53",
+        "android_client_info": {
+          "package_name": "com.studygoal.jisc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "147677483837-ivatnoj50loitslt2sesq6d1ire22i6l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbH3j_Q-UE283BE0EIBan5tiiPmwhuiGg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
