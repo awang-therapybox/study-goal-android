@@ -47,6 +47,7 @@ import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
 import com.studygoal.jisc.Models.ActivityHistory;
 import com.studygoal.jisc.Models.CurrentUser;
+import com.studygoal.jisc.Models.Module;
 import com.studygoal.jisc.Models.ReceivedRequest;
 import com.studygoal.jisc.Models.RunningActivity;
 import com.studygoal.jisc.Utils.CircleTransform;
@@ -237,7 +238,19 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void run() {
                 Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+
                 NetworkManager.getInstance().getModules();
+                if(DataManager.getInstance().user.isStaff) {
+                    for (int i = 0; i < 3; i++) {
+                        Module modules = new Module();
+
+                        modules.id = "dummy"+(i+1);
+                        modules.name = "Dummy Module "+(i+1);
+                        modules.save();
+                    }
+                } else {
+                    NetworkManager.getInstance().getModules();
+                }
                 NetworkManager.getInstance().getStretchTargets(DataManager.getInstance().user.id);
                 NetworkManager.getInstance().getFriends(DataManager.getInstance().user.id);
                 NetworkManager.getInstance().getFriendRequests(DataManager.getInstance().user.id);

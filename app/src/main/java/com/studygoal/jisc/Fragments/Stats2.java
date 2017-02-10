@@ -1,6 +1,8 @@
 package com.studygoal.jisc.Fragments;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -13,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
+import com.facebook.TestUserManager;
 import com.studygoal.jisc.Adapters.AttainmentAdapter;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
@@ -21,6 +24,8 @@ import com.studygoal.jisc.Models.Attainment;
 import com.studygoal.jisc.R;
 
 import java.util.Timer;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class Stats2 extends Fragment {
 
@@ -220,19 +225,20 @@ public class Stats2 extends Fragment {
             });
 
         mainView.findViewById(R.id.next).setVisibility(View.INVISIBLE);
-//        mainView.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                getActivity().getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.main_fragment, new Stats3())
-//                        .addToBackStack(null)
-//                        .commit();
-//            }
-//        });
 
-        if(DataManager.getInstance().user.isStaff) {
+        final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+        if(DataManager.getInstance().user.isStaff && preferences.getBoolean("stats_alert",true)) {
+
             android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(getActivity());
             alertDialogBuilder.setMessage(R.string.statistics_admin_view);
+            alertDialogBuilder.setPositiveButton("Don't show again", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putBoolean("stats_alert",false);
+                    editor.apply();
+                }
+            });
             alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

@@ -4078,7 +4078,7 @@ public class NetworkManager {
     }
 
     /**
-     * checkIfUserRegistered() => checks if the user is registered;
+     * checkIfStaffRegistered() => checks if the user is registered;
      *
      * @return true/false
      */
@@ -4371,34 +4371,35 @@ public class NetworkManager {
                 is.close();
 
                 JSONObject jsonObject = new JSONObject(sb.toString());
+                Log.e("JISC","Modules: "+jsonObject.toString());
 
                 ActiveAndroid.beginTransaction();
 
                 try {
                     new Delete().from(Module.class).execute();
 
-                    JSONArray jsonObject2 = jsonObject.getJSONArray("modules");
-                    JSONArray jsonObject3 = jsonObject.getJSONArray("courses");
-                    for (int i = 0; i < jsonObject2.length(); i++) {
-                        Module modules = new Module();
-                        String sModule = jsonObject2.get(i).toString();
+                    if(!DataManager.getInstance().user.isStaff) {
+                        JSONArray jsonObject2 = jsonObject.getJSONArray("modules");
+                        for (int i = 0; i < jsonObject2.length(); i++) {
+                            Module modules = new Module();
+                            String sModule = jsonObject2.get(i).toString();
+                            String[] separated = sModule.split(":");
 
-                        String[] separated = sModule.split(":");
+                            modules.id = separated[0].replace("\"", "").replace("{", "").replace("}", "");
+                            modules.name = separated[1].replace("\"", "").replace("{", "").replace("}", "");
 
-                        modules.id = separated[0].replace("\"", "").replace("{", "").replace("}", "");
-                        modules.name = separated[1].replace("\"", "").replace("{", "").replace("}", "");
-
-                        modules.save();
+                            modules.save();
+                        }
                     }
 
+                    JSONArray jsonObject3 = jsonObject.getJSONArray("courses");
                     for (int j = 0; j < jsonObject3.length(); j++) {
                         Courses courses = new Courses();
-                        String sCourses = jsonObject3.get(j).toString();
-                        String[] separated = sCourses.split(":");
-                        courses.id = separated[0].replace("\"", "").replace("{", "").replace("}", "");
-                        courses.name = separated[1].replace("\"", "").replace("{", "").replace("}", "");
-                        if (new Select().from(Courses.class).where("course_id = ?", courses.id).execute().size() == 0)
+                        courses.id = ""+j;
+                        courses.name = jsonObject3.getString(j);
+                        if (new Select().from(Courses.class).where("course_id = ?", courses.id).execute().size() == 0) {
                             courses.save();
+                        }
                     }
 
                     ActiveAndroid.setTransactionSuccessful();
@@ -4407,34 +4408,8 @@ public class NetworkManager {
                 }
                 return true;
 
-//                try {
-//                    new Delete().from(Module.class).execute();
-//                    Iterator<String> iterator = jsonObject.keys();
-//                    while (iterator.hasNext()) {
-////                        JSONArray jsonObject2 = jsonObject.getJSONArray("modules");
-//                        Module module = new Module();
-//                        String modules = jsonObject2.getString(0);
-//                        String[] separted = modules.split(":");
-//                        module.id = separted[0];
-//                        module.name = separted[1];
-////                        Courses courses = new Courses();
-////                        String courses1 = jsonObject2.opt(0).toString();
-////                        String[] separate = courses1.split(":");
-////                        courses.id = separate[0];
-////                        courses.name = separate[1];
-////                        System.out.println("ceva");
-//                        if (new Select().from(Module.class).where("module_id = ?", module.id).execute().size() == 0)
-//                            module.save();
-//                    }
-//                    ActiveAndroid.setTransactionSuccessful();
-//                } finally {
-//                    ActiveAndroid.endTransaction();
-//                }
-//                return true;
             } catch (Exception e) {
                 e.printStackTrace();
-
-                Log.e("getModules", "try-catch;");
                 return false;
             }
         }
