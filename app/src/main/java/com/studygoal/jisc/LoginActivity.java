@@ -11,6 +11,7 @@ import android.support.v7.widget.AppCompatTextView;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -175,7 +176,11 @@ public class LoginActivity extends Activity {
                                 String json = url.split("\\?")[1];
                                 try {
                                     JSONObject jsonObject = new JSONObject(java.net.URLDecoder.decode(json, "UTF-8"));
-                                    DataManager.getInstance().set_jwt(jsonObject.getString("jwt"));
+
+                                    // Token can be replaced here for testing individuals.
+                                    String token = jsonObject.getString("jwt");
+
+                                    DataManager.getInstance().set_jwt(token);
 
                                     CheckBox checkBox = (CheckBox) findViewById(R.id.choose_staff);
                                     if(checkBox.isChecked()) {

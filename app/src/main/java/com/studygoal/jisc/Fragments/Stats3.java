@@ -226,7 +226,7 @@ public class Stats3 extends Fragment {
 //                items.add(getString(R.string.last_24_hours));
                 items.add(getString(R.string.last_7_days));
                 items.add(getString(R.string.last_30_days));
-                items.add(getString(R.string.Overall));
+                //items.add(getString(R.string.Overall));
                 final ListView listView = (ListView) dialog.findViewById(R.id.dialog_listview);
                 listView.setAdapter(new GenericAdapter(DataManager.getInstance().mainActivity, period.getText().toString(), items));
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
