@@ -29,6 +29,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
@@ -56,6 +57,7 @@ import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends FragmentActivity {
@@ -222,14 +224,11 @@ public class MainActivity extends FragmentActivity {
         });
         addTarget = (RelativeLayout) findViewById(R.id.main_screen_addtarget);
 
-
         DataManager.getInstance().mainActivity = this;
+
         NetworkManager.getInstance().getAppSettings(DataManager.getInstance().user.id);
-
-
         NetworkManager.getInstance().getMyTrophies();
 
-        //Decide where to place it
         if (new Select().from(ActivityHistory.class).count() == 0) {
             NetworkManager.getInstance().getActivityHistory(DataManager.getInstance().user.id);
         }
@@ -239,18 +238,22 @@ public class MainActivity extends FragmentActivity {
             public void run() {
                 Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
-                NetworkManager.getInstance().getModules();
+
                 if(DataManager.getInstance().user.isStaff) {
+                    ActiveAndroid.beginTransaction();
+                    new Delete().from(Module.class).execute();
                     for (int i = 0; i < 3; i++) {
                         Module modules = new Module();
-
-                        modules.id = "dummy"+(i+1);
+                        modules.id = "DUMMY_"+(i+1);
                         modules.name = "Dummy Module "+(i+1);
                         modules.save();
                     }
+                    ActiveAndroid.setTransactionSuccessful();
+                    ActiveAndroid.endTransaction();
                 } else {
                     NetworkManager.getInstance().getModules();
                 }
+
                 NetworkManager.getInstance().getStretchTargets(DataManager.getInstance().user.id);
                 NetworkManager.getInstance().getFriends(DataManager.getInstance().user.id);
                 NetworkManager.getInstance().getFriendRequests(DataManager.getInstance().user.id);
@@ -260,7 +263,6 @@ public class MainActivity extends FragmentActivity {
 
         Intent intentService = new Intent(this, Syncronize.class);
         startService(intentService);
-
 
         if (DataManager.getInstance().home_screen == null) {
             DataManager.getInstance().home_screen = "feed";
@@ -476,6 +478,12 @@ public class MainActivity extends FragmentActivity {
                                     android.webkit.CookieManager.getInstance().removeAllCookies(null);
                                     DataManager.getInstance().checkForbidden = false;
                                     DataManager.getInstance().set_jwt("");
+
+                                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("jwt", "").apply();
+                                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_checked", "").apply();
+                                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_staff", "").apply();
+                                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", "").apply();
+
                                     new Delete().from(CurrentUser.class).execute();
                                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                                     startActivity(intent);
@@ -493,7 +501,6 @@ public class MainActivity extends FragmentActivity {
                         }
                     }
                 }
-
             }
         });
     }

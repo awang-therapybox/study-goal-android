@@ -48,6 +48,7 @@ import com.studygoal.jisc.Utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -182,7 +183,7 @@ public class Stats3 extends Fragment {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                 getActivity().runOnUiThread(new Runnable() {
+                                getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         if (module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && (compareTo.getText().toString().equals(getString(R.string.average)) || compareTo.getText().toString().equals(getString(R.string.top10))) ){
@@ -417,26 +418,165 @@ public class Stats3 extends Fragment {
         }
 
         if(DataManager.getInstance().user.isStaff) {
-            //generate 10 random data set
-
             list = new ArrayList<>();
-            for(int i=0;i<10;i++) {
-                ED item = new ED();
-                item.hour = ""+ (Math.abs(new Random().nextInt()) % 24);
-                item.activity_points = Math.abs(new Random().nextInt()) % 100;
 
-                list.add(item);
-            }
+            if (compareTo.getText().toString().equals(getString(R.string.no_one))) {
+                if (period.getText().toString().equals(getString(R.string.last_7_days))) {
+                    for (int i = 0; i < 7; i++) {
+                        ED item = new ED();
+                        item.day = "" + (i+1);
+                        item.activity_points = Math.abs(new Random().nextInt()) % 100;
 
-            Collections.sort(list, new Comparator<ED>() {
-                @Override
-                public int compare(ED s1, ED s2) {
-                    return Integer.parseInt(s2.hour) - Integer.parseInt(s1.hour);
+                        list.add(item);
+                    }
+
+                    Collections.sort(list, new Comparator<ED>() {
+                        @Override
+                        public int compare(ED s1, ED s2) {
+                            return s1.day.compareToIgnoreCase(s2.day);
+                        }
+                    });
+                } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
+
+                    for (int i = 0; i < 30; i++) {
+                        ED item = new ED();
+                        item.day = "" + (i+1);
+                        item.activity_points = Math.abs(new Random().nextInt()) % 100;
+
+                        list.add(item);
+                    }
+
+                    Collections.sort(list, new Comparator<ED>() {
+                        @Override
+                        public int compare(ED s1, ED s2) {
+                            return s1.day.compareToIgnoreCase(s2.day);
+                        }
+                    });
+                }  else if (period.getText().toString().equals(getString(R.string.overall))) {
+
+                    try {
+
+                        Calendar calendar = Calendar.getInstance();
+
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                        Date startDate = dateFormat.parse("01/01/2017");
+                        Date now = new Date();
+
+                        while (now.after(startDate)) {
+                            int numberOfDays = Math.abs(new Random().nextInt()) % 5 + 1;
+                            calendar.setTime(startDate);
+                            calendar.add(Calendar.DATE, numberOfDays);
+
+                            startDate = calendar.getTime();
+
+                            ED item = new ED();
+                            item.day = dateFormat.format(startDate);
+                            item.realDate = startDate;
+                            item.activity_points = Math.abs(new Random().nextInt()) % 100;
+
+                            list.add(item);
+                        }
+
+                        Collections.sort(list, new Comparator<ED>() {
+                            @Override
+                            public int compare(ED s1, ED s2) {
+                                return s1.realDate.compareTo(s2.realDate);
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            });
+            } else {
+                if (period.getText().toString().equals(getString(R.string.last_7_days))) {
+                    for (int i = 0; i < 7; i++) {
+                        ED item = new ED();
+                        item.day = "" + (i+1);
+                        item.activity_points = Math.abs(new Random().nextInt()) % 100;
+                        item.student_id = DataManager.getInstance().user.jisc_student_id;
+                        list.add(item);
+
+                        ED item1 = new ED();
+                        item1.day = "" + (i+1);
+                        item1.activity_points = Math.abs(new Random().nextInt()) % 100;
+                        item1.student_id = "";
+                        list.add(item1);
+                    }
+
+                    Collections.sort(list, new Comparator<ED>() {
+                        @Override
+                        public int compare(ED s1, ED s2) {
+                            return s1.day.compareToIgnoreCase(s2.day);
+                        }
+                    });
+                } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
+
+                    for (int i = 0; i < 30; i++) {
+                        ED item = new ED();
+                        item.day = "" + (i+1);
+                        item.activity_points = Math.abs(new Random().nextInt()) % 100;
+                        item.student_id = DataManager.getInstance().user.jisc_student_id;
+                        list.add(item);
+
+                        ED item1 = new ED();
+                        item1.day = "" + (i+1);
+                        item1.activity_points = Math.abs(new Random().nextInt()) % 100;
+                        item1.student_id = "";
+                        list.add(item1);
+                    }
+
+                    Collections.sort(list, new Comparator<ED>() {
+                        @Override
+                        public int compare(ED s1, ED s2) {
+                            return s1.day.compareToIgnoreCase(s2.day);
+                        }
+                    });
+                }  else if (period.getText().toString().equals(getString(R.string.overall))) {
+
+                    try {
+
+                        Calendar calendar = Calendar.getInstance();
+
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                        Date startDate = dateFormat.parse("01/01/2017");
+                        Date now = new Date();
+
+                        while (now.after(startDate)) {
+                            int numberOfDays = Math.abs(new Random().nextInt()) % 5 + 1;
+                            calendar.setTime(startDate);
+                            calendar.add(Calendar.DATE, numberOfDays);
+
+                            startDate = calendar.getTime();
+
+                            ED item = new ED();
+                            item.day = dateFormat.format(startDate);
+                            item.realDate = startDate;
+                            item.activity_points = Math.abs(new Random().nextInt()) % 100;
+                            item.student_id = DataManager.getInstance().user.jisc_student_id;
+                            list.add(item);
+
+                            ED item1 = new ED();
+                            item1.day = dateFormat.format(startDate);
+                            item1.realDate = startDate;
+                            item1.activity_points = Math.abs(new Random().nextInt()) % 100;
+                            item1.student_id = "";
+                            list.add(item1);
+                        }
+
+                        Collections.sort(list, new Comparator<ED>() {
+                            @Override
+                            public int compare(ED s1, ED s2) {
+                                return s1.realDate.compareTo(s2.realDate);
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else if (module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && compareTo.getText().toString().equals(getString(R.string.no_one)) && period.getText().toString().equals("Overall")) {
             list = NetworkManager.getInstance().get_ED();
-        }else if(module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && !compareTo.getText().toString().equals(getString(R.string.no_one))){
+        } else if(module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && !compareTo.getText().toString().equals(getString(R.string.no_one))){
             list = NetworkManager.getInstance().get_ED_for_time_period_module_and_compareTo_allActivity(DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase(),compareValue,compareType);
         } else if (module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && compareTo.getText().toString().equals(getString(R.string.no_one)) && !period.getText().toString().equals("")) {
             list = NetworkManager.getInstance().get_ED_for_time_period(DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase());
@@ -466,79 +606,8 @@ public class Stats3 extends Fragment {
 
         ArrayList<String> xVals = new ArrayList<>();
 
-        if (compareTo.getText().toString().equals(getString(R.string.no_one)) || DataManager.getInstance().user.isStaff) {
-            if (period.getText().toString().equals(getString(R.string.last_24_hours)) || DataManager.getInstance().user.isStaff) {
-
-                ViewGroup.LayoutParams params_main = chart_layout.getLayoutParams();
-                params_main.width = Utils.dpToPx((int) ((list.size() + 2) * 78.57142857));
-                chart_layout.setLayoutParams(params_main);
-
-                ViewGroup.LayoutParams params = lineChart.getLayoutParams();
-                params.width = Utils.dpToPx((int) ((list.size() + 2) * 78.57142857));
-                lineChart.setLayoutParams(params);
-
-                String name = getString(R.string.me);
-                ArrayList<Entry> vals1 = new ArrayList<>();
-                ArrayList<BarEntry> vals2 = new ArrayList<>();
-
-                for (int i = 0; i < list.size(); i++) {
-                    vals1.add(new Entry(list.get(i).activity_points, xVals.size()));
-                    xVals.add(list.get(i).hour);
-                    vals2.add(new BarEntry(list.get(i).activity_points, xVals.size()));
-                }
-
-                vals1.add(new Entry(0, xVals.size()));
-                xVals.add("");
-
-                // create a dataset and give it a type
-                LineDataSet set1 = new LineDataSet(vals1, name);
-                set1.setDrawCubic(false);
-                set1.setCubicIntensity(0.0f);
-                set1.setDrawFilled(true);
-                set1.setDrawCircles(false);
-                set1.setLineWidth(1.2f);
-                set1.setCircleSize(2f);
-                set1.setCircleColor(0xFF8864C8);
-                set1.setColor(0xFF8864C8);
-                set1.setFillColor(0xFF8864C8);
-                set1.setFillAlpha(0);
-                set1.setDrawHorizontalHighlightIndicator(true);
-
-                // create a data object with the datasets
-                LineData data = new LineData(xVals, set1);
-                data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                data.setValueTextSize(14f);
-                data.setDrawValues(false);
-
-                BarDataSet barDataSet = new BarDataSet(vals2,name);
-                barDataSet.setColor(0xFF8864C8);
-                barDataSet.setDrawValues(true);
-                barDataSet.setValueTextSize(15);
-                barDataSet.setValueTextColor(0xFF000000);
-
-                BarData barData = new BarData(xVals,barDataSet);
-                barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                barData.setValueTextSize(15f);
-                barData.setDrawValues(true);
-
-                barchart.getAxisLeft().setDrawGridLines(false);
-                barchart.getXAxis().setDrawGridLines(false);
-                barchart.setDrawValueAboveBar(true);
-                barchart.setDrawBorders(false);
-                barchart.setBackgroundColor(Color.TRANSPARENT);
-                barchart.setDrawGridBackground(false);
-                barchart.setMaxVisibleValueCount(vals1.size());
-                barchart.setBackgroundColor(0xFFFFFFFF);
-                barchart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-
-                // set data
-                lineChart.setData(data);
-
-                barchart.setData(barData);
-                barchart.invalidate();
-                barchart.setTouchEnabled(false);
-
-            } else if (period.getText().toString().equals(getString(R.string.last_7_days))) {
+        if (compareTo.getText().toString().equals(getString(R.string.no_one))) {
+            if (period.getText().toString().equals(getString(R.string.last_7_days))) {
 
                 ViewGroup.LayoutParams params_main = chart_layout.getLayoutParams();
                 params_main.width = Utils.dpToPx((int) ((list.size() + 2) * 78.57142857));
@@ -554,6 +623,7 @@ public class Stats3 extends Fragment {
 
                 ArrayList<Entry> vals1 = new ArrayList<>();
                 ArrayList<BarEntry> vals2 = new ArrayList<>();
+
                 String name = getString(R.string.me);
 
                 String day;
@@ -570,8 +640,6 @@ public class Stats3 extends Fragment {
                     vals2.add(new BarEntry(list.get(i).activity_points, xVals.size()));
                     xVals.add(day);
                 }
-//                vals1.add(new Entry(0, xVals.size()));
-//                xVals.add("");
 
                 // create a dataset and give it a type
                 LineDataSet set1 = new LineDataSet(vals1, name);
@@ -639,9 +707,6 @@ public class Stats3 extends Fragment {
                 String name = getString(R.string.me);
                 Integer val1 = 0;
 
-//                xVals.add(0, "");
-//                vals1.add(new Entry(0, 0));
-
                 Collections.reverse(list);
 
                 Date date = new Date();
@@ -661,9 +726,6 @@ public class Stats3 extends Fragment {
                         val1 = 0;
                     }
                 }
-
-//                vals1.add(new Entry(0, xVals.size()));
-//                xVals.add("");
 
                 // create a dataset and give it a type
                 LineDataSet set1 = new LineDataSet(vals1, name);
@@ -732,15 +794,13 @@ public class Stats3 extends Fragment {
                 ArrayList<Entry> vals1 = new ArrayList<>();
                 ArrayList<BarEntry> vals2 = new ArrayList<>();
                 String name = getString(R.string.me);
-//                vals1.add(new Entry(0, 0));
-//                xVals.add("");
+
                 for (int i = 0; i < list.size(); i++) {
                     vals1.add(new Entry(list.get(i).activity_points, xVals.size()));
                     vals2.add(new BarEntry(list.get(i).activity_points, xVals.size()));
                     xVals.add(list.get(i).day);
                 }
-//                vals1.add(new Entry(0, xVals.size()));
-//                xVals.add("");
+
                 // create a dataset and give it a type
                 LineDataSet set1 = new LineDataSet(vals1, name);
                 set1.setDrawCubic(false);
@@ -824,9 +884,6 @@ public class Stats3 extends Fragment {
                 for (int i = 0; i < vals3.size(); i++) {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
                     day = dateFormat.format(date);
-//                    String[] days = new String[] { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY" };
-//                    day = days[c.get(Calendar.DAY_OF_WEEK)-1];
-//                    c.setTimeInMillis(c.getTimeInMillis() + 86400000);
                     date.setTime(date.getTime() + 86400000);
                     vals1.add(new Entry((Integer) vals3.get(i), xVals.size()));
                     vals2.add(new Entry((Integer) vals4.get(i), xVals.size()));
@@ -836,7 +893,7 @@ public class Stats3 extends Fragment {
                 }
 
                 xVals.add("");
-                // create a dataset and give it a type
+
                 LineDataSet set1 = new LineDataSet(vals1, name);
                 set1.setDrawCubic(false);
                 set1.setCubicIntensity(0.0f);
@@ -851,9 +908,8 @@ public class Stats3 extends Fragment {
                 set1.setDrawHorizontalHighlightIndicator(true);
 
                 ArrayList<LineDataSet> dataSets = new ArrayList<>();
-                dataSets.add(set1); // add the datasets
+                dataSets.add(set1);
 
-                // create a dataset and give it a type
                 LineDataSet set2 = new LineDataSet(vals2, compareTo.getText().toString());
                 set2.setDrawCubic(false);
                 set2.setCubicIntensity(0.0f);
@@ -868,7 +924,6 @@ public class Stats3 extends Fragment {
                 set2.setDrawHorizontalHighlightIndicator(true);
                 dataSets.add(set2);
 
-                // create a data object with the datasets
                 LineData data = new LineData(xVals, dataSets);
                 data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
                 data.setValueTextSize(14f);
@@ -885,7 +940,6 @@ public class Stats3 extends Fragment {
                 barddataset.add(barDataSet1);
                 barDataSet.setColor(0xFF8864C8);
                 BarData barData = new BarData(xVals,barddataset);
-                // set data
 
                 barchart.getAxisLeft().setDrawGridLines(false);
                 barchart.getXAxis().setDrawGridLines(false);
@@ -971,7 +1025,6 @@ public class Stats3 extends Fragment {
 
                 ArrayList<LineDataSet> dataSets = new ArrayList<>();
 
-                // create a dataset and give it a type
                 LineDataSet set1 = new LineDataSet(vals1, name);
                 set1.setDrawCubic(false);
                 set1.setCubicIntensity(0.0f);
@@ -1005,7 +1058,6 @@ public class Stats3 extends Fragment {
                 data.setValueTextSize(14f);
                 data.setDrawValues(false);
 
-                // set data
                 lineChart.setData(data);
 
                 ArrayList<BarDataSet> barddataset = new ArrayList<>();
@@ -1016,7 +1068,6 @@ public class Stats3 extends Fragment {
                 barddataset.add(barDataSet1);
                 barDataSet.setColor(0xFF8864C8);
                 BarData barData = new BarData(xVals,barddataset);
-                // set data
 
                 barchart.getAxisLeft().setDrawGridLines(false);
                 barchart.getXAxis().setDrawGridLines(false);
@@ -1140,7 +1191,6 @@ public class Stats3 extends Fragment {
                 barchart.setBackgroundColor(0xFFFFFFFF);
                 barchart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
                 barchart.setData(barData);
-
             }
         }
     }

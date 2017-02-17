@@ -14,6 +14,7 @@ import com.studygoal.jisc.MainActivity;
 import com.studygoal.jisc.Models.CurrentUser;
 import com.studygoal.jisc.Models.TrophyMy;
 import com.studygoal.jisc.R;
+import com.studygoal.jisc.Utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,6 +68,7 @@ public class DataManager {
     }
     public void set_jwt(String jwt) {
         this.jwt = jwt;
+
     }
 
     public void reload() {

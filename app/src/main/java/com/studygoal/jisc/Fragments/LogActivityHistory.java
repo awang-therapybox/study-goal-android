@@ -38,33 +38,36 @@ public class LogActivityHistory extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
         DataManager.getInstance().mainActivity.setTitle(DataManager.getInstance().mainActivity.getString(R.string.activity_log));
         DataManager.getInstance().mainActivity.hideAllButtons();
         DataManager.getInstance().mainActivity.showCertainButtons(3);
 
+        DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                DataManager.getInstance().mainActivity.showProgressBar(null);
+            }
+        });
+
         new Thread(new Runnable() {
             @Override
             public void run() {
-                DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DataManager.getInstance().mainActivity.showProgressBar(null);
-                    }
-                });
+
                 NetworkManager.getInstance().getActivityHistory(DataManager.getInstance().user.id);
-                if(adapter == null) {
-                    adapter = new ActivitiesHistoryAdapter(LogActivityHistory.this);
-                }
-                adapter.historyList = new Select().from(ActivityHistory.class).orderBy("activity_date DESC").execute();
+
                 DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        list.setAdapter(adapter);
+
+                        adapter.historyList = new Select().from(ActivityHistory.class).orderBy("activity_date DESC").execute();
                         adapter.notifyDataSetChanged();
-                        if(adapter.historyList.size() == 0)
+
+                        if(adapter.historyList.size() == 0) {
                             message.setVisibility(View.VISIBLE);
-                        else
+                        } else {
                             message.setVisibility(View.GONE);
+                        }
                         DataManager.getInstance().mainActivity.hideProgressBar();
                     }
                 });
@@ -80,11 +83,14 @@ public class LogActivityHistory extends Fragment {
 
         ((TextView)mainView.findViewById(R.id.activity_history_title)).setTypeface(DataManager.getInstance().myriadpro_regular);
 
+        adapter = new ActivitiesHistoryAdapter(LogActivityHistory.this);
         list = (ListView) mainView.findViewById(R.id.list);
+        list.setAdapter(adapter);
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+
                 String mid = v.getTag().toString().split(";")[0];
                 String text = v.getTag().toString().split(";")[1];
 
@@ -99,8 +105,6 @@ public class LogActivityHistory extends Fragment {
 
             }
         });
-
-//        DataManager.getInstance().mainActivity.showProgressBar(null);
 
         layout.setColorSchemeResources(R.color.colorPrimary);
         layout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

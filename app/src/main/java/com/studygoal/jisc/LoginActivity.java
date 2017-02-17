@@ -31,10 +31,14 @@ import com.studygoal.jisc.Adapters.InstitutionsAdapter;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
 import com.studygoal.jisc.Models.Institution;
+import com.studygoal.jisc.Utils.Utils;
 
 import org.json.JSONObject;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class LoginActivity extends Activity {
@@ -139,6 +143,68 @@ public class LoginActivity extends Activity {
             final ListView list = (ListView) findViewById(R.id.list);
             list.setAdapter(institutionsAdapter);
 
+//            getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("jwt", DataManager.getInstance().get_jwt()).apply();
+//            getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_checked", "yes").apply();
+
+            String jwt = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("jwt","");
+            String is_checked = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("is_checked","");
+            String is_staff = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("is_staff","");
+            String is_institution = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("is_institution","");
+            if(is_checked.equals("yes") && jwt.length() > 0 ) {
+                //check expiration date from JWT
+
+                try {
+                    String jwtDecoded = Utils.jwtDecoded(jwt);
+                    JSONObject json = new JSONObject(jwtDecoded);
+
+                    Long expiration = Long.parseLong(json.optString("exp"));
+                    Long timestamp = System.currentTimeMillis()/1000;
+
+                    if(expiration < timestamp) {
+                        // it is expired
+                        getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("jwt", "").apply();
+                        getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_checked", "").apply();
+                        getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_staff", "").apply();
+                        getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", "").apply();
+                    } else {
+                        //continue with login process
+                        DataManager.getInstance().set_jwt(jwt);
+
+                        if(is_staff.equals("yes")) {
+                            if (NetworkManager.getInstance().checkIfStaffRegistered()) {
+                                if (NetworkManager.getInstance().loginStaff()) {
+                                    DataManager.getInstance().institution = is_institution;
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    LoginActivity.this.finish();
+                                } else {
+                                    //TODO: complete login staff workflow
+                                }
+                            } else {
+                                //TODO: register staff
+                            }
+                        } else {
+                            if (NetworkManager.getInstance().checkIfUserRegistered()) {
+                                if (NetworkManager.getInstance().login()) {
+                                    DataManager.getInstance().institution = is_institution;
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    LoginActivity.this.finish();
+                                } else {
+                                    //TODO: Need more information about the register flow so i can deal with other situations
+                                }
+
+                            } else {
+                                //TODO:REGISTER
+                            }
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
             list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -162,9 +228,15 @@ public class LoginActivity extends Activity {
 
                     final Institution institution = (Institution) view.getTag();
 
+                    final CheckBox checkBoxLogged = (CheckBox) findViewById(R.id.choose_keeplogged);
+
                     String url = "https://sp.data.alpha.jisc.ac.uk/Shibboleth.sso/Login?entityID=https://" +
                             institution.url + "&target=https://sp.data.alpha.jisc.ac.uk/secure/auth.php?u=" +
                             DataManager.getInstance().guid;
+
+                    if(checkBoxLogged.isChecked()) {
+                        url += "&lt=true";
+                    }
 
                     webView.setVisibility(View.VISIBLE);
                     webView.clearCache(true);
@@ -179,14 +251,23 @@ public class LoginActivity extends Activity {
 
                                     // Token can be replaced here for testing individuals.
                                     String token = jsonObject.getString("jwt");
-
                                     DataManager.getInstance().set_jwt(token);
 
                                     CheckBox checkBox = (CheckBox) findViewById(R.id.choose_staff);
+
+                                    if(checkBoxLogged.isChecked()) {
+                                        getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("jwt", DataManager.getInstance().get_jwt()).apply();
+                                        getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_checked", "yes").apply();
+                                        if(checkBox.isChecked()) {
+                                            getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_staff", "yes").apply();
+                                        }
+                                    }
+
                                     if(checkBox.isChecked()) {
                                         if (NetworkManager.getInstance().checkIfStaffRegistered()) {
                                             if (NetworkManager.getInstance().loginStaff()) {
                                                 DataManager.getInstance().institution = institutionList.get(position).name;
+                                                getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", DataManager.getInstance().institution).apply();
                                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                                 startActivity(intent);
                                                 LoginActivity.this.finish();
@@ -200,6 +281,7 @@ public class LoginActivity extends Activity {
                                         if (NetworkManager.getInstance().checkIfUserRegistered()) {
                                             if (NetworkManager.getInstance().login()) {
                                                 DataManager.getInstance().institution = institutionList.get(position).name;
+                                                getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", DataManager.getInstance().institution).apply();
                                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                                 startActivity(intent);
                                                 LoginActivity.this.finish();

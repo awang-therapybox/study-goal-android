@@ -5,11 +5,14 @@ import android.content.res.Resources;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Base64;
+import android.util.Log;
 
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.LinguisticManager;
 import com.studygoal.jisc.R;
 
+import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -375,4 +378,22 @@ public class Utils {
         String[] _one = date.split("T")[0].split("-");
         return _one[2] + "-" + _one[1] + "-" + _one[0].substring(2, 4);
     }
+
+    public static String jwtDecoded(String JWTEncoded) {
+        try {
+            String[] split = JWTEncoded.split("\\.");
+            Log.d("JWT_DECODED", "Header: " + getJson(split[0]));
+            Log.d("JWT_DECODED", "Body: " + getJson(split[1]));
+
+            return getJson(split[1]);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private static String getJson(String strEncoded) throws UnsupportedEncodingException{
+        byte[] decodedBytes = Base64.decode(strEncoded, Base64.URL_SAFE);
+        return new String(decodedBytes, "UTF-8");
+    }
+
 }
