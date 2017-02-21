@@ -14,14 +14,12 @@ import com.activeandroid.query.Select;
 import com.studygoal.jisc.LoginActivity;
 import com.studygoal.jisc.Models.ActivityHistory;
 import com.studygoal.jisc.Models.Attainment;
-import com.studygoal.jisc.Models.CourseAttendant;
 import com.studygoal.jisc.Models.Courses;
 import com.studygoal.jisc.Models.CurrentUser;
 import com.studygoal.jisc.Models.ED;
 import com.studygoal.jisc.Models.Feed;
 import com.studygoal.jisc.Models.Friend;
 import com.studygoal.jisc.Models.Institution;
-import com.studygoal.jisc.Models.Mark;
 import com.studygoal.jisc.Models.Module;
 import com.studygoal.jisc.Models.PendingRequest;
 import com.studygoal.jisc.Models.ReceivedRequest;
@@ -73,7 +71,7 @@ public class NetworkManager {
     private SSLContext context;
     private Context appContext;
     private ExecutorService executorService;
-    //    public String host = "http://therapy-box.com/jisc/";
+
     public String host = "http://stuapp.analytics.alpha.jisc.ac.uk/";
 
     public static NetworkManager getInstance() {
@@ -147,9 +145,11 @@ public class NetworkManager {
         @Override
         public Friend call() {
             try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_search_student_by_email?student_id=" + student_id + "&email=" + email + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
+                String apiURL = host + "fn_search_student_by_email?student_id=" + student_id + "&email=" + email + "&language=" + language
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 int responseCode = urlConnection.getResponseCode();
@@ -231,11 +231,12 @@ public class NetworkManager {
 
     private class forgotPassword implements Callable<String> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
-        public forgotPassword(HashMap<String, String> params) {
+        forgotPassword(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social", (DataManager.getInstance().user.isSocial ? "yes":"no"));
         }
 
         @Override
@@ -278,74 +279,6 @@ public class NetworkManager {
             }
         }
     }
-
-
-    public boolean fn_view_student(String id) {
-        language = LinguisticManager.getInstance().getLanguageCode();
-        Future<Boolean> future = executorService.submit(new getStudent(id));
-        try {
-            return future.get();
-        } catch (Exception exception) {
-            return false;
-        }
-    }
-
-    private class getStudent implements Callable<Boolean> {
-
-        String id;
-
-        getStudent(String i) {
-            id = i;
-        }
-
-        @Override
-        public Boolean call() {
-            try {
-
-                HttpURLConnection urlConnection;
-
-                String api = "fn_view_student?student_id=" + id + "&language=" + language;
-
-                URL url = new URL(host + api);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
-                urlConnection.setRequestMethod("GET");
-
-                int responseCode = urlConnection.getResponseCode();
-                forbidden(responseCode);
-                if (responseCode != 200) {
-                    if (responseCode == 204)
-                        Log.i("getStudent", "No records found");
-                    else
-                        Log.e("getStudent", "Code: " + responseCode);
-                    return false;
-                }
-
-                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                is.close();
-
-                JSONArray jsonArray = new JSONArray(sb.toString());
-
-                JSONObject jsonObject = jsonArray.getJSONObject(0);
-                if (jsonObject.has("photo"))
-                    DataManager.getInstance().user.profile_pic = jsonObject.getString("photo");
-                else if (jsonObject.has("profile_pic"))
-                    DataManager.getInstance().user.profile_pic = jsonObject.getString("profile_pic");
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-    }
-
 
     public boolean updateProfileImage(String path) {
         language = LinguisticManager.getInstance().getLanguageCode();
@@ -397,13 +330,20 @@ public class NetworkManager {
 
                 wr.writeBytes(crlf + twoHyphens + boundary + crlf);
 
+                header = "Content-Disposition: form-data; name=\"is_social\"";
+                wr.writeBytes(header);
+                wr.writeBytes(crlf);
+                wr.writeBytes(crlf);
+                wr.writeBytes((DataManager.getInstance().user.isStaff?"yes":"no"));
+
+                wr.writeBytes(crlf + twoHyphens + boundary + crlf);
+
                 header = "Content-Disposition: form-data; name=\"student_id\"";
                 wr.writeBytes(header);
                 wr.writeBytes(crlf);
                 wr.writeBytes(crlf);
                 wr.writeBytes(DataManager.getInstance().user.id);
 
-                //If we have image
                 wr.writeBytes(crlf + twoHyphens + boundary + crlf);
                 header = "Content-Disposition: attachment; name=\"profile_photo\"; filename=" + DataManager.getInstance().user.id + "_" + System.currentTimeMillis() + ".png" + crlf;
                 wr.writeBytes(header);
@@ -416,28 +356,6 @@ public class NetworkManager {
                 bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
 
                 wr.write(baos.toByteArray());
-
-                Log.e("Jisc", ""+baos.toByteArray());
-
-//                int maxBufferSize = 1024 * 1024;
-//                FileInputStream fileInputStream = new FileInputStream(path);
-//
-//                // create a buffer of  maximum size
-//                int bytesAvailable = fileInputStream.available();
-//
-//                int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-//                byte[] buffer = new byte[bufferSize];
-//
-//                // read file and write it into form...
-//                int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-//
-//                while (bytesRead > 0) {
-//                    wr.write(buffer, 0, bufferSize);
-//                    bytesAvailable = fileInputStream.available();
-//                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
-//                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-//                }
-
                 wr.writeBytes(crlf + twoHyphens + boundary + twoHyphens + crlf);
 
                 wr.flush();
@@ -493,8 +411,11 @@ public class NetworkManager {
 
             List<ED> engagement_list = new ArrayList<>();
             try {
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period + "&compareType=" + compareType + "&compareValue=" + compareValue
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+
+                URL url = new URL(apiURL);
                 HttpsURLConnection urlConnection;
-                URL url = new URL("https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period + "&compareType=" + compareType + "&compareValue=" + compareValue);
                 urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
                 urlConnection.setSSLSocketFactory(context.getSocketFactory());
@@ -617,8 +538,13 @@ public class NetworkManager {
         public List<ED> call() {
             List<ED> engagement_list = new ArrayList<>();
             try {
+
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period + "&filterType=" + filterType + "&filterValue=" + filterValue + "&compareType=" + compareType + "&compareValue=" + compareValue
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+
+                URL url = new URL(apiURL);
+
                 HttpsURLConnection urlConnection;
-                URL url = new URL("https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period + "&filterType=" + filterType + "&filterValue=" + filterValue + "&compareType=" + compareType + "&compareValue=" + compareValue);
                 urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
                 urlConnection.setSSLSocketFactory(context.getSocketFactory());
@@ -738,8 +664,13 @@ public class NetworkManager {
         public List<ED> call() {
             List<ED> engagement_list = new ArrayList<>();
             try {
+
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period + "&filterType=" + filterType + "&filterValue=" + filterValue + "&compareType=" + compareType
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+
+                URL url = new URL(apiURL);
+
                 HttpsURLConnection urlConnection;
-                URL url = new URL("https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period + "&filterType=" + filterType + "&filterValue=" + filterValue + "&compareType=" + compareType);
                 urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
                 urlConnection.setSSLSocketFactory(context.getSocketFactory());
@@ -831,135 +762,6 @@ public class NetworkManager {
         }
     }
 
-    public List<ED> get_ED_for_time_period_and_module(String time_period, String module_id) {
-        Future<List<ED>> future = executorService.submit(new get_ED_for_time_period_and_module(time_period, module_id));
-        try {
-            return future.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<ED>();
-        }
-    }
-
-    private class get_ED_for_time_period_and_module implements Callable<List<ED>> {
-
-        String time_period;
-        String module_id;
-
-        get_ED_for_time_period_and_module(String time_period, String module_id) {
-            this.time_period = time_period;
-            this.module_id = module_id;
-        }
-
-        @Override
-        public List<ED> call() {
-            List<ED> engagement_list = new ArrayList<>();
-
-            try {
-                HttpsURLConnection urlConnection;
-                URL url = new URL("https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period + "&module=" + module_id);
-                urlConnection = (HttpsURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setSSLSocketFactory(context.getSocketFactory());
-                urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
-
-                int responseCode = urlConnection.getResponseCode();
-                forbidden(responseCode);
-                if (responseCode != 200) {
-                    Log.e("time_period_m", "Code: " + responseCode);
-                    return engagement_list;
-                }
-
-                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                is.close();
-
-                switch (time_period) {
-                    case "24h": {
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONObject jsonObject = new JSONObject(sb.toString());
-                        Iterator<String> iterator = jsonObject.keys();
-                        int temp = jsonObject.length();
-                        while (iterator.hasNext()) {
-                            String key = iterator.next();
-                            ED item = new ED();
-                            c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600)) * 1000);
-                            item.hour = c.get(Calendar.HOUR_OF_DAY) + ":00";
-                            item.activity_points = jsonObject.getInt(key);
-                            temp--;
-                            engagement_list.add(item);
-                        }
-                        break;
-                    }
-                    case "7d": {
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONObject jsonObject = new JSONObject(sb.toString());
-                        Iterator<String> iterator = jsonObject.keys();
-                        int temp = jsonObject.length();
-                        while (iterator.hasNext()) {
-                            String key = iterator.next();
-                            ED item = new ED();
-                            c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600 * 24)) * 1000);
-                            item.day = LinguisticManager.getInstance().getWeekDay(c.get(Calendar.DAY_OF_WEEK));
-                            item.activity_points = jsonObject.getInt(key);
-                            temp--;
-                            engagement_list.add(item);
-                        }
-                        break;
-                    }
-                    case "28d": {
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONObject jsonObject = new JSONObject(sb.toString());
-                        Iterator<String> iterator = jsonObject.keys();
-                        int temp = jsonObject.length();
-                        while (iterator.hasNext()) {
-                            String key = iterator.next();
-                            ED item = new ED();
-                            c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600 * 24)) * 1000);
-                            item.day = (((c.get(Calendar.MONTH) + 1) < 10) ? ("0" + (c.get(Calendar.MONTH) + 1)) : ((c.get(Calendar.MONTH) + 1) + "")) + "/" + ((c.get(Calendar.DAY_OF_MONTH) < 10) ? ("0" + c.get(Calendar.DAY_OF_MONTH)) : (c.get(Calendar.DAY_OF_MONTH)));
-                            item.activity_points = jsonObject.getInt(key);
-                            temp--;
-                            engagement_list.add(item);
-                        }
-                        break;
-                    }
-                    case "overall": {
-                        JSONObject jsonObject = new JSONObject(sb.toString());
-                        Iterator<String> iterator = jsonObject.keys();
-                        while (iterator.hasNext()) {
-                            String key = iterator.next();
-                            ED item = new ED();
-                            item.day = key.replace("-", "/");
-                            item.activity_points = jsonObject.getJSONObject(key).getInt(DataManager.getInstance().user.jisc_student_id + "");
-                            engagement_list.add(item);
-                        }
-                        Collections.sort(engagement_list, new Comparator<ED>() {
-                            @Override
-                            public int compare(ED s1, ED s2) {
-                                return s1.day.compareToIgnoreCase(s2.day);
-                            }
-                        });
-                        break;
-                    }
-                }
-
-                return engagement_list;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return engagement_list;
-            }
-        }
-    }
-
     public List<ED> get_ED() {
         language = LinguisticManager.getInstance().getLanguageCode();
         Future<List<ED>> future = executorService.submit(new get_ED());
@@ -983,8 +785,13 @@ public class NetworkManager {
         public List<ED> call() throws Exception {
 
             try {
+
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?"
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+
+                URL url = new URL(apiURL);
+
                 HttpsURLConnection urlConnection;
-                URL url = new URL("https://app.analytics.alpha.jisc.ac.uk/v2/engagement");
                 urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setSSLSocketFactory(context.getSocketFactory());
                 urlConnection.setRequestMethod("GET");
@@ -1061,9 +868,12 @@ public class NetworkManager {
         @Override
         public List<ED> call() throws Exception {
             try {
-                HttpsURLConnection urlConnection;
-                URL url = new URL("https://app.analytics.alpha.jisc.ac.uk/v2/engagement?filterType=" + filterType + "&filterValue=" + filterValue + "&scope=" + time_period);
-                urlConnection = (HttpsURLConnection) url.openConnection();
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?filterType=" + filterType + "&filterValue=" + filterValue + "&scope=" + time_period
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+
+                URL url = new URL(apiURL);
+
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setSSLSocketFactory(context.getSocketFactory());
                 urlConnection.setRequestMethod("GET");
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
@@ -1174,8 +984,13 @@ public class NetworkManager {
         @Override
         public List<ED> call() {
             try {
+
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+
+                URL url = new URL(apiURL);
+
                 HttpsURLConnection urlConnection;
-                URL url = new URL("https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period);
                 urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setSSLSocketFactory(context.getSocketFactory());
                 urlConnection.setRequestMethod("GET");
@@ -1279,10 +1094,6 @@ public class NetworkManager {
         }
     }
 
-
-
-    //TODO SE TERMINA AICI
-
     public boolean getMyTrophies() {
         language = LinguisticManager.getInstance().getLanguageCode();
         Future<Boolean> future = executorService.submit(new getMyTrophies());
@@ -1299,12 +1110,13 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                HttpURLConnection urlConnection;
 
                 String api = "fn_get_student_trophies?student_id=" + DataManager.getInstance().user.id + "&language=" + language;
+                String apiURL = host + api
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
 
-                URL url = new URL(host + api);
-                urlConnection = (HttpURLConnection) url.openConnection();
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
 
@@ -1312,7 +1124,6 @@ public class NetworkManager {
                 forbidden(responseCode);
                 if (responseCode != 200) {
                     if (responseCode == 204) {
-//                        Log.i("getMyTrophies", "No records found");
                         new Delete().from(TrophyMy.class).execute();
                     } else
                         Log.e("getMyTrophies", "Code: " + responseCode);
@@ -1331,7 +1142,6 @@ public class NetworkManager {
 
                 JSONArray jsonArray = new JSONArray(sb.toString());
 
-                Log.e("Jisc","Trophies "+sb.toString());
 
                 ActiveAndroid.beginTransaction();
                 try {
@@ -1378,19 +1188,20 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                HttpURLConnection urlConnection;
-
 
                 String api = "fn_get_trophies";
+                String apiURL = host + api + "?language=" + language;
+                URL url = new URL(apiURL);
 
-                URL url = new URL(host + api + "?language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
-                urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
                 if (responseCode != 200) {
+
+                    Log.e("getAllTrophies", apiURL);
+
                     if (responseCode == 204) {
                         Log.i("getAllTrophies", "No records found");
                         new Delete().from(Trophy.class).execute();
@@ -1436,7 +1247,6 @@ public class NetworkManager {
         }
     }
 
-
     public boolean getAssignmentRanking() {
         Future<Boolean> future = executorService.submit(new getAssigmentRanking());
         try {
@@ -1449,16 +1259,18 @@ public class NetworkManager {
 
     private class getAssigmentRanking implements Callable<Boolean> {
 
-
         getAssigmentRanking() {
         }
 
         @Override
         public Boolean call() {
             try {
-                HttpsURLConnection urlConnection;
-                URL url = new URL("https://app.analytics.alpha.jisc.ac.uk/v2/attainment");
-                urlConnection = (HttpsURLConnection) url.openConnection();
+
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/attainment?"
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
                 urlConnection.setSSLSocketFactory(context.getSocketFactory());
                 urlConnection.setRequestMethod("GET");
@@ -1526,9 +1338,12 @@ public class NetworkManager {
         @Override
         public String call() {
             try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_get_overall_ranking?student_id=" + student_id + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
+
+                String apiURL = host + "fn_get_overall_ranking?student_id=" + student_id + "&language=" + language
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
 
@@ -1587,7 +1402,6 @@ public class NetworkManager {
         }
     }
 
-
     public String getCurrentRanking(String student_id) {
         Future<String> future = executorService.submit(new getCurrentRanking(student_id));
         try {
@@ -1609,9 +1423,12 @@ public class NetworkManager {
         @Override
         public String call() {
             try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_get_current_week_ranking?student_id=" + student_id + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
+
+                String apiURL = host + "fn_get_current_week_ranking?student_id=" + student_id + "&language=" + language
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
 
@@ -1683,16 +1500,18 @@ public class NetworkManager {
 
     private class getStudentActivityPoint implements Callable<Boolean> {
 
-
         getStudentActivityPoint() {
         }
 
         @Override
         public Boolean call() {
             try {
-                HttpsURLConnection urlConnection;
-                URL url = new URL("https://app.analytics.alpha.jisc.ac.uk/v2/activity/points?scope=overall");
-                urlConnection = (HttpsURLConnection) url.openConnection();
+
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/activity/points?scope=overall"
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
 
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
@@ -1751,97 +1570,6 @@ public class NetworkManager {
         }
     }
 
-    public boolean getStudentMarks(String student_id) {
-        language = LinguisticManager.getInstance().getLanguageCode();
-        Future<Boolean> future = executorService.submit(new getStudentMarks(student_id));
-        try {
-            return future.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private class getStudentMarks implements Callable<Boolean> {
-
-        String student_id;
-
-        getStudentMarks(String student_id) {
-            this.student_id = student_id;
-        }
-
-        @Override
-        public Boolean call() {
-            try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_marks_obtained_by_student?student_id=" + student_id + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
-                urlConnection.setRequestMethod("GET");
-
-                int responseCode = urlConnection.getResponseCode();
-                forbidden(responseCode);
-                if (responseCode != 200) {
-                    if (responseCode == 204) {
-                        new Delete().from(Mark.class).execute();
-                        Log.i("getStudentMarks", "No records found!");
-                        return true;
-                    } else {
-                        Log.e("getStudentMarks", "Code: " + responseCode);
-                        return false;
-                    }
-                }
-
-                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                is.close();
-
-                JSONObject jsonObject = new JSONObject(sb.toString());
-                Iterator<String> keys_0 = jsonObject.keys();
-
-
-                ActiveAndroid.beginTransaction();
-                try {
-                    new Delete().from(Mark.class).execute();
-                    while (keys_0.hasNext()) {
-                        String assignment = keys_0.next();
-                        JSONObject instanceObj = jsonObject.getJSONObject(assignment);
-                        Iterator<String> keys_1 = instanceObj.keys();
-                        while (keys_1.hasNext()) {
-                            String instance = keys_1.next();
-                            JSONObject moduleObj = instanceObj.getJSONObject(instance);
-                            Iterator<String> keys_2 = moduleObj.keys();
-                            while (keys_2.hasNext()) {
-                                Mark mark = new Mark();
-                                String module = keys_2.next();
-                                String mark_value = moduleObj.getJSONArray(module).getString(0);
-                                mark.id = student_id;
-                                mark.assigment = assignment;
-                                mark.module_instance = instance;
-                                mark.module = module;
-                                mark.mark = mark_value;
-                                mark.save();
-                            }
-                        }
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-                } finally {
-                    ActiveAndroid.endTransaction();
-                }
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-    }
-
     public boolean getAppSettings(String student_id) {
         language = LinguisticManager.getInstance().getLanguageCode();
         Future<Boolean> future = executorService.submit(new getAppSettings(student_id));
@@ -1864,16 +1592,18 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_get_student_app_settings?student_id=" + student_id + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
+                String apiURL = host + "fn_get_student_app_settings?student_id=" + student_id + "&language=" + language
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
                 if (responseCode != 200) {
-                    Log.w("getAppSettings", "Code: " + responseCode);
+                    Log.e("getAppSettings", "Code: " + responseCode);
                     SharedPreferences preferences = DataManager.getInstance().mainActivity.getSharedPreferences("jisc", Context.MODE_PRIVATE);
                     DataManager.getInstance().home_screen = preferences.getString("home_screen", "feed");
                     DataManager.getInstance().language = preferences.getString("home_screen", "english");
@@ -1922,17 +1652,20 @@ public class NetworkManager {
 
     private class changeAppSettings implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         changeAppSettings(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_change_app_settings");
+                String apiURL = host + "fn_change_app_settings";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
@@ -1958,7 +1691,6 @@ public class NetworkManager {
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
                 if (responseCode != 200) {
-                    System.out.println(urlParameters);
                     Log.e("changeAppSettings", "ResponseCode = " + responseCode);
                     return false;
                 }
@@ -1985,17 +1717,20 @@ public class NetworkManager {
 
     private class postFeedMessage implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String,String> params;
 
         postFeedMessage(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_post_message");
+                String apiURL = host + "fn_post_message";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
@@ -2020,7 +1755,6 @@ public class NetworkManager {
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
                 if (responseCode != 200) {
-                    System.out.println(urlParameters);
                     Log.e("postFeedMessage", "ResponseCode = " + responseCode);
                     return false;
                 }
@@ -2032,7 +1766,6 @@ public class NetworkManager {
             }
         }
     }
-
 
     public boolean hidePost(HashMap<String, String> params) {
         language = LinguisticManager.getInstance().getLanguageCode();
@@ -2047,17 +1780,20 @@ public class NetworkManager {
 
     private class hidePost implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         hidePost(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_hide_feed");
+                String apiURL = host + "fn_hide_feed";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("PUT");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
@@ -2106,17 +1842,20 @@ public class NetworkManager {
 
     private class acceptFriendRequest implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         acceptFriendRequest(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_accept_friend_request");
+                String apiURL = host + "fn_accept_friend_request";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
@@ -2165,16 +1904,20 @@ public class NetworkManager {
 
     private class deleteFriendRequest implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         deleteFriendRequest(HashMap<String, String> params) {
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_delete_friend_request?student_id=" + params.get("student_id") + "&deleted_user=" + params.get("deleted_user") + "&language=" + language);
+                String apiURL = host + "fn_delete_friend_request?student_id=" + params.get("student_id") + "&deleted_user=" + params.get("deleted_user") + "&language=" + language
+                        + "&is_social=" + params.get("is_social");
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("DELETE");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
@@ -2207,16 +1950,20 @@ public class NetworkManager {
 
     private class cancelFriendRequest implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         cancelFriendRequest(HashMap<String, String> params) {
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_cancel_pending_friend_request?student_id=" + params.get("student_id") + "&friend_id=" + params.get("friend_id") + "&language=" + language);
+                String apiURL = host + "fn_cancel_pending_friend_request?student_id=" + params.get("student_id") + "&friend_id=" + params.get("friend_id") + "&language=" + language
+                        + "&is_social=" + params.get("is_social");
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("DELETE");
@@ -2236,7 +1983,6 @@ public class NetworkManager {
         }
     }
 
-
     public boolean deleteFriend(HashMap<String, String> params) {
         language = LinguisticManager.getInstance().getLanguageCode();
         Future<Boolean> future_result = executorService.submit(new deleteFriend(params));
@@ -2250,16 +1996,20 @@ public class NetworkManager {
 
     private class deleteFriend implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         deleteFriend(HashMap<String, String> params) {
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_delete_friend?student_id=" + params.get("student_id") + "&friend_id=" + params.get("friend_id") + "&language=" + language);
+                String apiURL = host + "fn_delete_friend?student_id=" + params.get("student_id") + "&friend_id=" + params.get("friend_id") + "&language=" + language
+                        + "&is_social=" + params.get("is_social");
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("DELETE");
@@ -2292,17 +2042,20 @@ public class NetworkManager {
 
     private class changeFriendSettings implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         changeFriendSettings(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_change_friend_settings");
+                String apiURL = host + "fn_change_friend_settings";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
@@ -2338,7 +2091,6 @@ public class NetworkManager {
         }
     }
 
-    //TODO: Send Friend Request
     public boolean sendFriendRequest(HashMap<String, String> params) {
         language = LinguisticManager.getInstance().getLanguageCode();
         Future<Boolean> future_result = executorService.submit(new sendFriendRequest(params));
@@ -2352,17 +2104,20 @@ public class NetworkManager {
 
     private class sendFriendRequest implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         sendFriendRequest(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_send_friend_request");
+                String apiURL = host + "fn_send_friend_request";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
@@ -2432,9 +2187,11 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_list_friend_requests?student_id=" + student_id + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
+                String apiURL = host + "fn_list_friend_requests?student_id=" + student_id + "&language=" + language
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
 
@@ -2572,9 +2329,11 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_list_sent_friend_requests?student_id=" + student_id + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
+                String apiURL = host + "fn_list_sent_friend_requests?student_id=" + student_id + "&language=" + language
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
 
@@ -2689,101 +2448,6 @@ public class NetworkManager {
         }
     }
 
-    public boolean getStudentsInSameCourse(String student_id) {
-        language = LinguisticManager.getInstance().getLanguageCode();
-        Future<Boolean> future = executorService.submit(new getStudentsInSameCourse(student_id));
-        try {
-            return future.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private class getStudentsInSameCourse implements Callable<Boolean> {
-
-        String student_id;
-
-        getStudentsInSameCourse(String student_id) {
-            this.student_id = student_id;
-        }
-
-        @Override
-        public Boolean call() {
-            try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_get_students_in_same_course?student_id=" + student_id + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
-
-                int responseCode = urlConnection.getResponseCode();
-                forbidden(responseCode);
-                if (responseCode != 200) {
-                    if (responseCode == 204) {
-                        Log.i("getStudentsInSameCourse", "No records found");
-                        new Delete().from(CourseAttendant.class).execute();
-                    } else
-                        Log.e("getStudentsInSameCourse", "Code: " + responseCode);
-                    return false;
-                }
-
-                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                is.close();
-
-                JSONArray jsonArray = new JSONArray(sb.toString());
-
-                ActiveAndroid.beginTransaction();
-                try {
-                    new Delete().from(CourseAttendant.class).execute();
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        CourseAttendant item = new CourseAttendant();
-                        item.student_id = jsonObject.getString("student_id");
-                        item.id = jsonObject.getString("id");
-                        item.institution_id = jsonObject.getString("institution_id");
-                        item.dob = jsonObject.getString("dob");
-                        item.race_code = jsonObject.getString("race_code");
-                        item.sex_code = jsonObject.getString("sex_code");
-                        item.age = jsonObject.getString("age");
-                        item.learning_difficulty_code = jsonObject.getString("learning_difficulty_code");
-                        item.accommodation_code = jsonObject.getString("accommodation_code");
-                        item.disability_code = jsonObject.getString("disability_code");
-                        item.country_code = jsonObject.getString("country_code");
-                        item.parents_qualification = jsonObject.getString("parents_qualification");
-                        item.overseas_code = jsonObject.getString("overseas_code");
-                        item.first_name = jsonObject.getString("first_name");
-                        item.last_name = jsonObject.getString("last_name");
-                        item.address_line_1 = jsonObject.getString("address_line_1");
-                        item.address_line_2 = jsonObject.getString("address_line_2");
-                        item.address_line_3 = jsonObject.getString("address_line_3");
-                        item.address_line_4 = jsonObject.getString("address_line_4");
-                        item.postal_code = jsonObject.getString("postal_code");
-                        item.email = jsonObject.getString("email");
-                        item.home_phone = jsonObject.getString("home_phone");
-                        item.mobile_phone = jsonObject.getString("mobile_phone");
-                        item.photo = jsonObject.getString("photo");
-                        item.save();
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-                } finally {
-                    ActiveAndroid.endTransaction();
-                }
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-    }
-
     public boolean getFriends(String student_id) {
         language = LinguisticManager.getInstance().getLanguageCode();
         Future<Boolean> future = executorService.submit(new getFriends(student_id));
@@ -2806,17 +2470,33 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_list_friends?student_id=" + student_id + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
+                String apiURL = host + "fn_list_friends?student_id=" + student_id + "&language=" + language
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
                 if (responseCode != 200) {
+                    Log.e("getFriends",""+apiURL);
+                    Log.e("getFriends","JWT: "+DataManager.getInstance().get_jwt());
+
+                    InputStream is = new BufferedInputStream(urlConnection.getErrorStream());
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    is.close();
+
+                    Log.e("getFriends",""+sb.toString());
+
                     if (responseCode == 204) {
-                        Log.i("getFriends", "No records found");
+                        Log.e("getFriends", "No records found");
                         new Delete().from(Friend.class).execute();
                     } else {
                         Log.e("getFriends", "Code: " + responseCode);
@@ -2893,9 +2573,11 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_get_feeds?student_id=" + student_id + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
+                String apiURL = host + "fn_get_feeds?student_id=" + student_id + "&language=" + language
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
 
@@ -2971,9 +2653,11 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_get_stretch_targets?student_id=" + student_id + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
+                String apiURL = host + "fn_get_stretch_targets?student_id=" + student_id + "&language=" + language
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
 
@@ -3039,17 +2723,20 @@ public class NetworkManager {
 
     private class addStretchTarget implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         addStretchTarget(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_add_stretch_target");
+                String apiURL = host + "fn_add_stretch_target";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
@@ -3101,17 +2788,20 @@ public class NetworkManager {
 
     private class unhideFriend implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         unhideFriend(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_unhide_friend");
+                String apiURL = host + "fn_unhide_friend";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
@@ -3158,19 +2848,22 @@ public class NetworkManager {
         }
     }
 
-    class hideFriend implements Callable<Boolean> {
+    private class hideFriend implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
-        public hideFriend(HashMap<String, String> params) {
+        hideFriend(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_hide_friend");
+                String apiURL = host + "fn_hide_friend";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
@@ -3206,125 +2899,6 @@ public class NetworkManager {
         }
     }
 
-    public boolean editStretchTarget(HashMap<String, String> params) {
-        language = LinguisticManager.getInstance().getLanguageCode();
-        Future<Boolean> future_result = executorService.submit(new editStretchTarget(params));
-        try {
-            return future_result.get(NETWORK_TIMEOUT, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private class editStretchTarget implements Callable<Boolean> {
-
-        HashMap params;
-
-        editStretchTarget(HashMap<String, String> params) {
-            params.put("language", language);
-            this.params = params;
-        }
-
-        @Override
-        public Boolean call() {
-            try {
-                URL url = new URL(host + "fn_edit_stretch_target");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
-                urlConnection.setRequestMethod("PUT");
-                urlConnection.setDoInput(true);
-                urlConnection.setDoOutput(true);
-
-                String urlParameters = "";
-                Iterator it = params.entrySet().iterator();
-                for (int i = 0; it.hasNext(); i++) {
-                    Map.Entry entry = (Map.Entry) it.next();
-                    if (i == 0)
-                        urlParameters += entry.getKey() + "=" + entry.getValue();
-                    else
-                        urlParameters += "&" + entry.getKey() + "=" + entry.getValue();
-                }
-
-                DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
-                wr.writeBytes(urlParameters);
-                wr.flush();
-                wr.close();
-
-                int responseCode = urlConnection.getResponseCode();
-                forbidden(responseCode);
-                if (responseCode != 200) {
-                    Log.e("editStretchTarget", "ResponseCode = " + responseCode);
-                    return false;
-                }
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-    }
-
-    public boolean deleteStretchTarget(HashMap<String, String> params) {
-        language = LinguisticManager.getInstance().getLanguageCode();
-        Future<Boolean> future_result = executorService.submit(new deleteStretchTarget(params));
-        try {
-            return future_result.get(NETWORK_TIMEOUT, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private class deleteStretchTarget implements Callable<Boolean> {
-
-        HashMap params;
-
-        deleteStretchTarget(HashMap<String, String> params) {
-            params.put("language", language);
-            this.params = params;
-        }
-
-        @Override
-        public Boolean call() {
-            try {
-                URL url = new URL(host + "fn_delete_stretch_target ");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
-                urlConnection.setRequestMethod("PUT");
-                urlConnection.setDoInput(true);
-                urlConnection.setDoOutput(true);
-
-                String urlParameters = "";
-                Iterator it = params.entrySet().iterator();
-                for (int i = 0; it.hasNext(); i++) {
-                    Map.Entry entry = (Map.Entry) it.next();
-                    if (i == 0)
-                        urlParameters += entry.getKey() + "=" + entry.getValue();
-                    else
-                        urlParameters += "&" + entry.getKey() + "=" + entry.getValue();
-                }
-
-                DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
-                wr.writeBytes(urlParameters);
-                wr.flush();
-                wr.close();
-
-                int responseCode = urlConnection.getResponseCode();
-                forbidden(responseCode);
-                if (responseCode != 200) {
-                    Log.e("deleteStretchTarget", "ResponseCode = " + responseCode);
-                    return false;
-                }
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-    }
-
-
     public boolean deleteTarget(HashMap<String, String> params) {
         language = LinguisticManager.getInstance().getLanguageCode();
         Future<Boolean> future_result = executorService.submit(new deleteTarget(params));
@@ -3338,17 +2912,20 @@ public class NetworkManager {
 
     private class deleteTarget implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         deleteTarget(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_delete_target");
+                String apiURL = host + "fn_delete_target";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
@@ -3397,17 +2974,20 @@ public class NetworkManager {
 
     private class editTarget implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         editTarget(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_edit_target");
+                String apiURL = host + "fn_edit_target";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
@@ -3456,17 +3036,20 @@ public class NetworkManager {
 
     private class addTarget implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         addTarget(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_add_target");
+                String apiURL = host + "fn_add_target";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("POST");
@@ -3490,8 +3073,7 @@ public class NetworkManager {
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
-                if (responseCode != 200 && responseCode != 403) {
-                    System.out.println(urlParameters);
+                if (responseCode != 200) {
                     Log.e("addTarget", "ResponseCode = " + responseCode);
                     return false;
                 }
@@ -3526,9 +3108,12 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_get_targets?student_id=" + student_id + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
+
+                String apiURL = host + "fn_get_targets?student_id=" + student_id + "&language=" + language
+                        + "&is_social=" + (DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
 
@@ -3598,16 +3183,20 @@ public class NetworkManager {
 
     private class deleteActivity implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
-        public deleteActivity(HashMap<String, String> params) {
+        deleteActivity(HashMap<String, String> params) {
             this.params = params;
+            this.params.put("is_social",DataManager.getInstance().user.isSocial?"yes":"no");
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_delete_activity_log?student_id=" + DataManager.getInstance().user.id + "&log_id=" + params.get("log_id") + "&language=" + language);
+                String apiURL = host + "fn_delete_activity_log?student_id=" + DataManager.getInstance().user.id + "&log_id=" + params.get("log_id") + "&language=" + language
+                        + "&is_social="+params.get("is_social");
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("DELETE");
@@ -3640,17 +3229,20 @@ public class NetworkManager {
 
     private class editActivity implements Callable<Boolean> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         editActivity(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social",DataManager.getInstance().user.isSocial?"yes":"no");
         }
 
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_edit_activity_log");
+                String apiURL = host + "fn_edit_activity_log";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
@@ -3699,17 +3291,20 @@ public class NetworkManager {
 
     private class addActivity implements Callable<String> {
 
-        HashMap params;
+        HashMap<String, String> params;
 
         addActivity(HashMap<String, String> params) {
             params.put("language", language);
             this.params = params;
+            this.params.put("is_social", (DataManager.getInstance().user.isSocial ? "yes":"no"));
         }
 
         @Override
         public String call() {
             try {
-                URL url = new URL(host + "fn_add_activity_log");
+                String apiURL = host + "fn_add_activity_log";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("POST");
@@ -3734,8 +3329,19 @@ public class NetworkManager {
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
                 if (responseCode != 200) {
-                    System.out.println(urlParameters);
+
+                    InputStream is = new BufferedInputStream(urlConnection.getErrorStream());
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    is.close();
+
                     Log.e("addActivity", "ResponseCode = " + responseCode);
+                    Log.e("addActivity", "Response = " + sb.toString());
+
                     return responseCode + "";
                 }
                 System.out.println(urlParameters);
@@ -3772,7 +3378,9 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_staff_login");
+                String apiURL = host + "fn_staff_login";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
@@ -3805,6 +3413,7 @@ public class NetworkManager {
                 JSONObject jsonObject = new JSONObject(sb.toString());
 
                 new Delete().from(CurrentUser.class).execute();
+
                 DataManager.getInstance().user = new CurrentUser();
                 DataManager.getInstance().user.id = jsonObject.getInt("id") + "";
                 DataManager.getInstance().user.staff_id = jsonObject.getString("staff_id");
@@ -3854,7 +3463,9 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_login");
+                String apiURL = host + "fn_login";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
@@ -3871,6 +3482,7 @@ public class NetworkManager {
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
                 if (responseCode != 200) {
+                    Log.e("fn_login","Response code: "+responseCode);
                     return false;
                 }
 
@@ -3941,7 +3553,9 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                URL url = new URL(host + "fn_social_login");
+                String apiURL = host + "fn_social_login";
+                URL url = new URL(apiURL);
+
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
 
@@ -3971,9 +3585,8 @@ public class NetworkManager {
                     }
                     is.close();
 
-                    Log.e("JISC",""+sb.toString());
-
-
+                    Log.e("loginSocial", "Response code: "+responseCode);
+                    Log.e("loginSocial", ""+sb.toString());
                     return false;
                 }
 
@@ -3988,7 +3601,6 @@ public class NetworkManager {
 
                 JSONObject jsonObject = new JSONObject(sb.toString());
                 Log.e("JISC",""+jsonObject.toString());
-
 
                 new Delete().from(CurrentUser.class).execute();
                 DataManager.getInstance().user = new CurrentUser();
@@ -4044,8 +3656,11 @@ public class NetworkManager {
         public Boolean call() {
 
             try {
+
+                String apiURL = "https://sp.data.alpha.jisc.ac.uk/student";
+                URL url = new URL(apiURL);
+
                 HttpsURLConnection urlConnection;
-                URL url = new URL("https://sp.data.alpha.jisc.ac.uk/student");
                 urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setSSLSocketFactory(context.getSocketFactory());
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
@@ -4053,6 +3668,7 @@ public class NetworkManager {
 
                 int responseCode = urlConnection.getResponseCode();
                 if (responseCode != 200) {
+                    Log.e("checkIfUserRegistered", "Response code: "+responseCode);
                     return false;
                 }
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
@@ -4103,15 +3719,18 @@ public class NetworkManager {
         public Boolean call() {
 
             try {
-                HttpsURLConnection urlConnection;
-                URL url = new URL("https://sp.data.alpha.jisc.ac.uk/staff");
-                urlConnection = (HttpsURLConnection) url.openConnection();
+
+                String apiURL = "https://sp.data.alpha.jisc.ac.uk/staff";
+                URL url = new URL(apiURL);
+
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setSSLSocketFactory(context.getSocketFactory());
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
 
                 int responseCode = urlConnection.getResponseCode();
                 if (responseCode != 200) {
+                    Log.e("checkIfStaffRegistered", "Response code: "+responseCode);
                     return false;
                 }
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
@@ -4164,9 +3783,10 @@ public class NetworkManager {
         @Override
         public String call() {
             try {
-                HttpsURLConnection urlConnection;
-                URL url = new URL("https://app.analytics.alpha.jisc.ac.uk/idps");
-                urlConnection = (HttpsURLConnection) url.openConnection();
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/idps";
+                URL url = new URL(apiURL);
+
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setSSLSocketFactory(context.getSocketFactory());
                 urlConnection.setRequestMethod("GET");
 
@@ -4247,9 +3867,11 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                HttpURLConnection urlConnection;
-                URL url = new URL(host + "fn_get_activity_logs?student_id=" + student_id + "&language=" + language);
-                urlConnection = (HttpURLConnection) url.openConnection();
+                String apiURL = host + "fn_get_activity_logs?student_id=" + student_id + "&language=" + language
+                        + "&is_social="+(DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
 
@@ -4330,9 +3952,12 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
-                HttpsURLConnection urlConnection;
-                URL url = new URL("https://app.analytics.alpha.jisc.ac.uk/v2/filter");
-                urlConnection = (HttpsURLConnection) url.openConnection();
+
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/filter?"
+                        + "&is_social="+(DataManager.getInstance().user.isSocial?"yes":"no");
+                URL url = new URL(apiURL);
+
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setSSLSocketFactory(context.getSocketFactory());
@@ -4433,29 +4058,5 @@ public class NetworkManager {
             }
         }
         return true;
-    }
-
-    public static void deleteCache(Context context) {
-        try {
-            File dir = context.getCacheDir();
-            deleteDir(dir);
-        } catch (Exception e) {}
-    }
-
-    public static boolean deleteDir(File dir) {
-        if (dir != null && dir.isDirectory()) {
-            String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-            return dir.delete();
-        } else if(dir!= null && dir.isFile()) {
-            return dir.delete();
-        } else {
-            return false;
-        }
     }
 }

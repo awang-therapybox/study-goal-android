@@ -66,6 +66,7 @@ public class DataManager {
     public String get_jwt() {
         return jwt;
     }
+
     public void set_jwt(String jwt) {
         this.jwt = jwt;
 
@@ -95,11 +96,6 @@ public class DataManager {
         api_values.put(context.getString(R.string.studying_science), "Studying (science)");
         api_values.put(context.getString(R.string.coursework_exams), "Coursework/Exams");
         api_values.put(context.getString(R.string.attending), "Attending");
-
-//        display_values.put(context.getString(R.string.studying_arts), "Studying (Arts)");
-//        display_values.put(context.getString(R.string.studying_science), "Studying (Science)");
-//        display_values.put(context.getString(R.string.coursework_exams), "Coursework/Exams");
-//        display_values.put(context.getString(R.string.attending), "Attending");
 
         choose_activity = new HashMap<>();
         ArrayList<String> tmp = new ArrayList<>();

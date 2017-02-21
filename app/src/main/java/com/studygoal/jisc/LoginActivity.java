@@ -143,16 +143,11 @@ public class LoginActivity extends Activity {
             final ListView list = (ListView) findViewById(R.id.list);
             list.setAdapter(institutionsAdapter);
 
-//            getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("jwt", DataManager.getInstance().get_jwt()).apply();
-//            getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_checked", "yes").apply();
-
             String jwt = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("jwt","");
             String is_checked = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("is_checked","");
             String is_staff = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("is_staff","");
             String is_institution = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("is_institution","");
             if(is_checked.equals("yes") && jwt.length() > 0 ) {
-                //check expiration date from JWT
-
                 try {
                     String jwtDecoded = Utils.jwtDecoded(jwt);
                     JSONObject json = new JSONObject(jwtDecoded);
