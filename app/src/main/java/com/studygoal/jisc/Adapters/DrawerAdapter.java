@@ -29,7 +29,7 @@ public class DrawerAdapter extends BaseAdapter {
     public DrawerAdapter(Context con) {
         context = con;
         inflater = LayoutInflater.from(con);
-        values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.stats), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
+        values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.check_in), con.getString(R.string.stats), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
     }
 
     //Numarul de rows
@@ -84,12 +84,20 @@ public class DrawerAdapter extends BaseAdapter {
                 case 2: {
                     textView = (TextView) convertView.findViewById(R.id.drawer_item_text);
                     textView.setTypeface(DataManager.getInstance().myriadpro_regular);
+                    textView.setText(context.getString(R.string.check_in));
+                    imageView = (ImageView) convertView.findViewById(R.id.drawer_item_icon);
+                    Glide.with(context).load(R.drawable.checkin).into(imageView);
+                    break;
+                }
+                case 3: {
+                    textView = (TextView) convertView.findViewById(R.id.drawer_item_text);
+                    textView.setTypeface(DataManager.getInstance().myriadpro_regular);
                     textView.setText(context.getString(R.string.stats));
                     imageView = (ImageView) convertView.findViewById(R.id.drawer_item_icon);
                     Glide.with(context).load(R.drawable.stats_icon).into(imageView);
                     break;
                 }
-                case 3: {
+                case 4: {
                     textView = (TextView) convertView.findViewById(R.id.drawer_item_text);
                     textView.setTypeface(DataManager.getInstance().myriadpro_regular);
                     textView.setText(context.getString(R.string.log));
@@ -97,7 +105,7 @@ public class DrawerAdapter extends BaseAdapter {
                     Glide.with(context).load(R.drawable.log_icon).into(imageView);
                     break;
                 }
-                case 4: {
+                case 5: {
                     textView = (TextView) convertView.findViewById(R.id.drawer_item_text);
                     textView.setTypeface(DataManager.getInstance().myriadpro_regular);
                     textView.setText(context.getString(R.string.target));

@@ -36,6 +36,7 @@ import com.bumptech.glide.Glide;
 import com.lb.auto_fit_textview.AutoResizeTextView;
 import com.studygoal.jisc.Adapters.DrawerAdapter;
 import com.studygoal.jisc.Fragments.AddTarget;
+import com.studygoal.jisc.Fragments.CheckInFragment;
 import com.studygoal.jisc.Fragments.FeedFragment;
 import com.studygoal.jisc.Fragments.Friends;
 import com.studygoal.jisc.Fragments.LogActivityHistory;
@@ -72,7 +73,6 @@ public class MainActivity extends FragmentActivity {
     ListView navigationView;
     public DrawerAdapter adapter;
     View menu, blackout;
-    ProgressDialog progress;
 
     @Override
     protected void onResume() {
@@ -87,7 +87,7 @@ public class MainActivity extends FragmentActivity {
 
     public void refreshDrawer() {
         if (adapter != null) {
-            adapter.values = new String[]{"0", getString(R.string.feed), getString(R.string.stats), getString(R.string.log), getString(R.string.target), getString(R.string.logout)};
+            adapter.values = new String[]{"0", getString(R.string.feed), getString(R.string.check_in), getString(R.string.stats), getString(R.string.log), getString(R.string.target), getString(R.string.logout)};
             adapter.notifyDataSetChanged();
         }
     }
@@ -297,6 +297,10 @@ public class MainActivity extends FragmentActivity {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.main_fragment, new TargetFragment())
                     .commit();
+        } else if (DataManager.getInstance().home_screen.toLowerCase().equals("checkin")) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_fragment, new CheckInFragment())
+                    .commit();
         }
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -349,6 +353,12 @@ public class MainActivity extends FragmentActivity {
                         break;
                     }
                     case 2: {
+                        getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.main_fragment, new CheckInFragment())
+                                    .commit();
+                        break;
+                    }
+                    case 3: {
                         if (isLandscape)
                             getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.main_fragment, new Stats())
@@ -359,20 +369,20 @@ public class MainActivity extends FragmentActivity {
                                     .commit();
                         break;
                     }
-                    case 3: {
+                    case 4: {
                         logFragment = new LogActivityHistory();
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_fragment, logFragment)
                                 .commit();
                         break;
                     }
-                    case 4: {
+                    case 5: {
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_fragment, new TargetFragment())
                                 .commit();
                         break;
                     }
-                    case 5: {
+                    case 6: {
                         break;
                     }
                 }
@@ -429,6 +439,7 @@ public class MainActivity extends FragmentActivity {
                             }
                             selectedPosition = 3;
                             drawer.closeDrawer(GravityCompat.START);
+
                             break;
                         }
                         case 4: {
@@ -444,6 +455,18 @@ public class MainActivity extends FragmentActivity {
                             break;
                         }
                         case 5: {
+                            adapter.selected_image = (ImageView) view.findViewById(R.id.drawer_item_icon);
+                            adapter.selected_text = (TextView) view.findViewById(R.id.drawer_item_text);
+                            adapter.selected_image.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
+                            adapter.selected_text.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
+                            for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
+                                getSupportFragmentManager().popBackStackImmediate();
+                            }
+                            selectedPosition = 5;
+                            drawer.closeDrawer(GravityCompat.START);
+                            break;
+                        }
+                        case 6: {
                             final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
                             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                             dialog.setContentView(R.layout.confirmation_dialog);

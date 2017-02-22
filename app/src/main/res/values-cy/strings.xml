@@ -449,4 +449,6 @@
     <string name="facebook_app_id">1841301559462853</string>
     <string name="facebook_error_email">In order to continue, the app needs EMAIL permission</string>
     <string name="login_keeplogged">Keep me logged in</string>
+    <string name="check_in">Check-in</string>
+    <string name="send_pin_title">Send PIN</string>
 </resources>
