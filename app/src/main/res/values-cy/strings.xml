@@ -451,4 +451,6 @@
     <string name="login_keeplogged">Keep me logged in</string>
     <string name="check_in">Check-in</string>
     <string name="send_pin_title">Send PIN</string>
+    <string name="alert_invalid_pin">Your pin is invalid!</string>
+    <string name="alert_valid_pin">Pin succesfully set!</string>
 </resources>

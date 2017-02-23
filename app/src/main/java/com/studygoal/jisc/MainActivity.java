@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -58,6 +59,9 @@ import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -695,19 +699,41 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    private void savebitmap(Bitmap bmp) {
+        String extStorageDirectory = Environment.getExternalStorageDirectory().toString();
+        OutputStream outStream = null;
+        // String temp = null;
+        File file = new File(extStorageDirectory, "temp.png");
+        if (file.exists()) {
+            file.delete();
+            file = new File(extStorageDirectory, "temp.png");
+
+        }
+
+        try {
+            outStream = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+            outStream.flush();
+            outStream.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
         if (requestCode == 100) {
-            final String imagePath = getRealPathFromURI(MainActivity.this, intent.getData());
+            Bitmap photo = (Bitmap)intent.getExtras().get("data");
+            savebitmap(photo);
+
+            final String imagePath = Environment.getExternalStorageDirectory().toString() + "/temp.png";
             showProgressBar(null);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-
-                    Log.e("Jisc","Image Path: "+imagePath);
-
                     if (NetworkManager.getInstance().updateProfileImage(imagePath)) {
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
@@ -723,7 +749,6 @@ public class MainActivity extends FragmentActivity {
                             hideProgressBar();
                         }
                     });
-
                 }
             }).start();
         } else if (requestCode == 101) {

@@ -287,7 +287,7 @@ public class LoginActivity extends Activity {
                                         } else {
                                             //TODO:REGISTER
                                             webView.loadUrl("https://sp.data.alpha.jisc.ac.uk/Shibboleth.sso/Login?entityID=https://" + institutionList.get(position).url +
-                                                    "&target=https://sp.data.alpha.jisc.ac.uk/secure/register/form.php?u=" + DataManager.getInstance().get_jwt());
+                                                "&target=https://sp.data.alpha.jisc.ac.uk/secure/register/form.php?u=" + DataManager.getInstance().get_jwt());
 
                                             webView.setVisibility(View.VISIBLE);
                                         }

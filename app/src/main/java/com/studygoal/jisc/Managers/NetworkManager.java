@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -3630,6 +3631,53 @@ public class NetworkManager {
 
     // **************************************************
 
+    public boolean setUserPin(String pin_text_edit_text, String location) {
+        Future<Boolean> futureResult = executorService.submit(new setUserPin(pin_text_edit_text, location));
+        try {
+            return futureResult.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private class setUserPin implements Callable<Boolean> {
+
+        String pin;
+        String location;
+
+        setUserPin(String pin, String location) {
+            this.pin = pin;
+            this.location = location;
+        }
+
+        @Override
+        public Boolean call() {
+
+            try {
+                Long tsLong = System.currentTimeMillis()/1000;
+                String ts = tsLong.toString();
+
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/checkin?checkinpin="+this.pin+"&geo_tag="+this.location+"&timestamp="+ts;
+                URL url = new URL(apiURL);
+
+                HttpsURLConnection urlConnection;
+                urlConnection = (HttpsURLConnection) url.openConnection();
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
+                urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
+                urlConnection.setRequestMethod("GET");
+
+                int responseCode = urlConnection.getResponseCode();
+                return  (responseCode == 200);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
+
     /**
      * checkIfUserRegistered() => checks if the user is registered;
      *
@@ -3645,7 +3693,6 @@ public class NetworkManager {
             return false;
         }
     }
-
 
     private class checkIfUserRegistered implements Callable<Boolean> {
 
@@ -3682,10 +3729,14 @@ public class NetworkManager {
 
                 JSONObject jsonObject = new JSONObject(sb.toString());
 
-                if (jsonObject.getString("APPSHIB_ID") != JSONObject.NULL && !jsonObject.getString("APPSHIB_ID").contentEquals(""))
+                if (jsonObject.has("APPSHIB_ID")
+                        && !jsonObject.getString("APPSHIB_ID").equals("")
+                            && !jsonObject.getString("APPSHIB_ID").equals("null")
+                        ){
                     return true;
-                else
+                } else {
                     return false;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
