@@ -24,6 +24,8 @@ import android.widget.TextView;
 import com.activeandroid.query.Select;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -33,6 +35,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.studygoal.jisc.Adapters.GenericAdapter;
 import com.studygoal.jisc.Adapters.ModuleAdapter2;
 import com.studygoal.jisc.MainActivity;
@@ -69,7 +72,6 @@ public class Stats3 extends Fragment {
     AppCompatTextView compareTo;
     RelativeLayout chart_layout;
     List<ED> list;
-    HorizontalScrollView graph_scroll;
 
     @Override
     public void onResume() {
@@ -81,49 +83,74 @@ public class Stats3 extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View mainView = inflater.inflate(R.layout.stats3, container, false);
+        final View mainView = inflater .inflate(R.layout.stats3, container, false);
 
         lineChart = (LineChart) mainView.findViewById(R.id.chart);
         barchart = (BarChart) mainView.findViewById(R.id.barchart);
         chart_layout = (RelativeLayout) mainView.findViewById(R.id.chart_layout);
 
-        graph_scroll = (HorizontalScrollView) mainView.findViewById(R.id.horizontal_graph_scroll);
+//        graph_scroll = (HorizontalScrollView) mainView.findViewById(R.id.horizontal_graph_scroll);
 
         // no description text
-        lineChart.setDescription("");
-        barchart.setDescription("");
+        lineChart.getDescription().setEnabled(false);
+        barchart.getDescription().setEnabled(false);
 
         // enable touch gestures
         lineChart.setTouchEnabled(false);
-
-        // enable scaling and dragging
         lineChart.setDragEnabled(false);
         lineChart.setScaleEnabled(false);
-
-        // if disabled, scaling can be done on x- and y-axis separately
         lineChart.setPinchZoom(false);
-
         lineChart.setDrawGridBackground(false);
-
-        YAxis y = lineChart.getAxisLeft();
-        y.setTypeface(DataManager.getInstance().myriadpro_regular);
-        y.setStartAtZero(true);
-        y.setTextColor(Color.BLACK);
-        y.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        y.setDrawGridLines(true);
-        y.setAxisLineColor(Color.TRANSPARENT);
-
-        XAxis x = lineChart.getXAxis();
-        x.setTypeface(DataManager.getInstance().myriadpro_regular);
-        x.setTextColor(Color.BLACK);
-        x.setPosition(XAxis.XAxisPosition.BOTTOM);
-        x.setDrawGridLines(false);
-        x.setAxisLineColor(Color.BLACK);
-
         lineChart.getAxisRight().setEnabled(false);
-        lineChart.getLegend().setEnabled(true);
+
+        barchart.setTouchEnabled(false);
+        barchart.setDragEnabled(false);
+        barchart.setScaleEnabled(false);
+        barchart.setPinchZoom(false);
+        barchart.setDrawGridBackground(false);
+        barchart.getAxisRight().setEnabled(false);
+
+        YAxis yAxis = lineChart.getAxisLeft();
+        yAxis.setTypeface(DataManager.getInstance().myriadpro_regular);
+        yAxis.setTextColor(Color.BLACK);
+        yAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        yAxis.setDrawGridLines(true);
+        yAxis.setAxisLineColor(Color.TRANSPARENT);
+        yAxis.setTextSize(14f);
+
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setTypeface(DataManager.getInstance().myriadpro_regular);
+        xAxis.setTextColor(Color.BLACK);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setAxisLineColor(Color.BLACK);
+        xAxis.setTextSize(14f);
+        xAxis.setGranularity(1f);
+
 
         Legend legend = lineChart.getLegend();
+        legend.setTextSize(14f);
+        legend.setTypeface(DataManager.getInstance().myriadpro_regular);
+
+        yAxis = barchart.getAxisLeft();
+        yAxis.setTypeface(DataManager.getInstance().myriadpro_regular);
+        yAxis.setTextSize(14f);
+        yAxis.setTextColor(Color.BLACK);
+        yAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        yAxis.setDrawGridLines(true);
+        yAxis.setAxisLineColor(Color.TRANSPARENT);
+
+        xAxis = barchart.getXAxis();
+        xAxis.setTypeface(DataManager.getInstance().myriadpro_regular);
+        xAxis.setTextColor(Color.BLACK);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setTextSize(14f);
+        xAxis.setDrawLabels(true);
+        xAxis.setAxisLineColor(Color.BLACK);
+        xAxis.setGranularity(1f);
+
+        legend = barchart.getLegend();
         legend.setTextSize(14f);
         legend.setTypeface(DataManager.getInstance().myriadpro_regular);
 
@@ -604,29 +631,25 @@ public class Stats3 extends Fragment {
 
     private void setData() {
 
-        ArrayList<String> xVals = new ArrayList<>();
+        lineChart.setData(null);
+        lineChart.getXAxis().setValueFormatter(null);
+        lineChart.notifyDataSetChanged();
+        lineChart.invalidate();
+
+        barchart.setData(null);
+        barchart.getXAxis().setValueFormatter(null);
+        barchart.notifyDataSetChanged();
+        barchart.invalidate();
 
         if (compareTo.getText().toString().equals(getString(R.string.no_one))) {
             if (period.getText().toString().equals(getString(R.string.last_7_days))) {
 
-                ViewGroup.LayoutParams params_main = chart_layout.getLayoutParams();
-                params_main.width = Utils.dpToPx((int) ((list.size() + 2) * 78.57142857));
-                chart_layout.setLayoutParams(params_main);
-
-                ViewGroup.LayoutParams params = lineChart.getLayoutParams();
-                params.width = Utils.dpToPx((int) ((list.size() + 2) * 78.57142857));
-                lineChart.setLayoutParams(params);
-
-                ViewGroup.LayoutParams paramsBar = barchart.getLayoutParams();
-                paramsBar.width = Utils.dpToPx((int) ((list.size() + 2) * 78.57142857));
-                barchart.setLayoutParams(paramsBar);
-
+                final ArrayList<String> xVals = new ArrayList<>();
                 ArrayList<Entry> vals1 = new ArrayList<>();
                 ArrayList<BarEntry> vals2 = new ArrayList<>();
 
                 String name = getString(R.string.me);
 
-                String day;
                 Date date = new Date();
                 date.setTime(date.getTime() - 6*86400000);
 
@@ -634,232 +657,174 @@ public class Stats3 extends Fragment {
 
                 for (int i = 0; i < list.size(); i++) {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
-                    day = dateFormat.format(date);
+                    String day = dateFormat.format(date);
                     date.setTime(date.getTime() + 86400000);
-                    vals1.add(new Entry(list.get(i).activity_points, xVals.size()));
-                    vals2.add(new BarEntry(list.get(i).activity_points, xVals.size()));
+                    vals1.add(new Entry(xVals.size(), list.get(i).activity_points));
+                    vals2.add(new BarEntry(xVals.size(), list.get(i).activity_points));
                     xVals.add(day);
                 }
 
-                // create a dataset and give it a type
                 LineDataSet set1 = new LineDataSet(vals1, name);
-                set1.setDrawCubic(false);
                 set1.setCubicIntensity(0.0f);
                 set1.setDrawFilled(true);
                 set1.setDrawCircles(false);
-                set1.setLineWidth(1.2f);
-                set1.setCircleSize(2f);
+                set1.setCircleRadius(3f);
+                set1.setLineWidth(2f);
                 set1.setCircleColor(0xFF8864C8);
                 set1.setColor(0xFF8864C8);
                 set1.setFillColor(0xFF8864C8);
                 set1.setFillAlpha(0);
+                set1.setDrawValues(false);
+                set1.setAxisDependency(YAxis.AxisDependency.RIGHT);
                 set1.setDrawHorizontalHighlightIndicator(true);
 
-                // create a data object with the datasets
-                LineData data = new LineData(xVals, set1);
+                LineData data = new LineData(set1);
                 data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                data.setValueTextSize(14f);
                 data.setDrawValues(false);
+
+                IAxisValueFormatter valueFormatter = new IAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value, AxisBase axis) {
+                        if(xVals.size() > value)
+                            return xVals.get((int)value);
+                        else
+                            return "";
+                    }
+                };
+
+                lineChart.getXAxis().setValueFormatter(valueFormatter);
+                lineChart.setData(data);
+                lineChart.invalidate();
 
                 BarDataSet barDataSet = new BarDataSet(vals2,name);
                 barDataSet.setColor(0xFF8864C8);
                 barDataSet.setDrawValues(true);
                 barDataSet.setValueTextSize(50);
-                barDataSet.setValueTextColor(0xFF000000);
+                barDataSet.setValueTextColor(0xff000000);
+                barDataSet.setValueTextSize(14f);
 
-                BarData barData = new BarData(xVals,barDataSet);
+                BarData barData = new BarData(barDataSet);
                 barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                barData.setValueTextSize(50f);
                 barData.setDrawValues(true);
+                barData.setValueTextColor(0xff000000);
 
-                barchart.getAxisLeft().setDrawGridLines(false);
-                barchart.getXAxis().setDrawGridLines(false);
-                barchart.setDrawValueAboveBar(true);
-                barchart.setDrawBorders(false);
-                barchart.setBackgroundColor(Color.TRANSPARENT);
-                barchart.setDrawGridBackground(false);
-                barchart.setMaxVisibleValueCount(vals1.size());
-                barchart.setBackgroundColor(0xFFFFFFFF);
-                barchart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-
-                // set data
-                lineChart.setData(data);
-
+                barchart.getXAxis().setValueFormatter(valueFormatter);
                 barchart.setData(barData);
                 barchart.invalidate();
-                barchart.setTouchEnabled(false);
 
             } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
-                ViewGroup.LayoutParams params_main = chart_layout.getLayoutParams();
-                params_main.width = Utils.dpToPx((int) (6 * 78.57142857));
-                chart_layout.setLayoutParams(params_main);
-
-                ViewGroup.LayoutParams params = lineChart.getLayoutParams();
-                params.width = Utils.dpToPx((int) (6 * 78.57142857));
-                lineChart.setLayoutParams(params);
-
-                ViewGroup.LayoutParams paramsBar = barchart.getLayoutParams();
-                paramsBar.width = Utils.dpToPx((int) (6 * 78.57142857));
-                barchart.setLayoutParams(paramsBar);
 
                 ArrayList<Entry> vals1 = new ArrayList<>();
                 ArrayList<BarEntry> vals2 = new ArrayList<>();
-                String name = getString(R.string.me);
+                final ArrayList<String> xVals = new ArrayList<>();
+
                 Integer val1 = 0;
 
                 Collections.reverse(list);
 
-                Date date = new Date();
-                long time = date.getTime() - 21*86400000;
-                date.setTime(time);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(new Date());
+                calendar.add(Calendar.DATE, -27);
+
                 String day;
 
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd");
+                SimpleDateFormat dateFormatD = new SimpleDateFormat("dd");
+                SimpleDateFormat dateFormatM = new SimpleDateFormat("MM");
                 for (int i = 0; i < list.size(); i++) {
                     val1 = val1 + list.get(i).activity_points;
                     if (i == 6 || i == 13 || i == 20 || i == 27){
-                        vals1.add(new Entry(val1, xVals.size()));
-                        vals2.add(new BarEntry(val1, xVals.size()));
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                        day = dateFormat.format(date);
-                        date.setTime(date.getTime() + 7*86400000);
+                        vals1.add(new Entry(xVals.size(), val1));
+                        vals2.add(new BarEntry(xVals.size(), val1));
+
+                        day = dateFormat.format(calendar.getTime());
+                        String month1 = dateFormatM.format(calendar.getTime());
+
+                        calendar.add(Calendar.DATE, 6);
+                        String month2 = dateFormatM.format(calendar.getTime());
+
+                        if(month1.equals(month2)) {
+                            day += "-"+dateFormatD.format(calendar.getTime());
+                        } else {
+                            day += "-"+dateFormat.format(calendar.getTime());
+                        }
+                        calendar.add(Calendar.DATE, 1);
                         xVals.add(day);
                         val1 = 0;
                     }
                 }
 
-                // create a dataset and give it a type
+                String name = getString(R.string.me);
+
+                IAxisValueFormatter valueFormatter1 = new IAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value, AxisBase axis) {
+                        if(xVals.size() > value)
+                            return xVals.get((int)value);
+                        else
+                            return "";
+                    }
+                };
+
                 LineDataSet set1 = new LineDataSet(vals1, name);
-                set1.setDrawCubic(false);
                 set1.setCubicIntensity(0.0f);
                 set1.setDrawFilled(true);
                 set1.setDrawCircles(false);
-                set1.setLineWidth(1.2f);
-                set1.setCircleSize(2f);
+                set1.setCircleRadius(3f);
+                set1.setLineWidth(2f);
                 set1.setCircleColor(0xFF8864C8);
                 set1.setColor(0xFF8864C8);
                 set1.setFillColor(0xFF8864C8);
                 set1.setFillAlpha(0);
+                set1.setDrawValues(false);
+                set1.setAxisDependency(YAxis.AxisDependency.RIGHT);
                 set1.setDrawHorizontalHighlightIndicator(true);
 
-                // create a data object with the datasets
-                LineData data = new LineData(xVals, set1);
+                LineData data = new LineData(set1);
                 data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                data.setValueTextSize(14f);
                 data.setDrawValues(false);
+
+                lineChart.getXAxis().setValueFormatter(valueFormatter1);
+                lineChart.setData(data);
+                lineChart.invalidate();
 
                 BarDataSet barDataSet = new BarDataSet(vals2,name);
                 barDataSet.setColor(0xFF8864C8);
                 barDataSet.setDrawValues(true);
                 barDataSet.setValueTextSize(50);
-                barDataSet.setValueTextColor(0xFF000000);
+                barDataSet.setValueTextColor(0xff000000);
+                barDataSet.setValueTextSize(14f);
 
-                BarData barData = new BarData(xVals,barDataSet);
+                BarData barData = new BarData(barDataSet);
                 barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                barData.setValueTextSize(50f);
                 barData.setDrawValues(true);
+                barData.setValueTextColor(0xff000000);
 
-                barchart.getAxisLeft().setDrawGridLines(false);
-                barchart.getXAxis().setDrawGridLines(false);
-                barchart.setBackgroundColor(Color.TRANSPARENT);
-                barchart.setDrawGridBackground(false);
-                barchart.setDrawBorders(false);
-                barchart.setDrawValueAboveBar(true);
-                barchart.setMaxVisibleValueCount(vals1.size());
-                barchart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-                // set data-
-                lineChart.setData(data);
-
+                barchart.getXAxis().setValueFormatter(valueFormatter1);
                 barchart.setData(barData);
                 barchart.invalidate();
-                barchart.setTouchEnabled(false);
 
-            } else if (period.getText().toString().equals(getString(R.string.overall))) {
-                int size = list.size();
-                if (size > 38) {
-                    size = 38;
-                }
-
-                ViewGroup.LayoutParams params_main = chart_layout.getLayoutParams();
-                params_main.width = Utils.dpToPx((int) ((size + 1) * 78.57142857));
-                chart_layout.setLayoutParams(params_main);
-
-                ViewGroup.LayoutParams params = lineChart.getLayoutParams();
-                params.width = Utils.dpToPx((int) ((size + 1) * 78.57142857));
-                lineChart.setLayoutParams(params);
-
-                ViewGroup.LayoutParams paramsBar = barchart.getLayoutParams();
-                paramsBar.width = Utils.dpToPx((int) ((size + 1) * 78.57142857));
-                barchart.setLayoutParams(paramsBar);
-
-                ArrayList<Entry> vals1 = new ArrayList<>();
-                ArrayList<BarEntry> vals2 = new ArrayList<>();
-                String name = getString(R.string.me);
-
-                for (int i = 0; i < list.size(); i++) {
-                    vals1.add(new Entry(list.get(i).activity_points, xVals.size()));
-                    vals2.add(new BarEntry(list.get(i).activity_points, xVals.size()));
-                    xVals.add(list.get(i).day);
-                }
-
-                // create a dataset and give it a type
-                LineDataSet set1 = new LineDataSet(vals1, name);
-                set1.setDrawCubic(false);
-                set1.setCubicIntensity(0.0f);
-                set1.setDrawFilled(true);
-                set1.setDrawCircles(false);
-                set1.setLineWidth(1.2f);
-                set1.setCircleSize(2f);
-                set1.setCircleColor(0xFF8864C8);
-                set1.setColor(0xFF8864C8);
-                set1.setFillColor(0xFF8864C8);
-                set1.setFillAlpha(0);
-                set1.setDrawHorizontalHighlightIndicator(true);
-
-                // create a data object with the datasets
-                LineData data = new LineData(xVals, set1);
-                data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                data.setValueTextSize(5f);
-                data.setDrawValues(true);
-
-                BarDataSet barDataSet = new BarDataSet(vals2,name);
-                barDataSet.setColor(0xFF8864C8);
-                barDataSet.setDrawValues(true);
-                barDataSet.setValueTextColor(0xFF000000);
-
-                BarData barData = new BarData(xVals,barDataSet);
-                barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                barData.setValueTextSize(50f);
-                barData.setDrawValues(true);
-
-                barchart.getAxisLeft().setDrawGridLines(false);
-                barchart.getXAxis().setDrawGridLines(false);
-                barchart.setDrawValueAboveBar(true);
-                barchart.setBackgroundColor(Color.TRANSPARENT);
-                barchart.setDrawBorders(false);
-                barchart.setDrawGridBackground(false);
-                barchart.setMaxVisibleValueCount(vals1.size());
-                barchart.setBackgroundColor(0xFFFFFFFF);
-                barchart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-
-                // set data
-                lineChart.setData(data);
-                barchart.setData(barData);
-                barchart.invalidate();
-                barchart.setTouchEnabled(false);
             }
         } else {
             if (period.getText().toString().equals(getString(R.string.last_7_days))) {
 
+                final ArrayList<String> xVals = new ArrayList<>();
+
                 ArrayList vals3 = new ArrayList<>();
                 ArrayList vals4 = new ArrayList<>();
+
                 ArrayList<Entry> vals1 = new ArrayList<>();
                 ArrayList<Entry> vals2 = new ArrayList<>();
+
                 ArrayList<BarEntry> vals5 = new ArrayList<>();
                 ArrayList<BarEntry> vals6 = new ArrayList<>();
+
                 String name = getString(R.string.me);
                 String id = DataManager.getInstance().user.jisc_student_id;
+
                 Integer value_1;
                 Integer value_2;
+
                 String day;
                 Calendar c = Calendar.getInstance();
                 Long curr = c.getTimeInMillis() - 518400000;
@@ -895,7 +860,6 @@ public class Stats3 extends Fragment {
                 xVals.add("");
 
                 LineDataSet set1 = new LineDataSet(vals1, name);
-                set1.setDrawCubic(false);
                 set1.setCubicIntensity(0.0f);
                 set1.setDrawFilled(true);
                 set1.setDrawCircles(false);
@@ -911,7 +875,6 @@ public class Stats3 extends Fragment {
                 dataSets.add(set1);
 
                 LineDataSet set2 = new LineDataSet(vals2, compareTo.getText().toString());
-                set2.setDrawCubic(false);
                 set2.setCubicIntensity(0.0f);
                 set2.setDrawFilled(true);
                 set2.setDrawCircles(false);
@@ -924,22 +887,24 @@ public class Stats3 extends Fragment {
                 set2.setDrawHorizontalHighlightIndicator(true);
                 dataSets.add(set2);
 
-                LineData data = new LineData(xVals, dataSets);
+                LineData data = new LineData();
                 data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
                 data.setValueTextSize(14f);
                 data.setDrawValues(false);
+                data.addDataSet(set1);
+                data.addDataSet(set2);
 
                 // set data
                 lineChart.setData(data);
 
-                ArrayList<BarDataSet> barddataset = new ArrayList<>();
+                BarDataSet barDataSet1 = new BarDataSet(vals5,name);
+                barDataSet1.setColor(0xFF8864C8);
 
-                BarDataSet barDataSet = new BarDataSet(vals5,name);
-                barddataset.add(barDataSet);
-                BarDataSet barDataSet1 = new BarDataSet(vals6,compareTo.getText().toString());
-                barddataset.add(barDataSet1);
-                barDataSet.setColor(0xFF8864C8);
-                BarData barData = new BarData(xVals,barddataset);
+                BarDataSet barDataSet2 = new BarDataSet(vals6,compareTo.getText().toString());
+
+                BarData barData = new BarData();
+                barData.addDataSet(barDataSet1);
+                barData.addDataSet(barDataSet2);
 
                 barchart.getAxisLeft().setDrawGridLines(false);
                 barchart.getXAxis().setDrawGridLines(false);
@@ -955,17 +920,7 @@ public class Stats3 extends Fragment {
 
             } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
 
-                ViewGroup.LayoutParams params_main = chart_layout.getLayoutParams();
-                params_main.width = Utils.dpToPx((int) (6 * 78.57142857));
-                chart_layout.setLayoutParams(params_main);
-
-                ViewGroup.LayoutParams params = lineChart.getLayoutParams();
-                params.width = Utils.dpToPx((int) (6 * 78.57142857));
-                lineChart.setLayoutParams(params);
-
-                ViewGroup.LayoutParams paramsBar = barchart.getLayoutParams();
-                paramsBar.width = Utils.dpToPx((int) (6 * 78.57142857));
-                barchart.setLayoutParams(paramsBar);
+                final ArrayList<String> xVals = new ArrayList<>();
 
                 ArrayList vals3 = new ArrayList<>();
                 ArrayList vals4 = new ArrayList<>();
@@ -1026,7 +981,6 @@ public class Stats3 extends Fragment {
                 ArrayList<LineDataSet> dataSets = new ArrayList<>();
 
                 LineDataSet set1 = new LineDataSet(vals1, name);
-                set1.setDrawCubic(false);
                 set1.setCubicIntensity(0.0f);
                 set1.setDrawFilled(true);
                 set1.setDrawCircles(false);
@@ -1040,7 +994,6 @@ public class Stats3 extends Fragment {
                 dataSets.add(set1);
 
                 LineDataSet set2 = new LineDataSet(vals2, compareTo.getText().toString());
-                set2.setDrawCubic(false);
                 set2.setCubicIntensity(0.0f);
                 set2.setDrawFilled(true);
                 set2.setDrawCircles(false);
@@ -1053,21 +1006,23 @@ public class Stats3 extends Fragment {
                 set2.setDrawHorizontalHighlightIndicator(true);
                 dataSets.add(set2);
 
-                LineData data = new LineData(xVals, dataSets);
+                LineData data = new LineData();
+                data.addDataSet(set1);
+                data.addDataSet(set2);
                 data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
                 data.setValueTextSize(14f);
                 data.setDrawValues(false);
 
                 lineChart.setData(data);
 
-                ArrayList<BarDataSet> barddataset = new ArrayList<>();
+                BarDataSet barDataSet1 = new BarDataSet(vals5,name);
+                barDataSet1.setColor(0xFF8864C8);
 
-                BarDataSet barDataSet = new BarDataSet(vals5,name);
-                barddataset.add(barDataSet);
-                BarDataSet barDataSet1 = new BarDataSet(vals6,compareTo.getText().toString());
-                barddataset.add(barDataSet1);
-                barDataSet.setColor(0xFF8864C8);
-                BarData barData = new BarData(xVals,barddataset);
+                BarDataSet barDataSet2 = new BarDataSet(vals6,compareTo.getText().toString());
+
+                BarData barData = new BarData();
+                barData.addDataSet(barDataSet1);
+                barData.addDataSet(barDataSet2);
 
                 barchart.getAxisLeft().setDrawGridLines(false);
                 barchart.getXAxis().setDrawGridLines(false);
@@ -1088,18 +1043,7 @@ public class Stats3 extends Fragment {
                     size = 38;
                 }
 
-                ViewGroup.LayoutParams params_main = chart_layout.getLayoutParams();
-                params_main.width = Utils.dpToPx((int) ((size + 2) * 78.57142857));
-                chart_layout.setLayoutParams(params_main);
-
-                ViewGroup.LayoutParams params = lineChart.getLayoutParams();
-                params.width = Utils.dpToPx((int) ((size + 2) * 78.57142857));
-                lineChart.setLayoutParams(params);
-
-                ViewGroup.LayoutParams paramsBar = barchart.getLayoutParams();
-                paramsBar.width = Utils.dpToPx((int) ((size + 2) * 78.57142857));
-                barchart.setLayoutParams(paramsBar);
-
+                final ArrayList<String> xVals = new ArrayList<>();
                 ArrayList<Entry> vals1 = new ArrayList<>();
                 ArrayList<Entry> vals2 = new ArrayList<>();
                 ArrayList<BarEntry> vals5 = new ArrayList<>();
@@ -1136,7 +1080,6 @@ public class Stats3 extends Fragment {
 
                 // create a dataset and give it a type
                 LineDataSet set1 = new LineDataSet(vals1, name);
-                set1.setDrawCubic(false);
                 set1.setCubicIntensity(0.0f);
                 set1.setDrawFilled(true);
                 set1.setDrawCircles(false);
@@ -1150,7 +1093,6 @@ public class Stats3 extends Fragment {
                 dataSets.add(set1);
 
                 LineDataSet set2 = new LineDataSet(vals2, compareTo.getText().toString());
-                set2.setDrawCubic(false);
                 set2.setCubicIntensity(0.0f);
                 set2.setDrawFilled(true);
                 set2.setDrawCircles(false);
@@ -1163,7 +1105,9 @@ public class Stats3 extends Fragment {
                 set2.setDrawHorizontalHighlightIndicator(true);
                 dataSets.add(set2);
 
-                LineData data = new LineData(xVals, dataSets);
+                LineData data = new LineData();
+                data.addDataSet(set1);
+                data.addDataSet(set2);
                 data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
                 data.setValueTextSize(14f);
                 data.setDrawValues(false);
@@ -1171,15 +1115,13 @@ public class Stats3 extends Fragment {
                 // set data
                 lineChart.setData(data);
 
-                ArrayList<BarDataSet> barddataset = new ArrayList<>();
+                BarDataSet barDataSet1 = new BarDataSet(vals5,name);
+                barDataSet1.setColor(0xFF8864C8);
+                BarDataSet barDataSet2 = new BarDataSet(vals6,compareTo.getText().toString());
 
-                BarDataSet barDataSet = new BarDataSet(vals5,name);
-                barddataset.add(barDataSet);
-                BarDataSet barDataSet1 = new BarDataSet(vals6,compareTo.getText().toString());
-                barddataset.add(barDataSet1);
-                barDataSet.setColor(0xFF8864C8);
-                BarData barData = new BarData(xVals,barddataset);
-                // set data
+                BarData barData = new BarData();
+                barData.addDataSet(barDataSet1);
+                barData.addDataSet(barDataSet2);
 
                 barchart.getAxisLeft().setDrawGridLines(false);
                 barchart.getXAxis().setDrawGridLines(false);

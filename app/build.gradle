@@ -26,8 +26,8 @@ android {
         applicationId "com.studygoal.jisc"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 4
+        versionName "1.0.3"
         multiDexEnabled true
 
     }
@@ -62,7 +62,7 @@ dependencies {
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.android.support:recyclerview-v7:25.2.0'
     compile 'com.android.support:support-v4:25.2.0'
-    compile 'com.github.PhilJay:MPAndroidChart:v2.1.6'
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
     compile files('libs/HockeySDK-3.6.0.jar')
     compile 'com.github.AndroidDeveloperLB:AutoFitTextView:4'
 

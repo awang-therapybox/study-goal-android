@@ -148,8 +148,14 @@ public class TargetAdapter extends BaseAdapter {
         text += (hour == 1) ? "1 " + context.getString(R.string.hour) : hour + " " + context.getString(R.string.hours) + " ";
         if (minute > 0)
             text += ((minute == 1) ? " " + context.getString(R.string.and) + " 1 " + context.getString(R.string.minute) + " " : " " + context.getString(R.string.and) + " " + minute + " " + context.getString(R.string.minutes) + " ");
-        text += item.time_span.toLowerCase();
-        text += module == null ? "" : " " + context.getString(R.string._for) + " " + module.name;
+
+        if(item.time_span.length() > 0)
+            text += item.time_span.toLowerCase();
+
+        if(module != null && module.name.length() > 0) {
+            text += " " + context.getString(R.string._for) + " " + module.name;
+        }
+
         textView.setText(text);
 
         final com.daimajia.swipe.SwipeLayout swipeLayout = (com.daimajia.swipe.SwipeLayout) convertView.findViewById(R.id.swipelayout);

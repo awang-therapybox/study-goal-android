@@ -130,7 +130,6 @@ public class SettingsActivity extends AppCompatActivity {
             if (intent != null) {
 
                 final String imagePath = getRealPathFromURI(fragment.imageUri);
-
                 showProgressBar(null);
 
                 new Thread(new Runnable() {

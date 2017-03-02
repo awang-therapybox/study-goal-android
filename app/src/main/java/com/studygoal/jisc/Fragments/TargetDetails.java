@@ -32,7 +32,6 @@ public class TargetDetails extends Fragment {
     public int position;
 
     public TargetDetails() {
-
     }
 
     @Override

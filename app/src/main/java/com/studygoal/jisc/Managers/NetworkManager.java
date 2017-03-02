@@ -315,6 +315,7 @@ public class NetworkManager {
                 urlConnection.setRequestProperty("Connection", "Keep-Alive");
                 urlConnection.setRequestProperty("Cache-Control", "no-cache");
                 urlConnection.setUseCaches(false);
+                urlConnection.setConnectTimeout(50000);
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
@@ -3151,7 +3152,11 @@ public class NetworkManager {
                         target.activity_type = jsonObject.getString("activity_type");
                         target.activity = jsonObject.getString("activity");
                         target.total_time = jsonObject.getInt("total_time") + "";
-                        target.time_span = jsonObject.getString("time_span");
+                        if(!jsonObject.optString("time_span").equals("null")) {
+                            target.time_span = jsonObject.getString("time_span");
+                        } else {
+                            target.time_span = "";
+                        }
                         target.module_id = jsonObject.getString("module");
                         target.because = jsonObject.getString("because");
                         target.status = jsonObject.getInt("status") + "";
@@ -3567,6 +3572,7 @@ public class NetworkManager {
                                         "&social_id="+password+
                                         "&email="+email+
                                         "&full_name=test"+
+                                        "&is_social=yes"+
                                         "&institution=1";
 
                 DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
@@ -3586,6 +3592,8 @@ public class NetworkManager {
                     }
                     is.close();
 
+                    Log.e("loginSocial", "URL: "+apiURL);
+                    Log.e("loginSocial", "parameters: "+urlParameters);
                     Log.e("loginSocial", "Response code: "+responseCode);
                     Log.e("loginSocial", ""+sb.toString());
                     return false;
@@ -3606,7 +3614,7 @@ public class NetworkManager {
                 new Delete().from(CurrentUser.class).execute();
                 DataManager.getInstance().user = new CurrentUser();
                 DataManager.getInstance().user.id = jsonObject.getInt("id") + "";
-                DataManager.getInstance().user.jisc_student_id = jsonObject.getString("jisc_student_id");
+                DataManager.getInstance().user.jisc_student_id = jsonObject.getString("id");
                 DataManager.getInstance().user.pid = jsonObject.getString("pid");
                 DataManager.getInstance().user.name = jsonObject.getString("name");
                 DataManager.getInstance().user.email = jsonObject.getString("email");
@@ -3668,6 +3676,7 @@ public class NetworkManager {
                 urlConnection.setRequestMethod("GET");
 
                 int responseCode = urlConnection.getResponseCode();
+                Log.e("Jisc","Pin: "+responseCode);
                 return  (responseCode == 200);
 
             } catch (Exception e) {
@@ -3676,7 +3685,6 @@ public class NetworkManager {
             }
         }
     }
-
 
     /**
      * checkIfUserRegistered() => checks if the user is registered;

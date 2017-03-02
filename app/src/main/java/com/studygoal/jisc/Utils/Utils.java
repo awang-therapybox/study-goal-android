@@ -382,9 +382,6 @@ public class Utils {
     public static String jwtDecoded(String JWTEncoded) {
         try {
             String[] split = JWTEncoded.split("\\.");
-            Log.d("JWT_DECODED", "Header: " + getJson(split[0]));
-            Log.d("JWT_DECODED", "Body: " + getJson(split[1]));
-
             return getJson(split[1]);
         } catch (Exception e) {
             return "";

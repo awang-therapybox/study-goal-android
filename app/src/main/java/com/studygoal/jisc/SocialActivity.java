@@ -123,8 +123,6 @@ public class SocialActivity extends AppCompatActivity implements GoogleApiClient
 
                             @Override
                             public void failure(TwitterException exception) {
-                                Log.e("TWITTER", exception.toString());
-
                                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SocialActivity.this);
                                 alertDialogBuilder.setMessage(R.string.facebook_error_email);
                                 alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {

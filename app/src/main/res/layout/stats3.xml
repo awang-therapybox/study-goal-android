@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/container"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background_color"
-    android:weightSum="10">
+              android:id="@+id/container"
+              android:orientation="vertical" android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/background_color"
+              android:weightSum="10">
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
@@ -26,29 +26,24 @@
                 android:layout_margin="10dp"
                 android:textColor="@color/dark_grey"
                 android:textSize="18sp"/>
-            <HorizontalScrollView
-                android:id="@+id/horizontal_graph_scroll"
+            <RelativeLayout
+                android:id="@+id/chart_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp">
-                    <RelativeLayout
-                        android:id="@+id/chart_layout"
-                        android:layout_width="550dp"
-                        android:layout_height="match_parent">
-                        <com.github.mikephil.charting.charts.LineChart
-                            android:id="@+id/chart"
-                            android:layout_width="550dp"
-                            android:layout_height="match_parent"
-                            android:layout_margin="3dp"/>
-                        <com.github.mikephil.charting.charts.BarChart
-                            android:id="@+id/barchart"
-                            android:layout_width="550dp"
-                            android:visibility="invisible"
-                            android:layout_height="match_parent"
-                            android:layout_margin="3dp"/>/>
-                    </RelativeLayout>
-            </HorizontalScrollView>
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp">
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="0dp"/>
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/barchart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"
+                    android:layout_margin="0dp"/>/>
+            </RelativeLayout>
 
         </LinearLayout>
 

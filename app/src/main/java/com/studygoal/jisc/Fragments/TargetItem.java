@@ -22,6 +22,7 @@ import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -30,6 +31,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.studygoal.jisc.Adapters.GenericAdapter;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.LinguisticManager;
@@ -41,8 +43,8 @@ import com.studygoal.jisc.Models.StretchTarget;
 import com.studygoal.jisc.Models.Targets;
 import com.studygoal.jisc.R;
 import com.studygoal.jisc.Utils.Utils;
-import com.studygoal.jisc.Utils.YFormatter;
-import com.studygoal.jisc.Utils.YFormatterPercent;
+//import com.studygoal.jisc.Utils.YFormatter;
+//import com.studygoal.jisc.Utils.YFormatterPercent;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -67,7 +69,6 @@ public class TargetItem extends Fragment {
 
 
     public TargetItem() {
-
     }
 
     public void showDialog() {
@@ -226,7 +227,7 @@ public class TargetItem extends Fragment {
                                             NetworkManager.getInstance().getStretchTargets(DataManager.getInstance().user.id);
 //                                            mainView.findViewById(R.id.target_set_stretch_btn).setOnClickListener(edit_stretch_target);
                                             PieChart mChart2 = (PieChart) mainView.findViewById(R.id.piechart2);
-                                            mChart2.setDescription("");
+                                            mChart2.setDescription(new Description());
                                             mChart2.setTouchEnabled(false);
 
                                             // radius of the center hole in percent of maximum radius
@@ -370,7 +371,7 @@ public class TargetItem extends Fragment {
 
             if(stretch_target != null) {
                 PieChart mChart2 = (PieChart) mainView.findViewById(R.id.piechart2);
-                mChart2.setDescription("");
+                mChart2.setDescription(new Description());
                 mChart2.setTouchEnabled(false);
 
                 // radius of the center hole in percent of maximum radius
@@ -525,7 +526,7 @@ public class TargetItem extends Fragment {
         //PIE Chart Data
 
         mChart = (PieChart) mainView.findViewById(R.id.piechart);
-        mChart.setDescription("");
+        mChart.setDescription(new Description());
         mChart.setTouchEnabled(false);
 
         // radius of the center hole in percent of maximum radius
@@ -548,7 +549,7 @@ public class TargetItem extends Fragment {
 //        lineChart.setBackgroundColor(Color.rgb(104, 241, 175));
 
         // no description text
-        lineChart.setDescription("");
+        lineChart.setDescription(new Description());
 
         // enable touch gestures
         lineChart.setTouchEnabled(false);
@@ -566,12 +567,12 @@ public class TargetItem extends Fragment {
         YAxis y = lineChart.getAxisLeft();
         y.setTypeface(DataManager.getInstance().myriadpro_regular);
         if(target.time_span.toLowerCase().equals(getString(R.string.daily).toLowerCase())) {
-            y.setValueFormatter(new YFormatterPercent());
+//            y.setValueFormatter(new YFormatterPercent());
             y.setAxisMaxValue(100);
         } else if(target.time_span.toLowerCase().equals(getString(R.string.Weekly).toLowerCase())) {
-            y.setValueFormatter(new YFormatter(2));
+//            y.setValueFormatter(new YFormatter(2));
         } else if(target.time_span.toLowerCase().equals(getString(R.string.monthly).toLowerCase())) {
-            y.setValueFormatter(new YFormatter(2));
+//            y.setValueFormatter(new YFormatter(2));
         }
         y.setAxisMinValue(0);
         y.setStartAtZero(true);
@@ -744,7 +745,6 @@ public class TargetItem extends Fragment {
 
         // create a dataset and give it a type
         LineDataSet set1 = new LineDataSet(vals1, "DataSet 1");
-        set1.setDrawCubic(true);
         set1.setCubicIntensity(0.2f);
         set1.setDrawFilled(true);
         set1.setDrawCircles(false);
@@ -755,15 +755,9 @@ public class TargetItem extends Fragment {
         set1.setFillColor(0xFF8864C8);
         set1.setFillAlpha(255);
         set1.setDrawHorizontalHighlightIndicator(false);
-//        set1.setFillFormatter(new FillFormatter() {
-//            @Override
-//            public float getFillLinePosition(LineDataSet dataSet, LineDataProvider dataProvider) {
-//                return -10;
-//            }
-//        });
 
         // create a data object with the datasets
-        LineData data = new LineData(xVals, set1);
+        LineData data = new LineData(set1);
         data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
         data.setValueTextSize(12f);
         data.setDrawValues(false);
@@ -775,16 +769,16 @@ public class TargetItem extends Fragment {
 
     protected PieData generatePieData() {
 
-        ArrayList<Entry> entries1 = new ArrayList<>();
+        ArrayList<PieEntry> entries1 = new ArrayList<>();
         ArrayList<String> xVals = new ArrayList<>();
 
         xVals.add("");
-        entries1.add(new Entry(spent_time, 0));
+        entries1.add(new PieEntry(spent_time, 0));
 
 
         if(neccesary_time-spent_time > 0) {
             xVals.add("");
-            entries1.add(new Entry(neccesary_time - spent_time, 1));
+            entries1.add(new PieEntry(neccesary_time - spent_time, 1));
         }
 
         PieDataSet ds1 = new PieDataSet(entries1, "");
@@ -797,7 +791,7 @@ public class TargetItem extends Fragment {
         ds1.setValueTextSize(12f);
         ds1.setDrawValues(false);
 
-        PieData d = new PieData(xVals, ds1);
+        PieData d = new PieData(ds1);
         d.setValueTypeface(DataManager.getInstance().myriadpro_regular);
 
         return d;
@@ -805,17 +799,16 @@ public class TargetItem extends Fragment {
 
     protected PieData generatePieData2() {
 
-        ArrayList<Entry> entries1 = new ArrayList<>();
+        ArrayList<PieEntry> entries1 = new ArrayList<>();
         ArrayList<String> xVals = new ArrayList<>();
 
-//        neccesary_time + Integer.parseInt(stretch_target.stretch_time) - spent_time
         xVals.add("");
-        entries1.add(new Entry(spent_time - neccesary_time, 0));
+        entries1.add(new PieEntry(spent_time - neccesary_time, 0));
 
         if(stretch_target == null) stretch_target = new Select().from(StretchTarget.class).where("target_id = ?", target.target_id).executeSingle();
         if(neccesary_time + Integer.parseInt(stretch_target.stretch_time) - spent_time > 0) {
             xVals.add("");
-            entries1.add(new Entry(neccesary_time + Integer.parseInt(stretch_target.stretch_time) - spent_time, 1));
+            entries1.add(new PieEntry(neccesary_time + Integer.parseInt(stretch_target.stretch_time) - spent_time, 1));
         }
 
         PieDataSet ds1 = new PieDataSet(entries1, "");
@@ -828,7 +821,7 @@ public class TargetItem extends Fragment {
         ds1.setValueTextSize(12f);
         ds1.setDrawValues(false);
 
-        PieData d = new PieData(xVals, ds1);
+        PieData d = new PieData(ds1);
         d.setValueTypeface(DataManager.getInstance().myriadpro_regular);
 
         return d;
