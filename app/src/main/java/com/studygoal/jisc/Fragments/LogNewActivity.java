@@ -13,6 +13,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
@@ -50,7 +53,7 @@ public class LogNewActivity extends Fragment implements View.OnClickListener {
     AppCompatTextView module;
     AppCompatTextView activityType;
 
-    TextView reminder_textView;
+    EditText reminder_textView;
     TextView countdown_textView;
 
     AlarmManager am;
@@ -81,6 +84,8 @@ public class LogNewActivity extends Fragment implements View.OnClickListener {
         countdown_textView = ((TextView) mainView.findViewById(R.id.new_activity_text_timer_2));
         countdown_textView.setTypeface(DataManager.getInstance().myriadpro_regular);
 
+        ((TextView)mainView.findViewById(R.id.new_activity_text_minutes)).setTypeface(DataManager.getInstance().myriadpro_regular);
+
         am = (AlarmManager) DataManager.getInstance().mainActivity.getSystemService(Context.ALARM_SERVICE);
 
         module = (AppCompatTextView) mainView.findViewById(R.id.new_activity_module_textView);
@@ -98,9 +103,28 @@ public class LogNewActivity extends Fragment implements View.OnClickListener {
         chooseActivity.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
         chooseActivity.setOnClickListener(this);
 
-        reminder_textView = ((TextView) mainView.findViewById(R.id.new_activity_text_timer_1));
+        reminder_textView = ((EditText) mainView.findViewById(R.id.new_activity_text_timer_1));
         reminder_textView.setTypeface(DataManager.getInstance().myriadpro_regular);
-        reminder_textView.setOnClickListener(this);
+        reminder_textView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.toString().length() != 0) {
+                    int value = Integer.parseInt(s.toString());
+                    if (value < 0 || value > 60) {
+                        reminder_textView.setText("");
+                        reminder_textView.setSelection(reminder_textView.getText().length());
+                    }
+                }
+            }
+        });
 
         countdown_textView = ((TextView) mainView.findViewById(R.id.new_activity_text_timer_2));
         countdown_textView.setTypeface(DataManager.getInstance().myriadpro_regular);

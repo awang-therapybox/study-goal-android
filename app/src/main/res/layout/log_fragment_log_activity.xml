@@ -201,12 +201,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="5dp">
-                <TextView
+                <EditText
                     android:id="@+id/log_activity_text_timer_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="50sp"
+                    android:maxLength="1"
+                    android:inputType="number"
                     android:text="0"
+                    android:background="@android:color/transparent"
                     android:textColor="@color/login_btn_purple"/>
                 <TextView
                     android:id="@+id/log_activity_text_hours"
@@ -217,12 +220,16 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
                     android:text="@string/hours"/>
-                <TextView
+                <EditText
                     android:id="@+id/log_activity_text_timer_3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:imeOptions="actionDone"
                     android:textSize="50sp"
+                    android:inputType="number"
+                    android:maxLength="2"
                     android:text="00"
+                    android:background="@android:color/transparent"
                     android:textColor="@color/login_btn_purple"/>
                 <TextView
                     android:id="@+id/log_activity_text_minutes"

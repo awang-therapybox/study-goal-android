@@ -7,6 +7,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatTextView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -43,7 +45,7 @@ public class LogLogActivity extends Fragment implements View.OnClickListener {
     AppCompatTextView module;
     AppCompatTextView activityType;
 
-    TextView hours_spent, minutes_spent;
+    EditText hours_spent, minutes_spent;
     TextView date;
 
     public Boolean isInEditMode;
@@ -79,14 +81,58 @@ public class LogLogActivity extends Fragment implements View.OnClickListener {
         ((TextView)mainView.findViewById(R.id.log_activity_activity_type_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
 
 
-        ((TextView)mainView.findViewById(R.id.log_activity_text_hours)).setTypeface(DataManager.getInstance().myriadpro_regular);
+        TextView log_activity_text_hours = (TextView) mainView.findViewById(R.id.log_activity_text_hours);
+        log_activity_text_hours.setTypeface(DataManager.getInstance().myriadpro_regular);
 
-        mainView.findViewById(R.id.log_activity_cardView_timespent).setOnClickListener(this);
-
-        hours_spent = ((TextView)mainView.findViewById(R.id.log_activity_text_timer_1));
+        hours_spent = ((EditText) mainView.findViewById(R.id.log_activity_text_timer_1));
         hours_spent.setTypeface(DataManager.getInstance().myriadpro_regular);
-        minutes_spent = ((TextView)mainView.findViewById(R.id.log_activity_text_timer_3));
+        minutes_spent = ((EditText) mainView.findViewById(R.id.log_activity_text_timer_3));
         minutes_spent.setTypeface(DataManager.getInstance().myriadpro_regular);
+
+        TextWatcher hoursWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                if(s.toString().length() != 0) {
+                    int value = Integer.parseInt(s.toString());
+                    if (value < 0 || value > 9) {
+                        hours_spent.setText("0");
+                    }
+                }
+            }
+        };
+
+        TextWatcher minutesWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                if(s.toString().length() != 0) {
+                    int value = Integer.parseInt(s.toString());
+                    if (value < 0 || value > 59) {
+                        minutes_spent.setText("0");
+                    }
+                }
+            }
+        };
+
+        hours_spent.addTextChangedListener(hoursWatcher);
+        minutes_spent.addTextChangedListener(minutesWatcher);
 
         ((TextView)mainView.findViewById(R.id.log_activity_text_minutes)).setTypeface(DataManager.getInstance().myriadpro_regular);
 

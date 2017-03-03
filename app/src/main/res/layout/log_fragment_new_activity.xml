@@ -207,25 +207,30 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <TextView
+
+                <EditText
                     android:id="@+id/new_activity_text_timer_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="24sp"
-                    android:text="00:00"
+                    android:maxLength="5"
+                    android:imeOptions="actionDone"
+                    android:inputType="number"
+                    android:textSize="32sp"
+                    android:text="00"
+                    android:background="@android:color/transparent"
                     android:layout_centerInParent="true"
                     android:textColor="@color/login_btn_purple"/>
-                <!--<TextView-->
-                    <!--android:id="@+id/new_activity_text_minutes"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_toEndOf="@+id/new_activity_text_timer_1"-->
-                    <!--android:textSize="18sp"-->
-                    <!--android:textColor="@color/login_btn_purple"-->
-                    <!--android:layout_marginBottom="7.5dp"-->
-                    <!--android:layout_marginStart="5dp"-->
-                    <!--android:text="@string/minutes"-->
-                    <!--android:layout_alignParentBottom="true"/>-->
+                <TextView
+                    android:id="@+id/new_activity_text_minutes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/new_activity_text_timer_1"
+                    android:textSize="18sp"
+                    android:textColor="@color/login_btn_purple"
+                    android:layout_marginBottom="7.5dp"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/minutes"
+                    android:layout_alignParentBottom="true"/>
             </RelativeLayout>
         </android.support.v7.widget.CardView>
 

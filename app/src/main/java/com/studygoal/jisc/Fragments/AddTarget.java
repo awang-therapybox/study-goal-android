@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatTextView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -38,7 +40,7 @@ import java.util.Map;
 public class AddTarget extends Fragment implements View.OnClickListener {
 
     AppCompatTextView activityType, chooseActivity, every, in;
-    TextView hours, minutes;
+    EditText hours, minutes;
     EditText because;
     public Boolean isInEditMode = false;
     public Targets item;
@@ -77,10 +79,57 @@ public class AddTarget extends Fragment implements View.OnClickListener {
 
         ((TextView)mainView.findViewById(R.id.addtarget_text_for)).setTypeface(DataManager.getInstance().myriadpro_regular);
 
-        hours = ((TextView) mainView.findViewById(R.id.addtarget_text_timer_1));
+        TextWatcher hoursWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                if(s.toString().length() != 0) {
+                    int value = Integer.parseInt(s.toString());
+                    if (value < 0 || value > 8) {
+                        hours.setText("");
+                        hours.setSelection(hours.getText().length());
+                    }
+                }
+            }
+        };
+
+        TextWatcher minutesWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                if(s.toString().length() != 0) {
+                    int value = Integer.parseInt(s.toString());
+                    if (value < 0 || value > 60) {
+                        minutes.setText("");
+                        minutes.setSelection(minutes.getText().length());
+                    }
+                }
+            }
+        };
+
+        hours = ((EditText) mainView.findViewById(R.id.addtarget_text_timer_1));
         hours.setTypeface(DataManager.getInstance().myriadpro_regular);
-        minutes = ((TextView) mainView.findViewById(R.id.addtarget_text_timer_3));
+        minutes = ((EditText) mainView.findViewById(R.id.addtarget_text_timer_3));
         minutes.setTypeface(DataManager.getInstance().myriadpro_regular);
+
+        hours.addTextChangedListener(hoursWatcher);
+        minutes.addTextChangedListener(minutesWatcher);
 
         ((TextView)mainView.findViewById(R.id.addtarget_text_hours)).setTypeface(DataManager.getInstance().myriadpro_regular);
         ((TextView)mainView.findViewById(R.id.addtarget_text_minutes)).setTypeface(DataManager.getInstance().myriadpro_regular);
@@ -157,7 +206,6 @@ public class AddTarget extends Fragment implements View.OnClickListener {
         every.setOnClickListener(this);
         in.setOnClickListener(this);
 
-        mainView.findViewById(R.id.addtarget_cardView_timespent).setOnClickListener(this);
         mainView.findViewById(R.id.addtarget_save_btn).setOnClickListener(this);
 
         return mainView;

@@ -16,9 +16,6 @@ import com.studygoal.jisc.R;
 
 import java.util.List;
 
-/**
- * Created by MarcelC on 1/14/16.
- */
 public class TrophiesAdapter extends BaseAdapter implements View.OnClickListener {
 
     LayoutInflater inflater;

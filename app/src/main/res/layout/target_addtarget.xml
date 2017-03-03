@@ -147,12 +147,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="15dp">
-                <TextView
+                <EditText
                     android:id="@+id/addtarget_text_timer_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="50sp"
-                    android:text="00"
+                    android:inputType="number"
+                    android:background="@android:color/transparent"
+                    android:maxLength="1"
+                    android:text="0"
                     android:textColor="@color/login_btn_purple"/>
                 <TextView
                     android:id="@+id/addtarget_text_hours"
@@ -163,11 +166,15 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
                     android:text="@string/hours"/>
-                <TextView
+                <EditText
                     android:id="@+id/addtarget_text_timer_3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="50sp"
+                    android:inputType="number"
+                    android:imeOptions="actionDone"
+                    android:background="@android:color/transparent"
+                    android:maxLength="2"
                     android:text="00"
                     android:textColor="@color/login_btn_purple"/>
                 <TextView
