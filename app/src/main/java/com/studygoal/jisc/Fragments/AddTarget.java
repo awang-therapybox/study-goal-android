@@ -1,12 +1,15 @@
 package com.studygoal.jisc.Fragments;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -19,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
@@ -45,6 +49,8 @@ public class AddTarget extends Fragment implements View.OnClickListener {
     public Boolean isInEditMode = false;
     public Targets item;
     View body;
+
+    RelativeLayout addModuleLayout;
 
     public AddTarget() {}
 
@@ -76,6 +82,12 @@ public class AddTarget extends Fragment implements View.OnClickListener {
         chooseActivity = ((AppCompatTextView)mainView.findViewById(R.id.addtarget_chooseActivity_textView));
         chooseActivity.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
         chooseActivity.setTypeface(DataManager.getInstance().myriadpro_regular);
+
+        addModuleLayout = (RelativeLayout)mainView.findViewById(R.id.add_new_module_layout);
+        addModuleLayout.setVisibility(View.GONE);
+        ((EditText)mainView.findViewById(R.id.add_module_edit_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
+        ((TextView)mainView.findViewById(R.id.add_module_button_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
+        mainView.findViewById(R.id.add_module_button_text).setOnClickListener(this);
 
         ((TextView)mainView.findViewById(R.id.addtarget_text_for)).setTypeface(DataManager.getInstance().myriadpro_regular);
 
@@ -172,8 +184,6 @@ public class AddTarget extends Fragment implements View.OnClickListener {
                 if(entry.getValue().equals(item.activity))
                     chooseActivity.setText(entry.getKey());
             }
-//            activityType.setText(item.activity_type);
-//            chooseActivity.setText(item.activity);
 
             hours.setText(Integer.parseInt(item.total_time) / 60 > 10 ? "" + Integer.parseInt(item.total_time) / 60 : "0" + Integer.parseInt(item.total_time) / 60);
             minutes.setText(Integer.parseInt(item.total_time) % 60 > 10 ? "" + Integer.parseInt(item.total_time) % 60 : "0" + Integer.parseInt(item.total_time) % 60);
@@ -185,7 +195,6 @@ public class AddTarget extends Fragment implements View.OnClickListener {
                     every.setText(value);
                 }
             }
-//            every.setText((item.time_span.substring(0, 1)).toUpperCase() + item.time_span.substring(1, item.time_span.length()));
 
             if(item.module_id.equals(""))
                 in.setText(DataManager.getInstance().mainActivity.getString(R.string.any_module));
@@ -375,6 +384,7 @@ public class AddTarget extends Fragment implements View.OnClickListener {
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.custom_spinner_layout);
                 dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
                 if(DataManager.getInstance().mainActivity.isLandscape) {
                     DisplayMetrics displaymetrics = new DisplayMetrics();
                     DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -384,23 +394,37 @@ public class AddTarget extends Fragment implements View.OnClickListener {
                     params.width = width;
                     dialog.getWindow().setAttributes(params);
                 }
+
                 ((TextView) dialog.findViewById(R.id.dialog_title)).setTypeface(DataManager.getInstance().oratorstd_typeface);
                 ((TextView) dialog.findViewById(R.id.dialog_title)).setText(R.string.choose_module);
 
-
                 final ListView listView = (ListView) dialog.findViewById(R.id.dialog_listview);
 
-                ArrayList<String> items = new ArrayList<>();
+                final ArrayList<String> items = new ArrayList<>();
                 items.add(DataManager.getInstance().mainActivity.getString(R.string.any_module));
                 List<Module> modules = new Select().from(Module.class).execute();
                 for(int i=0; i < modules.size(); i++)
                     items.add(modules.get(i).name);
+
+                if(DataManager.getInstance().user.isSocial) {
+                    items.add(AddTarget.this.getActivity().getString(R.string.add_module));
+                }
+
                 listView.setAdapter(new GenericAdapter(DataManager.getInstance().mainActivity, in.getText().toString(), items));
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        in.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
-                        dialog.dismiss();
+                        if(DataManager.getInstance().user.isSocial
+                                && position == items.size() - 1) {
+                            //add new module
+                            EditText add_module_edit_text = (EditText)addModuleLayout.findViewById(R.id.add_module_edit_text);
+                            add_module_edit_text.setText("");
+                            addModuleLayout.setVisibility(View.VISIBLE);
+                            dialog.dismiss();
+                        } else {
+                            in.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
+                            dialog.dismiss();
+                        }
                     }
                 });
 
@@ -409,6 +433,21 @@ public class AddTarget extends Fragment implements View.OnClickListener {
             }
             case R.id.addtarget_save_btn: {
                 if(isInEditMode) {
+
+                    if(DataManager.getInstance().user.isDemo) {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(AddTarget.this.getActivity());
+                        alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.demo_mode_edittarget) + "</font>"));
+                        alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
+                        return;
+                    }
+
                     final int total_time = Integer.parseInt(hours.getText().toString()) * 60 + Integer.parseInt(minutes.getText().toString());
                     if(total_time == Integer.parseInt(item.total_time)
                             && every.getText().toString().toLowerCase().equals(item.time_span.toLowerCase())
@@ -476,6 +515,21 @@ public class AddTarget extends Fragment implements View.OnClickListener {
                         }).start();
                     }
                 } else {
+
+                    if(DataManager.getInstance().user.isDemo) {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(AddTarget.this.getActivity());
+                        alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.demo_mode_addtarget) + "</font>"));
+                        alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
+                        return;
+                    }
+
                     int total_time = Integer.parseInt(hours.getText().toString()) * 60 + Integer.parseInt(minutes.getText().toString());
                     if (total_time == 0) {
                         Snackbar.make(body, R.string.fail_to_add_target_insufficient_time, Snackbar.LENGTH_LONG).show();
@@ -531,6 +585,46 @@ public class AddTarget extends Fragment implements View.OnClickListener {
                     }
                 }
                 break;
+            }
+            case R.id.add_module_button_text: {
+                EditText add_module_edit_text = (EditText)addModuleLayout.findViewById(R.id.add_module_edit_text);
+                final String moduleName = add_module_edit_text.getText().toString();
+                if(moduleName.length() == 0) {
+                    Snackbar.make(body, R.string.module_name_invalid, Snackbar.LENGTH_LONG).show();
+                    return;
+                }
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        final HashMap<String, String> params = new HashMap<>();
+                        params.put("student_id", DataManager.getInstance().user.id);
+                        params.put("module", moduleName);
+                        params.put("is_social", "yes");
+
+                        if (NetworkManager.getInstance().addModule(params)) {
+
+                            DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                }
+                            });
+                        } else {
+                            DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    (DataManager.getInstance().mainActivity).hideProgressBar();
+                                    Snackbar.make(body, R.string.something_went_wrong, Snackbar.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    }
+                }).start();
+
+                addModuleLayout.setVisibility(View.GONE);
+
+                return;
             }
         }
     }

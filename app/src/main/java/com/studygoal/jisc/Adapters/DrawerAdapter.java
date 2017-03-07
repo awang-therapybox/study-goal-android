@@ -29,7 +29,12 @@ public class DrawerAdapter extends BaseAdapter {
     public DrawerAdapter(Context con) {
         context = con;
         inflater = LayoutInflater.from(con);
-        values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.check_in), con.getString(R.string.stats), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
+        if(DataManager.getInstance().user.isSocial) {
+            values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
+        } else {
+            values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.check_in), con.getString(R.string.stats), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
+        }
+
     }
 
     //Numarul de rows
@@ -72,94 +77,70 @@ public class DrawerAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.nav_item, parent, false);
             TextView textView;
             ImageView imageView;
-            switch (position) {
-                case 1: {
-                    textView = (TextView) convertView.findViewById(R.id.drawer_item_text);
-                    textView.setTypeface(DataManager.getInstance().myriadpro_regular);
-                    textView.setText(context.getString(R.string.feed));
-                    imageView = (ImageView) convertView.findViewById(R.id.drawer_item_icon);
-                    Glide.with(context).load(R.drawable.feed_icon).into(imageView);
-                    break;
-                }
-                case 2: {
-                    textView = (TextView) convertView.findViewById(R.id.drawer_item_text);
-                    textView.setTypeface(DataManager.getInstance().myriadpro_regular);
-                    textView.setText(context.getString(R.string.check_in));
-                    imageView = (ImageView) convertView.findViewById(R.id.drawer_item_icon);
-                    Glide.with(context).load(R.drawable.checkin).into(imageView);
-                    break;
-                }
-                case 3: {
-                    textView = (TextView) convertView.findViewById(R.id.drawer_item_text);
-                    textView.setTypeface(DataManager.getInstance().myriadpro_regular);
-                    textView.setText(context.getString(R.string.stats));
-                    imageView = (ImageView) convertView.findViewById(R.id.drawer_item_icon);
-                    Glide.with(context).load(R.drawable.stats_icon).into(imageView);
-                    break;
-                }
-                case 4: {
-                    textView = (TextView) convertView.findViewById(R.id.drawer_item_text);
-                    textView.setTypeface(DataManager.getInstance().myriadpro_regular);
-                    textView.setText(context.getString(R.string.log));
-                    imageView = (ImageView) convertView.findViewById(R.id.drawer_item_icon);
-                    Glide.with(context).load(R.drawable.log_icon).into(imageView);
-                    break;
-                }
-                case 5: {
-                    textView = (TextView) convertView.findViewById(R.id.drawer_item_text);
-                    textView.setTypeface(DataManager.getInstance().myriadpro_regular);
-                    textView.setText(context.getString(R.string.target));
-                    imageView = (ImageView) convertView.findViewById(R.id.drawer_item_icon);
-                    Glide.with(context).load(R.drawable.target_icon).into(imageView);
-                    break;
-                }
-                default: {
-                    textView = (TextView) convertView.findViewById(R.id.drawer_item_text);
-                    textView.setTypeface(DataManager.getInstance().myriadpro_regular);
-                    textView.setText(context.getString(R.string.logout));
-                    imageView = (ImageView) convertView.findViewById(R.id.drawer_item_icon);
-                    Glide.with(context).load(R.drawable.logout_icon).into(imageView);
-                    break;
-                }
+            textView = (TextView) convertView.findViewById(R.id.drawer_item_text);
+            textView.setTypeface(DataManager.getInstance().myriadpro_regular);
+            textView.setText(values[position]);
+            imageView = (ImageView) convertView.findViewById(R.id.drawer_item_icon);
+
+            int iconResID = -1;
+
+            if(values[position].equals(context.getString(R.string.feed))) {
+                iconResID = R.drawable.feed_icon;
+            }
+            if(values[position].equals(context.getString(R.string.check_in))) {
+                iconResID = R.drawable.checkin;
+            }
+            if(values[position].equals(context.getString(R.string.stats))) {
+                iconResID = R.drawable.stats_icon;
+            }
+            if(values[position].equals(context.getString(R.string.log))) {
+                iconResID = R.drawable.log_icon;
+            }
+            if(values[position].equals(context.getString(R.string.target))) {
+                iconResID = R.drawable.target_icon;
+            }
+            if(values[position].equals(context.getString(R.string.logout))) {
+                iconResID = R.drawable.logout_icon;
             }
 
+            Glide.with(context).load(iconResID).into(imageView);
 
-                if (DataManager.getInstance().fragment != null) {
-                    if (DataManager.getInstance().fragment == position) {
-                        textView.setTextColor(ContextCompat.getColor(context, R.color.default_blue));
-                        imageView.setColorFilter(ContextCompat.getColor(context, R.color.default_blue));
-                        selected_image = imageView;
-                        selected_text = textView;
-                        DataManager.getInstance().fragment = null;
+            if (DataManager.getInstance().fragment != null) {
+                if (DataManager.getInstance().fragment == position) {
+                    textView.setTextColor(ContextCompat.getColor(context, R.color.default_blue));
+                    imageView.setColorFilter(ContextCompat.getColor(context, R.color.default_blue));
+                    selected_image = imageView;
+                    selected_text = textView;
+                    DataManager.getInstance().fragment = null;
+                }
+            } else {
+                String selected_value = "";
+                switch (DataManager.getInstance().home_screen.toLowerCase()) {
+                    case "feed": {
+                        selected_value = context.getString(R.string.feed);
+                        break;
                     }
-                } else {
-                    String selected_value = "";
-                    switch (DataManager.getInstance().home_screen.toLowerCase()) {
-                        case "feed": {
-                            selected_value = context.getString(R.string.feed);
-                            break;
-                        }
-                        case "stats": {
-                            selected_value = context.getString(R.string.stats);
-                            break;
-                        }
-                        case "log": {
-                            selected_value = context.getString(R.string.log);
-                            break;
-                        }
-                        case "target": {
-                            selected_value = context.getString(R.string.target);
-                            break;
-                        }
+                    case "stats": {
+                        selected_value = context.getString(R.string.stats);
+                        break;
                     }
-                    if (textView.getText().toString().toLowerCase().equals(selected_value.toLowerCase())) {
-                        textView.setTextColor(ContextCompat.getColor(context, R.color.default_blue));
-                        imageView.setColorFilter(ContextCompat.getColor(context, R.color.default_blue));
-                        selected_image = imageView;
-                        selected_text = textView;
+                    case "log": {
+                        selected_value = context.getString(R.string.log);
+                        break;
+                    }
+                    case "target": {
+                        selected_value = context.getString(R.string.target);
+                        break;
                     }
                 }
+                if (textView.getText().toString().toLowerCase().equals(selected_value.toLowerCase())) {
+                    textView.setTextColor(ContextCompat.getColor(context, R.color.default_blue));
+                    imageView.setColorFilter(ContextCompat.getColor(context, R.color.default_blue));
+                    selected_image = imageView;
+                    selected_text = textView;
+                }
             }
+        }
         return convertView;
     }
 }

@@ -260,11 +260,38 @@ public class SocialActivity extends AppCompatActivity implements GoogleApiClient
     }
 
     void loginSocial() {
-        if (NetworkManager.getInstance().loginSocial(email,socialID)) {
+
+        Integer response = NetworkManager.getInstance().loginSocial(email,socialID);
+
+        if(response == 200) {
             Intent intent = new Intent(SocialActivity.this, MainActivity.class);
             startActivity(intent);
             SocialActivity.this.finish();
+            return;
+        }
+
+        if (response == 403) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SocialActivity.this);
+            alertDialogBuilder.setMessage(R.string.social_login_error);
+            alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        } else {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SocialActivity.this);
+            alertDialogBuilder.setMessage(R.string.something_went_wrong);
+            alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
         }
     }
-
 }

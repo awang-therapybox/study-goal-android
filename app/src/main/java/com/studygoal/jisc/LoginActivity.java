@@ -102,6 +102,7 @@ public class LoginActivity extends Activity {
                 if (NetworkManager.getInstance().checkIfUserRegistered()) {
                     if (NetworkManager.getInstance().login()) {
                         DataManager.getInstance().institution = "1";
+                        DataManager.getInstance().user.isDemo = true;
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         LoginActivity.this.finish();

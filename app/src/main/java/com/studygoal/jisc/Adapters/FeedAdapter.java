@@ -58,8 +58,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             feedViewHolder.share.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    feedViewHolder.share.setVisibility(View.GONE);
-//                    feedViewHolder.share_layout.setVisibility(View.VISIBLE);
                     SocialManager.getInstance().shareOnFacebook(item.message);
                 }
             });
@@ -84,7 +82,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 }
             });
 
-            //Setam Close/Open
             feedViewHolder.open.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -109,10 +106,17 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             if (feedViewHolder.close.getVisibility() == View.VISIBLE)
                 feedViewHolder.close.callOnClick();
 
-            //HidePost
             feedViewHolder.hide_post.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    if(DataManager.getInstance().user.isDemo) {
+                        feedViewHolder.close.callOnClick();
+                        removeItem(feedViewHolder.getAdapterPosition());
+                        Snackbar.make(layout, R.string.post_hidden_message, Snackbar.LENGTH_LONG).show();
+                        return;
+                    }
+
                     HashMap<String, String> map = new HashMap<>();
                     map.put("feed_id", item.id);
                     map.put("student_id", DataManager.getInstance().user.id);
@@ -126,7 +130,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 }
             });
 
-            //TODO: 1 Setam poza care trebuie
             if (item.message_from.equals(DataManager.getInstance().user.id)) {
                 feedViewHolder.share.setVisibility(View.VISIBLE);
                 feedViewHolder.open.setVisibility(View.GONE);
@@ -149,17 +152,13 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                     Glide.with(context).load(NetworkManager.getInstance().host + photo).transform(new CircleTransform(context)).placeholder(R.drawable.profilenotfound).into(feedViewHolder.profile_pic);
             }
 
-            //TODO: 2 Time Ago
             Calendar c = Calendar.getInstance();
             c.setTimeZone(TimeZone.getTimeZone("UTC"));
-            long current_time = System.currentTimeMillis();//c.getTimeInMillis();
+            long current_time = System.currentTimeMillis();
 
             c.set(Integer.parseInt(item.created_date.split(" ")[0].split("-")[0]), Integer.parseInt(item.created_date.split(" ")[0].split("-")[1]) - 1, Integer.parseInt(item.created_date.split(" ")[0].split("-")[2]), Integer.parseInt(item.created_date.split(" ")[1].split(":")[0]), Integer.parseInt(item.created_date.split(" ")[1].split(":")[1]));
             long created_date = c.getTimeInMillis();
             long diff = (current_time - created_date) / 60000;
-
-            //TimeDiff WTF
-//            diff -= (c.get(Calendar.ZONE_OFFSET) / 60000);
 
             if (diff <= 1)
                 feedViewHolder.time_ago.setText(context.getString(R.string.just_a_moment_ago));
@@ -204,7 +203,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         TextView delete_friend;
         View menu;
         protected View close;
-        protected View open;
+        View open;
         View bottom_bar;
         View share_layout, facebook_btn, twitter_btn, mail_btn;
         View selfPost;

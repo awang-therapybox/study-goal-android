@@ -1,9 +1,12 @@
 package com.studygoal.jisc.Fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,6 +80,21 @@ public class HomeScreen extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if(DataManager.getInstance().user.isDemo) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(HomeScreen.this.getActivity());
+                    alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.demo_mode_changeappsettings) + "</font>"));
+                    alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                    return;
+                }
+
                 if(!((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString().equals(selected_value)) {
                     HashMap<String, String> map = new HashMap<>();
                     map.put("student_id", DataManager.getInstance().user.id);

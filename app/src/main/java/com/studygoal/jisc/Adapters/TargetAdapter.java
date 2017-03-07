@@ -172,6 +172,7 @@ public class TargetAdapter extends BaseAdapter {
                         .commit();
             }
         });
+
         final int finalPosition = position;
         convertView.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
             @Override

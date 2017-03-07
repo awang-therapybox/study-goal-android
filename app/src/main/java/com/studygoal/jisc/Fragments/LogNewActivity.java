@@ -1,9 +1,11 @@
 package com.studygoal.jisc.Fragments;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -14,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -25,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.activeandroid.query.Delete;
@@ -65,6 +69,7 @@ public class LogNewActivity extends Fragment implements View.OnClickListener {
 
     SharedPreferences saves;
 
+    RelativeLayout addModuleLayout;
 
     @Override
     public void onResume() {
@@ -80,6 +85,12 @@ public class LogNewActivity extends Fragment implements View.OnClickListener {
         mainView = inflater.inflate(R.layout.log_fragment_new_activity, container, false);
 
         DataManager.getInstance().reload();
+
+        addModuleLayout = (RelativeLayout)mainView.findViewById(R.id.add_new_module_layout);
+        addModuleLayout.setVisibility(View.GONE);
+        ((EditText)mainView.findViewById(R.id.add_module_edit_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
+        ((TextView)mainView.findViewById(R.id.add_module_button_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
+        mainView.findViewById(R.id.add_module_button_text).setOnClickListener(this);
 
         countdown_textView = ((TextView) mainView.findViewById(R.id.new_activity_text_timer_2));
         countdown_textView.setTypeface(DataManager.getInstance().myriadpro_regular);
@@ -426,6 +437,21 @@ public class LogNewActivity extends Fragment implements View.OnClickListener {
                 break;
             }
             case R.id.new_activity_btn_start: {
+
+                if(DataManager.getInstance().user.isDemo) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LogNewActivity.this.getActivity());
+                    alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.demo_mode_addactivitylog) + "</font>"));
+                    alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                    return;
+                }
+
                 if(module.getText().toString().equals(DataManager.getInstance().mainActivity.getString(R.string.no_module))) {
                     Snackbar.make(mainView.findViewById(R.id.container), R.string.no_module_selected, Snackbar.LENGTH_LONG).show();
                     return;
@@ -586,19 +612,30 @@ public class LogNewActivity extends Fragment implements View.OnClickListener {
                 ((TextView)dialog.findViewById(R.id.dialog_title)).setTypeface(DataManager.getInstance().oratorstd_typeface);
                 ((TextView)dialog.findViewById(R.id.dialog_title)).setText(R.string.choose_module);
 
+                final ModuleAdapter moduleAdapter = new ModuleAdapter(DataManager.getInstance().mainActivity, module.getText().toString());
                 final ListView listView = (ListView) dialog.findViewById(R.id.dialog_listview);
-                listView.setAdapter(new ModuleAdapter(DataManager.getInstance().mainActivity, module.getText().toString()));
+                listView.setAdapter(moduleAdapter);
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        module.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
-                        RunningActivity activity = new Select().from(RunningActivity.class).executeSingle();
-                        if(activity != null) {
-                            activity.student_id = DataManager.getInstance().user.id;
-                            activity.module_id = ((Module) (new Select().from(Module.class).where("module_name = ?", module.getText().toString()).executeSingle())).id;
-                            activity.save();
+
+                        if(DataManager.getInstance().user.isSocial
+                                && position == moduleAdapter.moduleList.size() - 1) {
+                            //add new module
+                            EditText add_module_edit_text = (EditText)addModuleLayout.findViewById(R.id.add_module_edit_text);
+                            add_module_edit_text.setText("");
+                            addModuleLayout.setVisibility(View.VISIBLE);
+                            dialog.dismiss();
+                        } else {
+                            module.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
+                            RunningActivity activity = new Select().from(RunningActivity.class).executeSingle();
+                            if (activity != null) {
+                                activity.student_id = DataManager.getInstance().user.id;
+                                activity.module_id = ((Module) (new Select().from(Module.class).where("module_name = ?", module.getText().toString()).executeSingle())).id;
+                                activity.save();
+                            }
+                            dialog.dismiss();
                         }
-                        dialog.dismiss();
                     }
                 });
 
@@ -680,6 +717,46 @@ public class LogNewActivity extends Fragment implements View.OnClickListener {
 
                 dialog.show();
                 break;
+            }
+            case R.id.add_module_button_text: {
+                EditText add_module_edit_text = (EditText)addModuleLayout.findViewById(R.id.add_module_edit_text);
+                final String moduleName = add_module_edit_text.getText().toString();
+                if(moduleName.length() == 0) {
+                    Snackbar.make(DataManager.getInstance().mainActivity.findViewById(R.id.drawer_layout), R.string.module_name_invalid, Snackbar.LENGTH_LONG).show();
+                    return;
+                }
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        final HashMap<String, String> params = new HashMap<>();
+                        params.put("student_id", DataManager.getInstance().user.id);
+                        params.put("module", moduleName);
+                        params.put("is_social", "yes");
+
+                        if (NetworkManager.getInstance().addModule(params)) {
+
+                            DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                }
+                            });
+                        } else {
+                            DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    (DataManager.getInstance().mainActivity).hideProgressBar();
+                                    Snackbar.make(DataManager.getInstance().mainActivity.findViewById(R.id.drawer_layout), R.string.something_went_wrong, Snackbar.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    }
+                }).start();
+
+                addModuleLayout.setVisibility(View.GONE);
+
+                return;
             }
         }
     }

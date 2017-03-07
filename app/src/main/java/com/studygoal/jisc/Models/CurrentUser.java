@@ -38,6 +38,7 @@ public class CurrentUser extends Model {
 
     public String last_week_activity_points;
     public String overall_activity_points;
+    public boolean isDemo;
 
     public CurrentUser() {
         super();

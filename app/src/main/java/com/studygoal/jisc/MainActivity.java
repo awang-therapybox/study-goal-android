@@ -1,8 +1,10 @@
 package com.studygoal.jisc;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -19,6 +21,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -91,7 +94,12 @@ public class MainActivity extends FragmentActivity {
 
     public void refreshDrawer() {
         if (adapter != null) {
-            adapter.values = new String[]{"0", getString(R.string.feed), getString(R.string.check_in), getString(R.string.stats), getString(R.string.log), getString(R.string.target), getString(R.string.logout)};
+            if(DataManager.getInstance().user.isSocial) {
+                adapter.values = new String[]{"0", getString(R.string.feed), getString(R.string.log), getString(R.string.target), getString(R.string.logout)};
+            } else {
+                adapter.values = new String[]{"0", getString(R.string.feed), getString(R.string.check_in), getString(R.string.stats), getString(R.string.log), getString(R.string.target), getString(R.string.logout)};
+            }
+
             adapter.notifyDataSetChanged();
         }
     }
@@ -141,6 +149,21 @@ public class MainActivity extends FragmentActivity {
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(DataManager.getInstance().user.isDemo) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                    alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.demo_mode_postfeed) + "</font>"));
+                    alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                    return;
+                }
+
                 if (feedFragment != null) {
                     feedFragment.post();
                 }
@@ -349,46 +372,33 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             public void onDrawerClosed(View drawerView) {
-                switch (selectedPosition) {
-                    case 1: {
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.main_fragment, new FeedFragment())
-                                .commit();
-                        break;
-                    }
-                    case 2: {
-                        getSupportFragmentManager().beginTransaction()
+                if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.feed))) {
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.main_fragment, new FeedFragment())
+                                    .commit();
+                } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.check_in))) {
+                            getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.main_fragment, new CheckInFragment())
                                     .commit();
-                        break;
-                    }
-                    case 3: {
-                        if (isLandscape)
+                } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.stats))) {
+                            if (isLandscape)
+                                getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.main_fragment, new Stats())
+                                        .commit();
+                            else
+                                getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.main_fragment, new Stats2())
+                                        .commit();
+
+                } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.log))) {
+                            logFragment = new LogActivityHistory();
                             getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.main_fragment, new Stats())
+                                    .replace(R.id.main_fragment, logFragment)
                                     .commit();
-                        else
+                } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.target))) {
                             getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.main_fragment, new Stats2())
+                                    .replace(R.id.main_fragment, new TargetFragment())
                                     .commit();
-                        break;
-                    }
-                    case 4: {
-                        logFragment = new LogActivityHistory();
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.main_fragment, logFragment)
-                                .commit();
-                        break;
-                    }
-                    case 5: {
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.main_fragment, new TargetFragment())
-                                .commit();
-                        break;
-                    }
-                    case 6: {
-                        break;
-                    }
                 }
             }
 
@@ -407,125 +417,71 @@ public class MainActivity extends FragmentActivity {
                 if (position != 0) {
                     adapter.selected_image.setColorFilter(0x00FFFFFF);
                     adapter.selected_text.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.light_grey));
-                    switch (position) {
-                        case 1: {
-                            adapter.selected_image = (ImageView) view.findViewById(R.id.drawer_item_icon);
-                            adapter.selected_text = (TextView) view.findViewById(R.id.drawer_item_text);
-                            adapter.selected_image.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
-                            adapter.selected_text.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
-                            for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
-                                getSupportFragmentManager().popBackStackImmediate();
-                            }
-                            selectedPosition = 1;
-                            drawer.closeDrawer(GravityCompat.START);
-                            break;
+                    adapter.selected_image = (ImageView) view.findViewById(R.id.drawer_item_icon);
+                    adapter.selected_text = (TextView) view.findViewById(R.id.drawer_item_text);
+                    adapter.selected_image.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
+                    adapter.selected_text.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
+
+                    for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
+                        getSupportFragmentManager().popBackStackImmediate();
+                    }
+
+                    selectedPosition = position;
+                    drawer.closeDrawer(GravityCompat.START);
+
+                    if(adapter.selected_text.getText().toString().equals(MainActivity.this.getString(R.string.logout))) {
+                        final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
+                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialog.setContentView(R.layout.confirmation_dialog);
+                        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+                        if (DataManager.getInstance().mainActivity.isLandscape) {
+                            DisplayMetrics displaymetrics = new DisplayMetrics();
+                            DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+                            int width = (int) (displaymetrics.widthPixels * 0.45);
+
+                            WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                            params.width = width;
+                            dialog.getWindow().setAttributes(params);
                         }
-                        case 2: {
-                            adapter.selected_image = (ImageView) view.findViewById(R.id.drawer_item_icon);
-                            adapter.selected_text = (TextView) view.findViewById(R.id.drawer_item_text);
-                            adapter.selected_image.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
-                            adapter.selected_text.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
-                            for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
-                                getSupportFragmentManager().popBackStackImmediate();
+
+                        ((TextView) dialog.findViewById(R.id.dialog_title)).setTypeface(DataManager.getInstance().oratorstd_typeface);
+                        ((TextView) dialog.findViewById(R.id.dialog_title)).setText(R.string.confirm);
+
+                        ((TextView) dialog.findViewById(R.id.dialog_message)).setTypeface(DataManager.getInstance().myriadpro_regular);
+                        ((TextView) dialog.findViewById(R.id.dialog_message)).setText(R.string.confirm_logout_message);
+
+                        ((TextView) dialog.findViewById(R.id.dialog_no_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
+                        ((TextView) dialog.findViewById(R.id.dialog_no_text)).setText(R.string.no);
+
+                        ((TextView) dialog.findViewById(R.id.dialog_ok_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
+                        ((TextView) dialog.findViewById(R.id.dialog_ok_text)).setText(R.string.yes);
+
+                        dialog.findViewById(R.id.dialog_ok).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                                android.webkit.CookieManager.getInstance().removeAllCookies(null);
+                                DataManager.getInstance().checkForbidden = false;
+                                DataManager.getInstance().set_jwt("");
+
+                                getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("jwt", "").apply();
+                                getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_checked", "").apply();
+                                getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_staff", "").apply();
+                                getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", "").apply();
+
+                                new Delete().from(CurrentUser.class).execute();
+                                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                startActivity(intent);
+                                MainActivity.this.finish();
                             }
-                            selectedPosition = 2;
-                            drawer.closeDrawer(GravityCompat.START);
-
-                            break;
-                        }
-                        case 3: {
-                            adapter.selected_image = (ImageView) view.findViewById(R.id.drawer_item_icon);
-                            adapter.selected_text = (TextView) view.findViewById(R.id.drawer_item_text);
-                            adapter.selected_image.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
-                            adapter.selected_text.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
-                            for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
-                                getSupportFragmentManager().popBackStackImmediate();
+                        });
+                        dialog.findViewById(R.id.dialog_no).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
                             }
-                            selectedPosition = 3;
-                            drawer.closeDrawer(GravityCompat.START);
-
-                            break;
-                        }
-                        case 4: {
-                            adapter.selected_image = (ImageView) view.findViewById(R.id.drawer_item_icon);
-                            adapter.selected_text = (TextView) view.findViewById(R.id.drawer_item_text);
-                            adapter.selected_image.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
-                            adapter.selected_text.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
-                            for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
-                                getSupportFragmentManager().popBackStackImmediate();
-                            }
-                            selectedPosition = 4;
-                            drawer.closeDrawer(GravityCompat.START);
-                            break;
-                        }
-                        case 5: {
-                            adapter.selected_image = (ImageView) view.findViewById(R.id.drawer_item_icon);
-                            adapter.selected_text = (TextView) view.findViewById(R.id.drawer_item_text);
-                            adapter.selected_image.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
-                            adapter.selected_text.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
-                            for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
-                                getSupportFragmentManager().popBackStackImmediate();
-                            }
-                            selectedPosition = 5;
-                            drawer.closeDrawer(GravityCompat.START);
-                            break;
-                        }
-                        case 6: {
-                            final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
-                            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                            dialog.setContentView(R.layout.confirmation_dialog);
-                            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-                            if (DataManager.getInstance().mainActivity.isLandscape) {
-                                DisplayMetrics displaymetrics = new DisplayMetrics();
-                                DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-                                int width = (int) (displaymetrics.widthPixels * 0.45);
-
-                                WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-                                params.width = width;
-                                dialog.getWindow().setAttributes(params);
-                            }
-
-                            ((TextView) dialog.findViewById(R.id.dialog_title)).setTypeface(DataManager.getInstance().oratorstd_typeface);
-                            ((TextView) dialog.findViewById(R.id.dialog_title)).setText(R.string.confirm);
-
-                            ((TextView) dialog.findViewById(R.id.dialog_message)).setTypeface(DataManager.getInstance().myriadpro_regular);
-                            ((TextView) dialog.findViewById(R.id.dialog_message)).setText(R.string.confirm_logout_message);
-
-                            ((TextView) dialog.findViewById(R.id.dialog_no_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
-                            ((TextView) dialog.findViewById(R.id.dialog_no_text)).setText(R.string.no);
-
-                            ((TextView) dialog.findViewById(R.id.dialog_ok_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
-                            ((TextView) dialog.findViewById(R.id.dialog_ok_text)).setText(R.string.yes);
-
-                            dialog.findViewById(R.id.dialog_ok).setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-//                                    drawer.closeDrawer(GravityCompat.START);
-                                    dialog.dismiss();
-                                    android.webkit.CookieManager.getInstance().removeAllCookies(null);
-                                    DataManager.getInstance().checkForbidden = false;
-                                    DataManager.getInstance().set_jwt("");
-
-                                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("jwt", "").apply();
-                                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_checked", "").apply();
-                                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_staff", "").apply();
-                                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", "").apply();
-
-                                    new Delete().from(CurrentUser.class).execute();
-                                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                                    startActivity(intent);
-                                    MainActivity.this.finish();
-                                }
-                            });
-                            dialog.findViewById(R.id.dialog_no).setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    dialog.dismiss();
-                                }
-                            });
-                            dialog.show();
-                            break;
-                        }
+                        });
+                        dialog.show();
                     }
                 }
             }
@@ -781,15 +737,6 @@ public class MainActivity extends FragmentActivity {
             }
         }
     }
-
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
-    }
-
     public static String getRealPathFromURI(Context context, Uri contentUri) {
         String[] proj = { MediaStore.Images.Media.DATA };
         CursorLoader cursorLoader = new CursorLoader(context, contentUri, proj, null, null, null);
@@ -798,6 +745,4 @@ public class MainActivity extends FragmentActivity {
         cursor.moveToFirst();
         return cursor.getString(column_index);
     }
-
-
 }

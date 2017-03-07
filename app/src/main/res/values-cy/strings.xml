@@ -451,7 +451,22 @@
     <string name="login_keeplogged">Keep me logged in</string>
     <string name="check_in">Check-in</string>
     <string name="send_pin_title">Send PIN</string>
-    <string name="alert_invalid_pin">Your pin is invalid!</string>
-    <string name="alert_valid_pin">Pin succesfully set!</string>
+    <string name="alert_invalid_pin">Oops. PIN wasn\'t recognised. Please try again.</string>
+    <string name="alert_valid_pin">Thanks. You\'ve just successfully checked in.</string>
+    <string name="alert_invalid_pin_staff">"Check-in section is for demonstration purposes, and your PIN was not validated. This section is active for student users.</string>
     <string name="demo_mode">Demo</string>
+    <string name="demo_mode_postfeed">Login to start posting messages.</string>
+    <string name="demo_mode_sendfriendrequest">Login to start adding friends.</string>
+    <string name="demo_mode_setcheckinpin">Check-In option will be available to participating institutions.</string>
+    <string name="demo_mode_addactivitylog">To start saving logs, create an account.</string>
+    <string name="demo_mode_editactivitylog">You can\’t edit logs in demo mode.</string>
+    <string name="demo_mode_deleteactivitylog">To start saving logs, create an account.</string>
+    <string name="demo_mode_addtarget">To start saving targets, create an account.</string>
+    <string name="demo_mode_deletetarget">You can\’t edit targets in demo mode</string>
+    <string name="demo_mode_edittarget">Targets can\’t be deleted in demo mode.</string>
+    <string name="demo_mode_changeappsettings">Demo mode only. You can\’t change the settings.</string>
+
+    <string name="social_login_error">This email is already registered in our system. Please try again with a different social platform!</string>
+    <string name="add_module">Add Module</string>
+    <string name="module_name_invalid">Please add a valid Module Name</string>
 </resources>

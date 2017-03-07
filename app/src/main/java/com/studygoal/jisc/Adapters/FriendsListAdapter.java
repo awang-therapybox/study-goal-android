@@ -191,6 +191,14 @@ public class FriendsListAdapter extends BaseAdapter {
                 dialog.findViewById(R.id.dialog_ok).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
+                        if(DataManager.getInstance().user.isDemo) {
+                            attendant.delete();
+                            list.remove(attendant);
+                            notifyDataSetChanged();
+                            return;
+                        }
+
                         dialog.dismiss();
                         HashMap<String, String> params = new HashMap<>();
                         params.put("student_id", DataManager.getInstance().user.id);
@@ -233,6 +241,14 @@ public class FriendsListAdapter extends BaseAdapter {
         hide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(DataManager.getInstance().user.isDemo) {
+                    attendant.hidden = true;
+                    attendant.save();
+                    hide.setVisibility(View.INVISIBLE);
+                    unhide.setVisibility(View.VISIBLE);
+                    return;
+                }
+
                 HashMap<String, String> map = new HashMap<>();
                 map.put("from_student_id", DataManager.getInstance().user.id);
                 map.put("to_student_id", attendant.id);
@@ -257,6 +273,15 @@ public class FriendsListAdapter extends BaseAdapter {
         unhide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(DataManager.getInstance().user.isDemo) {
+                    attendant.hidden = false;
+                    attendant.save();
+                    unhide.setVisibility(View.INVISIBLE);
+                    hide.setVisibility(View.VISIBLE);
+                    return;
+                }
+
                 HashMap<String, String> map = new HashMap<>();
                 map.put("from_student_id", DataManager.getInstance().user.id);
                 map.put("to_student_id", attendant.id);

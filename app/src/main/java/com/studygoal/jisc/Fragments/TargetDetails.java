@@ -1,5 +1,7 @@
 package com.studygoal.jisc.Fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -7,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,6 +98,21 @@ public class TargetDetails extends Fragment {
     }
 
     public void deleteTarget(final Targets target, final int finalPosition) {
+
+        if(DataManager.getInstance().user.isDemo) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(TargetDetails.this.getActivity());
+            alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.demo_mode_deletetarget) + "</font>"));
+            alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+            return;
+        }
+
         final HashMap<String, String> params = new HashMap<>();
         params.put("target_id", target.target_id);
         DataManager.getInstance().mainActivity.showProgressBar(null);

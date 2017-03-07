@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
+import com.studygoal.jisc.Fragments.AddTarget;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Models.Module;
 import com.studygoal.jisc.R;
@@ -24,8 +25,12 @@ public class ModuleAdapter extends BaseAdapter {
         this.selected = selected;
         this.moduleList = new ArrayList<>();
         List<Module> moduleList = new Select().from(Module.class).execute();
-        for(int i = 0; i < moduleList.size(); i++)
+        for(int i = 0; i < moduleList.size(); i++) {
             this.moduleList.add(moduleList.get(i).name);
+        }
+        if(DataManager.getInstance().user.isSocial) {
+            this.moduleList.add(context.getString(R.string.add_module));
+        }
         inflater = LayoutInflater.from(context);
     }
 

@@ -1,12 +1,15 @@
 package com.studygoal.jisc.Fragments;
 
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
+import android.text.Html;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -22,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.studygoal.jisc.Adapters.FriendsSearchAdapter;
+import com.studygoal.jisc.MainActivity;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
 import com.studygoal.jisc.Models.Friend;
@@ -89,6 +93,21 @@ public class FriendsSearch extends Fragment {
         send_friend_request.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(DataManager.getInstance().user.isDemo) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(FriendsSearch.this.getActivity());
+                    alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.demo_mode_sendfriendrequest) + "</font>"));
+                    alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                    return;
+                }
+
                 final String email = search.getText().toString();
                 if (!Utils.validate_email(email)) {
                     if (DataManager.getInstance().isLandscape) {

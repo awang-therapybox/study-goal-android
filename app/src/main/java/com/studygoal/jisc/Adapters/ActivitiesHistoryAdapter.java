@@ -146,6 +146,9 @@ public class ActivitiesHistoryAdapter extends BaseAdapter {
                     convertView.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+
+
+
                             final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
                             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                             dialog.setContentView(R.layout.confirmation_dialog);
