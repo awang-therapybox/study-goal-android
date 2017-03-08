@@ -45,6 +45,7 @@ import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -54,6 +55,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -3685,10 +3687,10 @@ public class NetworkManager {
         public Boolean call() {
 
             try {
-                Long tsLong = System.currentTimeMillis()/1000;
-                String ts = tsLong.toString();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 
-                String apiURL = "https://api.x-staging.data.alpha.jisc.ac.uk/att/checkin?checkinpin="+this.pin+"&geo_tag="+this.location+"&timestamp="+ts;
+                String apiURL = "https://api.x-staging.data.alpha.jisc.ac.uk/att/checkin?checkinpin="+this.pin+"&geo_tag="+this.location+"&timestamp="+sdf.format(new Date());
                 URL url = new URL(apiURL);
 
                 HttpsURLConnection urlConnection;
@@ -3712,14 +3714,36 @@ public class NetworkManager {
                 }
                 is.close();
 
+                Log.e("Jisc","setuserpin: "+apiURL);
+                Log.e("Jisc","setuserpin: "+sb.toString());
+
                 try {
-                    JSONObject object = new JSONObject(sb.toString());
-                    if(object.has("register_id")) {
-                        String register_id = object.getString("register_id");
-                        return register_id.length() > 0 && !register_id.equals("null");
-                    } else {
+                    JSONArray jsonArray = new JSONArray(sb.toString());
+                    if(jsonArray.length() == 0) {
                         return false;
                     }
+
+                    JSONObject jsonObject = jsonArray.getJSONObject(0);
+                    if(!jsonObject.has("ATTENDED")
+                            || !jsonObject.has("id")) {
+
+                        return false;
+
+                    }
+
+                    String attended = jsonObject.getString("ATTENDED");
+                    String id = jsonObject.getString("id");
+
+                    if(id.length() == 0) {
+                        return false;
+                    }
+
+                    if(Integer.parseInt(attended) == 0) {
+                        return false;
+                    }
+
+                    return true;
+
                 } catch (Exception e) {
                     return false;
                 }
@@ -4059,6 +4083,11 @@ public class NetworkManager {
 
                 String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/filter?"
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
+
+                if(DataManager.getInstance().user.isSocial) {
+                    apiURL = host + "fn_get_modules?student_id="+DataManager.getInstance().user.jisc_student_id+"&language="+language;
+                }
+
                 URL url = new URL(apiURL);
 
                 HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
@@ -4076,8 +4105,7 @@ public class NetworkManager {
                         Log.e("getModules", "Code: " + responseCode);
 
                     InputStream is = new BufferedInputStream(urlConnection.getErrorStream());
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(
-                            is, "iso-8859-1"), 8);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                     StringBuilder sb = new StringBuilder();
                     String line;
                     while ((line = reader.readLine()) != null) {
@@ -4129,6 +4157,94 @@ public class NetworkManager {
                         if (new Select().from(Courses.class).where("course_id = ?", courses.id).execute().size() == 0) {
                             courses.save();
                         }
+                    }
+
+                    ActiveAndroid.setTransactionSuccessful();
+                } finally {
+                    ActiveAndroid.endTransaction();
+                }
+                return true;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
+    public boolean getSocialModules() {
+        language = LinguisticManager.getInstance().getLanguageCode();
+        Future<Boolean> future = executorService.submit(new getSocialModules());
+        try {
+            return future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private class getSocialModules implements Callable<Boolean> {
+
+        getSocialModules() {
+        }
+
+        @Override
+        public Boolean call() {
+            try {
+
+                String apiURL = host + "fn_get_modules?student_id="+DataManager.getInstance().user.jisc_student_id+"&language="+language;
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
+                urlConnection.setRequestMethod("GET");
+
+                int responseCode = urlConnection.getResponseCode();
+                forbidden(responseCode);
+                if (responseCode != 200) {
+                    if (responseCode == 204) {
+                        Log.i("getModules", "No records found");
+                        new Delete().from(Module.class).execute();
+                    } else
+                        Log.e("getModules", "Code: " + responseCode);
+
+                    InputStream is = new BufferedInputStream(urlConnection.getErrorStream());
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    is.close();
+
+                    return false;
+                }
+
+                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                is.close();
+
+                JSONArray jsonArray = new JSONArray(sb.toString());
+                Log.e("JISC","Modules: "+jsonArray.toString());
+
+                ActiveAndroid.beginTransaction();
+
+                try {
+                    new Delete().from(Module.class).execute();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        Module modules = new Module();
+                        String sModule = jsonArray.get(i).toString();
+
+                        modules.id = sModule;
+                        modules.name = sModule;
+
+                        modules.save();
                     }
 
                     ActiveAndroid.setTransactionSuccessful();
@@ -4217,7 +4333,12 @@ public class NetworkManager {
                 }
                 is.close();
 
-                Log.e("Jisc","addmodule:"+sb.toString());
+                Module modules = new Module();
+
+                modules.id = params.get("module");
+                modules.name = params.get("module");
+
+                modules.save();
 
                 return true;
             } catch (Exception e) {

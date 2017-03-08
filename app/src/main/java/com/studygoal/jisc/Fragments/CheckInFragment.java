@@ -115,6 +115,8 @@ public class CheckInFragment extends Fragment {
                                 });
                                 AlertDialog alertDialog = alertDialogBuilder.create();
                                 alertDialog.show();
+
+                                pin_text_edit.setText("");
                             }
                         });
                     }

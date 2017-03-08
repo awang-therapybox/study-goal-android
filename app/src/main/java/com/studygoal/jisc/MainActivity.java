@@ -265,7 +265,6 @@ public class MainActivity extends FragmentActivity {
             public void run() {
                 Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
-
                 if(DataManager.getInstance().user.isStaff) {
                     ActiveAndroid.beginTransaction();
                     new Delete().from(Module.class).execute();
@@ -278,7 +277,11 @@ public class MainActivity extends FragmentActivity {
                     ActiveAndroid.setTransactionSuccessful();
                     ActiveAndroid.endTransaction();
                 } else {
-                    NetworkManager.getInstance().getModules();
+                    if(DataManager.getInstance().user.isSocial) {
+                        NetworkManager.getInstance().getSocialModules();
+                    } else {
+                        NetworkManager.getInstance().getModules();
+                    }
                 }
 
                 NetworkManager.getInstance().getStretchTargets(DataManager.getInstance().user.id);

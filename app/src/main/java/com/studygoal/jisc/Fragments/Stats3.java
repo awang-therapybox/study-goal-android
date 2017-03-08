@@ -664,24 +664,6 @@ public class Stats3 extends Fragment {
                     xVals.add(day);
                 }
 
-                LineDataSet set1 = new LineDataSet(vals1, name);
-                set1.setCubicIntensity(0.0f);
-                set1.setDrawFilled(true);
-                set1.setDrawCircles(false);
-                set1.setCircleRadius(3f);
-                set1.setLineWidth(2f);
-                set1.setCircleColor(0xFF8864C8);
-                set1.setColor(0xFF8864C8);
-                set1.setFillColor(0xFF8864C8);
-                set1.setFillAlpha(0);
-                set1.setDrawValues(false);
-                set1.setAxisDependency(YAxis.AxisDependency.RIGHT);
-                set1.setDrawHorizontalHighlightIndicator(true);
-
-                LineData data = new LineData(set1);
-                data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                data.setDrawValues(false);
-
                 IAxisValueFormatter valueFormatter = new IAxisValueFormatter() {
                     @Override
                     public String getFormattedValue(float value, AxisBase axis) {
@@ -693,23 +675,11 @@ public class Stats3 extends Fragment {
                 };
 
                 lineChart.getXAxis().setValueFormatter(valueFormatter);
-                lineChart.setData(data);
+                lineChart.setData(getLineData(vals1, name));
                 lineChart.invalidate();
 
-                BarDataSet barDataSet = new BarDataSet(vals2,name);
-                barDataSet.setColor(0xFF8864C8);
-                barDataSet.setDrawValues(true);
-                barDataSet.setValueTextSize(50);
-                barDataSet.setValueTextColor(0xff000000);
-                barDataSet.setValueTextSize(14f);
-
-                BarData barData = new BarData(barDataSet);
-                barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                barData.setDrawValues(true);
-                barData.setValueTextColor(0xff000000);
-
                 barchart.getXAxis().setValueFormatter(valueFormatter);
-                barchart.setData(barData);
+                barchart.setData(getBarData(vals2,name));
                 barchart.invalidate();
 
             } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
@@ -728,8 +698,8 @@ public class Stats3 extends Fragment {
 
                 String day;
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd");
-                SimpleDateFormat dateFormatD = new SimpleDateFormat("dd");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/d");
+                SimpleDateFormat dateFormatD = new SimpleDateFormat("d");
                 SimpleDateFormat dateFormatM = new SimpleDateFormat("MM");
                 for (int i = 0; i < list.size(); i++) {
                     val1 = val1 + list.get(i).activity_points;
@@ -766,52 +736,21 @@ public class Stats3 extends Fragment {
                     }
                 };
 
-                LineDataSet set1 = new LineDataSet(vals1, name);
-                set1.setCubicIntensity(0.0f);
-                set1.setDrawFilled(true);
-                set1.setDrawCircles(false);
-                set1.setCircleRadius(3f);
-                set1.setLineWidth(2f);
-                set1.setCircleColor(0xFF8864C8);
-                set1.setColor(0xFF8864C8);
-                set1.setFillColor(0xFF8864C8);
-                set1.setFillAlpha(0);
-                set1.setDrawValues(false);
-                set1.setAxisDependency(YAxis.AxisDependency.RIGHT);
-                set1.setDrawHorizontalHighlightIndicator(true);
-
-                LineData data = new LineData(set1);
-                data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                data.setDrawValues(false);
-
                 lineChart.getXAxis().setValueFormatter(valueFormatter1);
-                lineChart.setData(data);
+                lineChart.setData(getLineData(vals1, name));
                 lineChart.invalidate();
 
-                BarDataSet barDataSet = new BarDataSet(vals2,name);
-                barDataSet.setColor(0xFF8864C8);
-                barDataSet.setDrawValues(true);
-                barDataSet.setValueTextSize(50);
-                barDataSet.setValueTextColor(0xff000000);
-                barDataSet.setValueTextSize(14f);
-
-                BarData barData = new BarData(barDataSet);
-                barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                barData.setDrawValues(true);
-                barData.setValueTextColor(0xff000000);
-
                 barchart.getXAxis().setValueFormatter(valueFormatter1);
-                barchart.setData(barData);
+                barchart.setData(getBarData(vals2, name));
                 barchart.invalidate();
-
             }
         } else {
             if (period.getText().toString().equals(getString(R.string.last_7_days))) {
 
                 final ArrayList<String> xVals = new ArrayList<>();
 
-                ArrayList vals3 = new ArrayList<>();
-                ArrayList vals4 = new ArrayList<>();
+                ArrayList<Integer> vals3 = new ArrayList<>();
+                ArrayList<Integer> vals4 = new ArrayList<>();
 
                 ArrayList<Entry> vals1 = new ArrayList<>();
                 ArrayList<Entry> vals2 = new ArrayList<>();
@@ -850,82 +789,62 @@ public class Stats3 extends Fragment {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
                     day = dateFormat.format(date);
                     date.setTime(date.getTime() + 86400000);
-                    vals1.add(new Entry((Integer) vals3.get(i), xVals.size()));
-                    vals2.add(new Entry((Integer) vals4.get(i), xVals.size()));
-                    vals5.add(new BarEntry((Integer) vals3.get(i), xVals.size()));
-                    vals6.add(new BarEntry((Integer) vals4.get(i), xVals.size()));
+                    vals1.add(new Entry(vals3.get(i), xVals.size()));
+                    vals2.add(new Entry(vals4.get(i), xVals.size()));
+                    vals5.add(new BarEntry(vals3.get(i), xVals.size()));
+                    vals6.add(new BarEntry(vals4.get(i), xVals.size()));
                     xVals.add(day);
                 }
 
                 xVals.add("");
 
-                LineDataSet set1 = new LineDataSet(vals1, name);
-                set1.setCubicIntensity(0.0f);
-                set1.setDrawFilled(true);
-                set1.setDrawCircles(false);
-                set1.setLineWidth(1.2f);
-                set1.setCircleSize(2f);
-                set1.setCircleColor(0xFF8864C8);
-                set1.setColor(0xFF8864C8);
-                set1.setFillColor(0xFF8864C8);
-                set1.setFillAlpha(0);
-                set1.setDrawHorizontalHighlightIndicator(true);
+                LineDataSet set1 = getLineDataSet(vals1, name);
+                LineDataSet set2 = getLineDataSet(vals2, compareTo.getText().toString());
 
-                ArrayList<LineDataSet> dataSets = new ArrayList<>();
-                dataSets.add(set1);
+                LineData lineData = new LineData();
+                lineData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
+                lineData.setDrawValues(false);
+                lineData.addDataSet(set1);
+                lineData.addDataSet(set2);
 
-                LineDataSet set2 = new LineDataSet(vals2, compareTo.getText().toString());
-                set2.setCubicIntensity(0.0f);
-                set2.setDrawFilled(true);
-                set2.setDrawCircles(false);
-                set2.setLineWidth(1.2f);
-                set2.setCircleSize(2f);
-                set2.setCircleColor(0xFF3791ee);
-                set2.setColor(0xFF3791ee);
-                set2.setFillColor(0xFF3791ee);
-                set2.setFillAlpha(0);
-                set2.setDrawHorizontalHighlightIndicator(true);
-                dataSets.add(set2);
-
-                LineData data = new LineData();
-                data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                data.setValueTextSize(14f);
-                data.setDrawValues(false);
-                data.addDataSet(set1);
-                data.addDataSet(set2);
-
-                // set data
-                lineChart.setData(data);
-
-                BarDataSet barDataSet1 = new BarDataSet(vals5,name);
-                barDataSet1.setColor(0xFF8864C8);
-
-                BarDataSet barDataSet2 = new BarDataSet(vals6,compareTo.getText().toString());
+                BarDataSet barDataSet1 = getBarDataSet(vals5,name);
+                BarDataSet barDataSet2 = getBarDataSet(vals6,compareTo.getText().toString());
 
                 BarData barData = new BarData();
+                barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
+                barData.setDrawValues(true);
+                barData.setValueTextColor(0xff000000);
                 barData.addDataSet(barDataSet1);
                 barData.addDataSet(barDataSet2);
 
-                barchart.getAxisLeft().setDrawGridLines(false);
-                barchart.getXAxis().setDrawGridLines(false);
-                barchart.setDrawValueAboveBar(true);
-                barchart.setBackgroundColor(Color.TRANSPARENT);
-                barchart.setDrawBorders(false);
-                barchart.setDrawGridBackground(false);
-                barchart.setMaxVisibleValueCount(vals1.size());
-                barchart.setBackgroundColor(0xFFFFFFFF);
-                barchart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+                IAxisValueFormatter valueFormatter = new IAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value, AxisBase axis) {
+                        if(xVals.size() > value)
+                            return xVals.get((int)value);
+                        else
+                            return "";
+                    }
+                };
 
+                lineChart.getXAxis().setValueFormatter(valueFormatter);
+                lineChart.setData(lineData);
+                lineChart.invalidate();
+
+                barchart.getXAxis().setValueFormatter(valueFormatter);
                 barchart.setData(barData);
+                barchart.invalidate();
 
             } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
 
                 final ArrayList<String> xVals = new ArrayList<>();
 
-                ArrayList vals3 = new ArrayList<>();
-                ArrayList vals4 = new ArrayList<>();
+                ArrayList<Integer> vals3 = new ArrayList<>();
+                ArrayList<Integer> vals4 = new ArrayList<>();
+
                 ArrayList<Entry> vals1 = new ArrayList<>();
                 ArrayList<Entry> vals2 = new ArrayList<>();
+
                 ArrayList<BarEntry> vals5 = new ArrayList<>();
                 ArrayList<BarEntry> vals6 = new ArrayList<>();
 
@@ -962,178 +881,110 @@ public class Stats3 extends Fragment {
                 date.setTime(time);
 
                 for (int i = 0; i < vals3.size(); i++) {
-                    val1 = val1 + (Integer) vals3.get(i);
-                    val2 = val2 + (Integer) vals4.get(i);
+                    val1 = val1 + vals3.get(i);
+                    val2 = val2 + vals4.get(i);
                     if (i == 6 || i == 13 || i == 20 || i == 27) {
                         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                         label = dateFormat.format(date);
                         date.setTime(date.getTime() + 7*86400000);
+
                         vals1.add(new Entry(val1, xVals.size()));
                         vals2.add(new Entry(val2, xVals.size()));
+
                         vals5.add(new BarEntry(val1, xVals.size()));
                         vals6.add(new BarEntry(val2, xVals.size()));
+
                         xVals.add(label);
+
                         val1 = 0;
                         val2 = 0;
                     }
                 }
 
-                ArrayList<LineDataSet> dataSets = new ArrayList<>();
+                LineDataSet set1 = getLineDataSet(vals1, name);
+                LineDataSet set2 = getLineDataSet(vals2, compareTo.getText().toString());
 
-                LineDataSet set1 = new LineDataSet(vals1, name);
-                set1.setCubicIntensity(0.0f);
-                set1.setDrawFilled(true);
-                set1.setDrawCircles(false);
-                set1.setLineWidth(1.2f);
-                set1.setCircleSize(2f);
-                set1.setCircleColor(0xFF8864C8);
-                set1.setColor(0xFF8864C8);
-                set1.setFillColor(0xFF8864C8);
-                set1.setFillAlpha(0);
-                set1.setDrawHorizontalHighlightIndicator(true);
-                dataSets.add(set1);
+                LineData lineData = new LineData();
+                lineData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
+                lineData.setDrawValues(false);
+                lineData.addDataSet(set1);
+                lineData.addDataSet(set2);
 
-                LineDataSet set2 = new LineDataSet(vals2, compareTo.getText().toString());
-                set2.setCubicIntensity(0.0f);
-                set2.setDrawFilled(true);
-                set2.setDrawCircles(false);
-                set2.setLineWidth(1.2f);
-                set2.setCircleSize(2f);
-                set2.setCircleColor(0xFF3791ee);
-                set2.setColor(0xFF3791ee);
-                set2.setFillColor(0xFF3791ee);
-                set2.setFillAlpha(0);
-                set2.setDrawHorizontalHighlightIndicator(true);
-                dataSets.add(set2);
-
-                LineData data = new LineData();
-                data.addDataSet(set1);
-                data.addDataSet(set2);
-                data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                data.setValueTextSize(14f);
-                data.setDrawValues(false);
-
-                lineChart.setData(data);
-
-                BarDataSet barDataSet1 = new BarDataSet(vals5,name);
-                barDataSet1.setColor(0xFF8864C8);
-
-                BarDataSet barDataSet2 = new BarDataSet(vals6,compareTo.getText().toString());
+                BarDataSet barDataSet1 = getBarDataSet(vals5,name);
+                BarDataSet barDataSet2 = getBarDataSet(vals6,compareTo.getText().toString());
 
                 BarData barData = new BarData();
+                barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
+                barData.setDrawValues(true);
+                barData.setValueTextColor(0xff000000);
                 barData.addDataSet(barDataSet1);
                 barData.addDataSet(barDataSet2);
 
-                barchart.getAxisLeft().setDrawGridLines(false);
-                barchart.getXAxis().setDrawGridLines(false);
-                barchart.setDrawValueAboveBar(true);
-                barchart.setBackgroundColor(Color.TRANSPARENT);
-                barchart.setDrawBorders(false);
-                barchart.setDrawGridBackground(false);
-                barchart.setMaxVisibleValueCount(vals1.size());
-                barchart.setBackgroundColor(0xFFFFFFFF);
-                barchart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-
-                barchart.setData(barData);
-
-            } else if (period.getText().toString().equals(getString(R.string.overall))) {
-
-                int size = list.size();
-                if (size > 38) {
-                    size = 38;
-                }
-
-                final ArrayList<String> xVals = new ArrayList<>();
-                ArrayList<Entry> vals1 = new ArrayList<>();
-                ArrayList<Entry> vals2 = new ArrayList<>();
-                ArrayList<BarEntry> vals5 = new ArrayList<>();
-                ArrayList<BarEntry> vals6 = new ArrayList<>();
-                ArrayList vals3 = new ArrayList<>();
-                ArrayList vals4 = new ArrayList<>();
-
-                String name = getString(R.string.me);
-                String id = DataManager.getInstance().user.jisc_student_id;
-
-                Integer value_2;
-                Integer value_1;
-
-                for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).student_id.equals(id)) {
-                        value_1 = list.get(i).activity_points;
-                        vals3.add(value_1);
-                    } else {
-                        value_2 = list.get(i).activity_points;
-                        vals4.add(value_2);
+                IAxisValueFormatter valueFormatter1 = new IAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value, AxisBase axis) {
+                        if(xVals.size() > value)
+                            return xVals.get((int)value);
+                        else
+                            return "";
                     }
-                }
+                };
 
-                for (int i = 0; i < vals3.size(); i++) {
-                    vals1.add(new Entry((Integer) vals3.get(i), xVals.size()));
-                    vals2.add(new Entry((Integer) vals4.get(i), xVals.size()));
-                    vals5.add(new BarEntry((Integer) vals3.get(i), xVals.size()));
-                    vals6.add(new BarEntry((Integer) vals4.get(i), xVals.size()));
-                    xVals.add(list.get(i).date);
-                }
+                lineChart.getXAxis().setValueFormatter(valueFormatter1);
+                lineChart.setData(lineData);
+                lineChart.invalidate();
 
-
-                ArrayList<LineDataSet> dataSets = new ArrayList<>();
-
-                // create a dataset and give it a type
-                LineDataSet set1 = new LineDataSet(vals1, name);
-                set1.setCubicIntensity(0.0f);
-                set1.setDrawFilled(true);
-                set1.setDrawCircles(false);
-                set1.setLineWidth(1.2f);
-                set1.setCircleSize(2f);
-                set1.setCircleColor(0xFF8864C8);
-                set1.setColor(0xFF8864C8);
-                set1.setFillColor(0xFF8864C8);
-                set1.setFillAlpha(0);
-                set1.setDrawHorizontalHighlightIndicator(true);
-                dataSets.add(set1);
-
-                LineDataSet set2 = new LineDataSet(vals2, compareTo.getText().toString());
-                set2.setCubicIntensity(0.0f);
-                set2.setDrawFilled(true);
-                set2.setDrawCircles(false);
-                set2.setLineWidth(1.2f);
-                set2.setCircleSize(2f);
-                set2.setCircleColor(0xFF3791ee);
-                set2.setColor(0xFF3791ee);
-                set2.setFillColor(0xFF3791ee);
-                set2.setFillAlpha(0);
-                set2.setDrawHorizontalHighlightIndicator(true);
-                dataSets.add(set2);
-
-                LineData data = new LineData();
-                data.addDataSet(set1);
-                data.addDataSet(set2);
-                data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                data.setValueTextSize(14f);
-                data.setDrawValues(false);
-
-                // set data
-                lineChart.setData(data);
-
-                BarDataSet barDataSet1 = new BarDataSet(vals5,name);
-                barDataSet1.setColor(0xFF8864C8);
-                BarDataSet barDataSet2 = new BarDataSet(vals6,compareTo.getText().toString());
-
-                BarData barData = new BarData();
-                barData.addDataSet(barDataSet1);
-                barData.addDataSet(barDataSet2);
-
-                barchart.getAxisLeft().setDrawGridLines(false);
-                barchart.getXAxis().setDrawGridLines(false);
-                barchart.setDrawValueAboveBar(true);
-                barchart.setBackgroundColor(Color.TRANSPARENT);
-                barchart.setDrawBorders(false);
-                barchart.setDrawGridBackground(false);
-                barchart.setMaxVisibleValueCount(vals1.size());
-                barchart.setBackgroundColor(0xFFFFFFFF);
-                barchart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+                barchart.getXAxis().setValueFormatter(valueFormatter1);
                 barchart.setData(barData);
+                barchart.invalidate();
             }
         }
+    }
+
+    public LineData getLineData(ArrayList<Entry> vals1, String name) {
+
+        LineData data = new LineData(getLineDataSet(vals1, name));
+        data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
+        data.setDrawValues(false);
+
+        return data;
+    }
+
+    public BarData getBarData(ArrayList<BarEntry> vals2, String name) {
+        BarData barData = new BarData(getBarDataSet(vals2, name));
+        barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
+        barData.setDrawValues(true);
+        barData.setValueTextColor(0xff000000);
+
+        return barData;
+    }
+
+    public LineDataSet getLineDataSet(ArrayList<Entry> vals1, String name) {
+        LineDataSet lineDataSet = new LineDataSet(vals1, name);
+        lineDataSet.setCubicIntensity(0.0f);
+        lineDataSet.setDrawFilled(true);
+        lineDataSet.setDrawCircles(false);
+        lineDataSet.setCircleRadius(3f);
+        lineDataSet.setLineWidth(2f);
+        lineDataSet.setCircleColor(0xFF8864C8);
+        lineDataSet.setColor(0xFF8864C8);
+        lineDataSet.setFillColor(0xFF8864C8);
+        lineDataSet.setFillAlpha(0);
+        lineDataSet.setDrawValues(false);
+        lineDataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
+        lineDataSet.setDrawHorizontalHighlightIndicator(true);
+
+        return lineDataSet;
+    }
+
+    public BarDataSet getBarDataSet(ArrayList<BarEntry> vals2, String name) {
+        BarDataSet barDataSet = new BarDataSet(vals2,name);
+        barDataSet.setColor(0xFF8864C8);
+        barDataSet.setDrawValues(true);
+        barDataSet.setValueTextSize(50);
+        barDataSet.setValueTextColor(0xff000000);
+        barDataSet.setValueTextSize(14f);
+
+        return barDataSet;
     }
 }
