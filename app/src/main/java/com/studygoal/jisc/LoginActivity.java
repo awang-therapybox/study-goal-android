@@ -230,6 +230,25 @@ public class LoginActivity extends Activity {
                         return;
                     }
 
+                    if(view.getTag().equals("demo")) {
+                        String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0ODgzNjU2NzcsImp0aSI6IjFtbjhnU3YrWk9mVzJlYXV1NmVrN0Rzbm1MUjA0dDRyT0V0SEQ5Z1BGdk09IiwiaXNzIjoiaHR0cDpcL1wvc3AuZGF0YVwvYXV0aCIsIm5iZiI6MTQ4ODM2NTY2NywiZXhwIjoxNjYyNTY0NTY2NywiZGF0YSI6eyJlcHBuIjoiIiwicGlkIjoiZGVtb3VzZXJAZGVtby5hYy51ayIsImFmZmlsaWF0aW9uIjoic3R1ZGVudEBkZW1vLmFjLnVrIn19.xM6KkBFvHW7vtf6dF-X4f_6G3t_KGPVNylN_rMJROsh1MXIg9sK5j77L0Jzg1JR8fhXZf-0jFMnZz6FMotAeig";
+                        DataManager.getInstance().set_jwt(token);
+
+                        if (NetworkManager.getInstance().checkIfUserRegistered()) {
+                            if (NetworkManager.getInstance().login()) {
+                                DataManager.getInstance().institution = "1";
+                                DataManager.getInstance().user.isDemo = true;
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                LoginActivity.this.finish();
+                            } else {
+                                //TODO: Need more information about the register flow so i can deal with other situations
+                            }
+
+                        }
+                        return;
+                    }
+
                     showProgressBar();
 
                     if (getCurrentFocus() != null) {

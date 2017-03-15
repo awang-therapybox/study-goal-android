@@ -63,8 +63,7 @@ public class ModuleAdapter2 extends BaseAdapter {
         TextView textView = (TextView) convertView.findViewById(R.id.dialog_item_name);
         textView.setTypeface(DataManager.getInstance().myriadpro_regular);
         if (!coursesList.contains(moduleList.get(position)) && position != 0){
-            String liniuta = " -" + moduleList.get(position);
-            textView.setText(liniuta);
+            textView.setText(" -" + moduleList.get(position));
         }else {
             textView.setText(moduleList.get(position));
         }

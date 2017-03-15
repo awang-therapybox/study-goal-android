@@ -3701,7 +3701,6 @@ public class NetworkManager {
 
                 int responseCode = urlConnection.getResponseCode();
                 if(responseCode != 200) {
-
                     return false;
                 }
 
@@ -3726,9 +3725,7 @@ public class NetworkManager {
                     JSONObject jsonObject = jsonArray.getJSONObject(0);
                     if(!jsonObject.has("ATTENDED")
                             || !jsonObject.has("id")) {
-
                         return false;
-
                     }
 
                     String attended = jsonObject.getString("ATTENDED");
@@ -3805,6 +3802,8 @@ public class NetworkManager {
                 is.close();
 
                 JSONObject jsonObject = new JSONObject(sb.toString());
+
+                Log.e("Jisc","/student: "+jsonObject.toString());
 
                 if (jsonObject.has("APPSHIB_ID")
                         && !jsonObject.getString("APPSHIB_ID").equals("")
@@ -4083,10 +4082,6 @@ public class NetworkManager {
 
                 String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/filter?"
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
-
-                if(DataManager.getInstance().user.isSocial) {
-                    apiURL = host + "fn_get_modules?student_id="+DataManager.getInstance().user.jisc_student_id+"&language="+language;
-                }
 
                 URL url = new URL(apiURL);
 

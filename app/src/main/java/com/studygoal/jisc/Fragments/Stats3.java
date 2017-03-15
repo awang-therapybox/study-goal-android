@@ -157,7 +157,7 @@ public class Stats3 extends Fragment {
         module = (AppCompatTextView) mainView.findViewById(R.id.module_list);
         module.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
         module.setTypeface(DataManager.getInstance().myriadpro_regular);
-        module.setText(R.string.anymodule);
+        module.setText(R.string.any_module);
 
         period = (AppCompatTextView) mainView.findViewById(R.id.period_list);
         period.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
@@ -168,131 +168,9 @@ public class Stats3 extends Fragment {
         compareTo.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
         compareTo.setTypeface(DataManager.getInstance().myriadpro_regular);
         compareTo.setText(R.string.no_one);
+        compareTo.setAlpha(0.5f);
 
-        getData();
-
-        final TextView description = (TextView) mainView.findViewById(R.id.description);
-        description.setTypeface(DataManager.getInstance().myriadpro_regular);
-        description.setText(R.string.last_week);
-
-        ((TextView) mainView.findViewById(R.id.module)).setTypeface(DataManager.getInstance().myriadpro_regular);
-        ((TextView) mainView.findViewById(R.id.period)).setTypeface(DataManager.getInstance().myriadpro_regular);
-        ((TextView) mainView.findViewById(R.id.compare_to)).setTypeface(DataManager.getInstance().myriadpro_regular);
-
-        //Setting the module
-        module.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.setContentView(R.layout.custom_spinner_layout);
-                dialog.setCancelable(false);
-                if (DataManager.getInstance().mainActivity.isLandscape) {
-                    DisplayMetrics displaymetrics = new DisplayMetrics();
-                    DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-                    int width = (int) (displaymetrics.widthPixels * 0.3);
-
-                    WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-                    params.width = width;
-                    dialog.getWindow().setAttributes(params);
-                }
-
-                ((TextView) dialog.findViewById(R.id.dialog_title)).setTypeface(DataManager.getInstance().oratorstd_typeface);
-                ((TextView) dialog.findViewById(R.id.dialog_title)).setText(R.string.choose_module);
-
-                final ListView listView = (ListView) dialog.findViewById(R.id.dialog_listview);
-                listView.setAdapter(new ModuleAdapter2(DataManager.getInstance().mainActivity, module.getText().toString()));
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        dialog.dismiss();
-                        module.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && (compareTo.getText().toString().equals(getString(R.string.average)) || compareTo.getText().toString().equals(getString(R.string.top10))) ){
-                                            compareTo.setText(R.string.no_one);
-                                        }
-                                        getData();
-                                        ((MainActivity) getActivity()).hideProgressBar();
-                                    }
-                                });
-                            }
-                        }).start();
-
-                    }
-                });
-                ((MainActivity) getActivity()).showProgressBar2("");
-                dialog.show();
-            }
-        });
-
-        period.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.setContentView(R.layout.custom_spinner_layout);
-                dialog.setCancelable(false);
-                if (DataManager.getInstance().mainActivity.isLandscape) {
-                    DisplayMetrics displaymetrics = new DisplayMetrics();
-                    DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-                    int width = (int) (displaymetrics.widthPixels * 0.3);
-
-                    WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-                    params.width = width;
-                    dialog.getWindow().setAttributes(params);
-                }
-
-                ((TextView) dialog.findViewById(R.id.dialog_title)).setTypeface(DataManager.getInstance().oratorstd_typeface);
-                ((TextView) dialog.findViewById(R.id.dialog_title)).setText(R.string.time_period);
-
-                ArrayList<String> items = new ArrayList<>();
-//                items.add(getString(R.string.last_24_hours));
-                items.add(getString(R.string.last_7_days));
-                items.add(getString(R.string.last_30_days));
-                //items.add(getString(R.string.Overall));
-                final ListView listView = (ListView) dialog.findViewById(R.id.dialog_listview);
-                listView.setAdapter(new GenericAdapter(DataManager.getInstance().mainActivity, period.getText().toString(), items));
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        period.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
-//                        if(period.getText().toString().equals(getString(R.string.last_24_hours))) {
-//                            description.setText(R.string.last_day);
-//                        } else
-                        if (period.getText().toString().equals(getString(R.string.last_7_days))) {
-                            description.setText(R.string.last_week_engagement);
-                        } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
-                            description.setText(R.string.last_month_engagement);
-                        } else if (period.getText().toString().equals(getString(R.string.overall))) {
-                            description.setText(R.string.Overall_engagement);
-                        }
-                        dialog.dismiss();
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        getData();
-                                        ((MainActivity) getActivity()).hideProgressBar();
-                                    }
-                                });
-                            }
-                        }).start();
-
-                    }
-                });
-                ((MainActivity) getActivity()).showProgressBar2("");
-                dialog.show();
-            }
-        });
-
-        compareTo.setOnClickListener(new View.OnClickListener() {
+        final View.OnClickListener compareToListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!module.getText().toString().equals(DataManager.getInstance().mainActivity.getString(R.string.any_module))) {
@@ -397,6 +275,138 @@ public class Stats3 extends Fragment {
                     ((MainActivity) getActivity()).showProgressBar2("");
                     dialog.show();
                 }
+            }
+        };
+
+//        getData();
+
+        final TextView description = (TextView) mainView.findViewById(R.id.description);
+        description.setTypeface(DataManager.getInstance().myriadpro_regular);
+        description.setText(R.string.last_week);
+
+        ((TextView) mainView.findViewById(R.id.module)).setTypeface(DataManager.getInstance().myriadpro_regular);
+        ((TextView) mainView.findViewById(R.id.period)).setTypeface(DataManager.getInstance().myriadpro_regular);
+        ((TextView) mainView.findViewById(R.id.compare_to)).setTypeface(DataManager.getInstance().myriadpro_regular);
+
+        //Setting the module
+        module.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.custom_spinner_layout);
+                dialog.setCancelable(false);
+                if (DataManager.getInstance().mainActivity.isLandscape) {
+                    DisplayMetrics displaymetrics = new DisplayMetrics();
+                    DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+                    int width = (int) (displaymetrics.widthPixels * 0.3);
+
+                    WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                    params.width = width;
+                    dialog.getWindow().setAttributes(params);
+                }
+
+                ((TextView) dialog.findViewById(R.id.dialog_title)).setTypeface(DataManager.getInstance().oratorstd_typeface);
+                ((TextView) dialog.findViewById(R.id.dialog_title)).setText(R.string.choose_module);
+
+                final ListView listView = (ListView) dialog.findViewById(R.id.dialog_listview);
+                listView.setAdapter(new ModuleAdapter2(DataManager.getInstance().mainActivity, module.getText().toString()));
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        dialog.dismiss();
+                        module.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
+
+                        if(!module.getText().toString().equals(getString(R.string.any_module))) {
+                            compareTo.setOnClickListener(compareToListener);
+                            compareTo.setAlpha(1.0f);
+                        } else {
+                            compareTo.setOnClickListener(null);
+                            compareTo.setAlpha(0.5f);
+                        }
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && (compareTo.getText().toString().equals(getString(R.string.average)) || compareTo.getText().toString().equals(getString(R.string.top10))) ){
+                                            compareTo.setText(R.string.no_one);
+                                        }
+                                        getData();
+                                        ((MainActivity) getActivity()).hideProgressBar();
+                                    }
+                                });
+                            }
+                        }).start();
+
+                    }
+                });
+                ((MainActivity) getActivity()).showProgressBar2("");
+                dialog.show();
+            }
+        });
+
+        period.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.custom_spinner_layout);
+                dialog.setCancelable(false);
+                if (DataManager.getInstance().mainActivity.isLandscape) {
+                    DisplayMetrics displaymetrics = new DisplayMetrics();
+                    DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+                    int width = (int) (displaymetrics.widthPixels * 0.3);
+
+                    WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                    params.width = width;
+                    dialog.getWindow().setAttributes(params);
+                }
+
+                ((TextView) dialog.findViewById(R.id.dialog_title)).setTypeface(DataManager.getInstance().oratorstd_typeface);
+                ((TextView) dialog.findViewById(R.id.dialog_title)).setText(R.string.time_period);
+
+                ArrayList<String> items = new ArrayList<>();
+//                items.add(getString(R.string.last_24_hours));
+                items.add(getString(R.string.last_7_days));
+                items.add(getString(R.string.last_30_days));
+                //items.add(getString(R.string.Overall));
+                final ListView listView = (ListView) dialog.findViewById(R.id.dialog_listview);
+                listView.setAdapter(new GenericAdapter(DataManager.getInstance().mainActivity, period.getText().toString(), items));
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        period.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
+//                        if(period.getText().toString().equals(getString(R.string.last_24_hours))) {
+//                            description.setText(R.string.last_day);
+//                        } else
+                        if (period.getText().toString().equals(getString(R.string.last_7_days))) {
+                            description.setText(R.string.last_week_engagement);
+                        } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
+                            description.setText(R.string.last_month_engagement);
+                        } else if (period.getText().toString().equals(getString(R.string.overall))) {
+                            description.setText(R.string.Overall_engagement);
+                        }
+                        dialog.dismiss();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        getData();
+                                        ((MainActivity) getActivity()).hideProgressBar();
+                                    }
+                                });
+                            }
+                        }).start();
+
+                    }
+                });
+                ((MainActivity) getActivity()).showProgressBar2("");
+                dialog.show();
             }
         });
 
