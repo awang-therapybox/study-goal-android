@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -25,7 +24,6 @@ import com.activeandroid.query.Select;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -36,6 +34,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.studygoal.jisc.Adapters.GenericAdapter;
 import com.studygoal.jisc.Adapters.ModuleAdapter2;
 import com.studygoal.jisc.MainActivity;
@@ -46,12 +45,7 @@ import com.studygoal.jisc.Models.ED;
 import com.studygoal.jisc.Models.Friend;
 import com.studygoal.jisc.Models.Module;
 import com.studygoal.jisc.R;
-import com.studygoal.jisc.Utils.Utils;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -60,7 +54,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.regex.Matcher;
 
 public class Stats3 extends Fragment {
 
@@ -117,6 +110,8 @@ public class Stats3 extends Fragment {
         yAxis.setDrawGridLines(true);
         yAxis.setAxisLineColor(Color.TRANSPARENT);
         yAxis.setTextSize(14f);
+        yAxis.setAxisMinimum(0.0f);
+        yAxis.setGranularity(1.0f);
 
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setTypeface(DataManager.getInstance().myriadpro_regular);
@@ -126,7 +121,7 @@ public class Stats3 extends Fragment {
         xAxis.setAxisLineColor(Color.BLACK);
         xAxis.setTextSize(14f);
         xAxis.setGranularity(1f);
-
+        xAxis.setAxisMinimum(0.0f);
 
         Legend legend = lineChart.getLegend();
         legend.setTextSize(14f);
@@ -139,6 +134,8 @@ public class Stats3 extends Fragment {
         yAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         yAxis.setDrawGridLines(true);
         yAxis.setAxisLineColor(Color.TRANSPARENT);
+        yAxis.setAxisMinimum(0.0f);
+        yAxis.setGranularity(1.0f);
 
         xAxis = barchart.getXAxis();
         xAxis.setTypeface(DataManager.getInstance().myriadpro_regular);
@@ -149,6 +146,7 @@ public class Stats3 extends Fragment {
         xAxis.setDrawLabels(true);
         xAxis.setAxisLineColor(Color.BLACK);
         xAxis.setGranularity(1f);
+        xAxis.setAxisMinimum(0.0f);
 
         legend = barchart.getLegend();
         legend.setTextSize(14f);
@@ -157,7 +155,7 @@ public class Stats3 extends Fragment {
         module = (AppCompatTextView) mainView.findViewById(R.id.module_list);
         module.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
         module.setTypeface(DataManager.getInstance().myriadpro_regular);
-        module.setText(R.string.any_module);
+        module.setText(R.string.anymodule);
 
         period = (AppCompatTextView) mainView.findViewById(R.id.period_list);
         period.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
@@ -173,7 +171,7 @@ public class Stats3 extends Fragment {
         final View.OnClickListener compareToListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!module.getText().toString().equals(DataManager.getInstance().mainActivity.getString(R.string.any_module))) {
+                if (!module.getText().toString().equals(DataManager.getInstance().mainActivity.getString(R.string.anymodule))) {
                     final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
                     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     dialog.setContentView(R.layout.custom_spinner_layout);
@@ -317,7 +315,7 @@ public class Stats3 extends Fragment {
                         dialog.dismiss();
                         module.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
 
-                        if(!module.getText().toString().equals(getString(R.string.any_module))) {
+                        if(!module.getText().toString().equals(getString(R.string.anymodule))) {
                             compareTo.setOnClickListener(compareToListener);
                             compareTo.setAlpha(1.0f);
                         } else {
@@ -436,23 +434,6 @@ public class Stats3 extends Fragment {
 
 
     private void getData() {
-        String fileterType;
-        String compareValue = null;
-        String compareType = null;
-        if (new Select().from(Module.class).where("module_name LIKE ?", "%" + module.getText().toString().replace(" -", "") + "%").exists()) {
-            fileterType = "module";
-        } else {
-            fileterType = "course";
-        }
-        if (compareTo.getText().toString().contains("Top")) {
-            compareValue = "10";
-            compareType = "top";
-        } else if (!compareTo.getText().toString().equals(getString(R.string.no_one)) && !compareTo.getText().toString().equals(getString(R.string.top10)) && !compareTo.getText().toString().equals(getString(R.string.average))) {
-            compareValue = ((Friend) new Select().from(Friend.class).where("name = ?", compareTo.getText().toString()).executeSingle()).jisc_student_id.replace("[", "").replace("]", "").replace("\"", "");
-            compareType = "friend";
-        } else if (compareTo.getText().toString().contains("Average")){
-            compareType = "average";
-        }
 
         if(DataManager.getInstance().user.isStaff) {
             list = new ArrayList<>();
@@ -611,35 +592,69 @@ public class Stats3 extends Fragment {
                     }
                 }
             }
-        } else if (module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && compareTo.getText().toString().equals(getString(R.string.no_one)) && period.getText().toString().equals("Overall")) {
-            list = NetworkManager.getInstance().get_ED();
-        } else if(module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && !compareTo.getText().toString().equals(getString(R.string.no_one))){
-            list = NetworkManager.getInstance().get_ED_for_time_period_module_and_compareTo_allActivity(DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase(),compareValue,compareType);
-        } else if (module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && compareTo.getText().toString().equals(getString(R.string.no_one)) && !period.getText().toString().equals("")) {
-            list = NetworkManager.getInstance().get_ED_for_time_period(DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase());
-        } else if (!module.getText().toString().replace(" -", "").equals(getString(R.string.anymodule)) && compareTo.getText().toString().equals(getString(R.string.no_one)) && !period.getText().toString().equals("")) {
-            if (fileterType.equals("module")) {
-                list = NetworkManager.getInstance().get_ED_for_time_and_course(DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase(), fileterType, ((Module) new Select().from(Module.class).where("module_name = ?", module.getText().toString().replace(" -", "")).executeSingle()).id);
+            setData();
+            lineChart.invalidate();
+            DataManager.getInstance().mainActivity.hideProgressBar();
+            return;
+        }
+
+        String filterType;
+        String filterValue;
+        boolean isCourse = false;
+
+        String moduleTitleName = module.getText().toString().replace(" -", "");
+        if (new Select().from(Module.class).where("module_name LIKE ?", "%" + moduleTitleName + "%").exists()) {
+            filterType = "module";
+            filterValue = ((Module) new Select().from(Module.class).where("module_name = ?", moduleTitleName).executeSingle()).id;
+        } else {
+            filterType = "course";
+            if (new Select().from(Courses.class).where("course_name LIKE ?", "%" + moduleTitleName + "%").exists()) {
+                filterValue = ((Courses) new Select().from(Courses.class).where("course_name = ?", moduleTitleName).executeSingle()).id;
+                isCourse = true;
             } else {
-                list = NetworkManager.getInstance().get_ED_for_time_and_course(DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase(), fileterType, ((Courses) new Select().from(Courses.class).where("course_name = ?", module.getText().toString().replace(" -", "")).executeSingle()).id);
-            }
-        } else if (!module.getText().toString().equals(getString(R.string.anymodule)) && !compareTo.getText().toString().equals(getString(R.string.no_one)) && !period.getText().toString().equals("")) {
-            if (fileterType.equals("module") && !compareTo.getText().toString().equals(getString(R.string.average))) {
-                list = NetworkManager.getInstance().get_ED_for_time_period_module_and_compareTo(DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase(), fileterType, ((Module) new Select().from(Module.class).where("module_name = ?", module.getText().toString().replace(" -", "")).executeSingle()).id, compareValue, compareType);
-            } else if (!compareTo.getText().toString().equals(getString(R.string.average))) {
-                list = NetworkManager.getInstance().get_ED_for_time_period_module_and_compareTo(DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase(), fileterType, ((Courses) new Select().from(Courses.class).where("course_name = ?", module.getText().toString().replace(" -", "")).executeSingle()).id, compareValue, compareType);
-            } else if (fileterType.equals("module") && compareTo.getText().toString().equals(getString(R.string.average))) {
-                list = NetworkManager.getInstance().get_ED_for_time_period_module_and_compareTo_average(DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase(), fileterType, ((Module) new Select().from(Module.class).where("module_name = ?", module.getText().toString().replace(" -", "")).executeSingle()).id, compareType);
-            } else if (compareTo.getText().toString().equals(getString(R.string.average))) {
-                list = NetworkManager.getInstance().get_ED_for_time_period_module_and_compareTo_average(DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase(), fileterType, ((Courses) new Select().from(Courses.class).where("course_name = ?", module.getText().toString().replace(" -", "")).executeSingle()).id, compareType);
+                filterValue = "";
             }
         }
+
+        String compareValue;
+        String compareType;
+        if (compareTo.getText().toString().contains("Top")) {
+            compareValue = "10";
+            compareType = "top";
+        } else if (!compareTo.getText().toString().equals(getString(R.string.no_one))
+                && !compareTo.getText().toString().equals(getString(R.string.top10))
+                && !compareTo.getText().toString().equals(getString(R.string.average))) {
+            compareValue = ((Friend) new Select().from(Friend.class).where("name = ?", compareTo.getText().toString()).executeSingle()).jisc_student_id.replace("[", "").replace("]", "").replace("\"", "");
+            compareType = "friend";
+        } else if (compareTo.getText().toString().contains("Average")){
+            compareValue = "";
+            compareType = "average";
+        } else {
+            compareType = "";
+            compareValue = "";
+        }
+
+        String scope = DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase();
+
+        list = NetworkManager.getInstance().getEngagementGraph(
+                scope,
+                compareType,
+                compareValue,
+                filterType,
+                filterValue,
+                isCourse
+        );
+
         setData();
         lineChart.invalidate();
         DataManager.getInstance().mainActivity.hideProgressBar();
     }
 
     private void setData() {
+
+        if(list == null) {
+            list = new ArrayList<>();
+        }
 
         lineChart.setData(null);
         lineChart.getXAxis().setValueFormatter(null);
@@ -665,8 +680,8 @@ public class Stats3 extends Fragment {
 
                 Collections.reverse(list);
 
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
                 for (int i = 0; i < list.size(); i++) {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
                     String day = dateFormat.format(date);
                     date.setTime(date.getTime() + 86400000);
                     vals1.add(new Entry(xVals.size(), list.get(i).activity_points));
@@ -696,6 +711,7 @@ public class Stats3 extends Fragment {
 
                 ArrayList<Entry> vals1 = new ArrayList<>();
                 ArrayList<BarEntry> vals2 = new ArrayList<>();
+
                 final ArrayList<String> xVals = new ArrayList<>();
 
                 Integer val1 = 0;
@@ -780,7 +796,7 @@ public class Stats3 extends Fragment {
                 c.setTimeInMillis(curr);
 
                 for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).student_id.equals(id)) {
+                    if (list.get(i).student_id.contains(id)) {
                         value_1 = list.get(i).activity_points;
                         vals3.add(value_1);
                     } else {
@@ -795,37 +811,38 @@ public class Stats3 extends Fragment {
                 Date date = new Date();
                 date.setTime(date.getTime() - 6*86400000);
 
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
+
                 for (int i = 0; i < vals3.size(); i++) {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
                     day = dateFormat.format(date);
                     date.setTime(date.getTime() + 86400000);
-                    vals1.add(new Entry(vals3.get(i), xVals.size()));
-                    vals2.add(new Entry(vals4.get(i), xVals.size()));
-                    vals5.add(new BarEntry(vals3.get(i), xVals.size()));
-                    vals6.add(new BarEntry(vals4.get(i), xVals.size()));
+                    vals1.add(new Entry(xVals.size(), vals3.get(i)));
+                    vals2.add(new Entry(xVals.size(), vals4.get(i)));
+
+                    vals5.add(new BarEntry(xVals.size(), vals3.get(i)));
+                    vals6.add(new BarEntry(xVals.size(), vals4.get(i)));
                     xVals.add(day);
                 }
-
-                xVals.add("");
 
                 LineDataSet set1 = getLineDataSet(vals1, name);
                 LineDataSet set2 = getLineDataSet(vals2, compareTo.getText().toString());
 
-                LineData lineData = new LineData();
+                LineData lineData = new LineData(set1);
                 lineData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
                 lineData.setDrawValues(false);
-                lineData.addDataSet(set1);
                 lineData.addDataSet(set2);
 
                 BarDataSet barDataSet1 = getBarDataSet(vals5,name);
                 BarDataSet barDataSet2 = getBarDataSet(vals6,compareTo.getText().toString());
 
-                BarData barData = new BarData();
+                BarData barData = new BarData(barDataSet1);
                 barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
                 barData.setDrawValues(true);
                 barData.setValueTextColor(0xff000000);
-                barData.addDataSet(barDataSet1);
                 barData.addDataSet(barDataSet2);
+                barData.setBarWidth(0.40f);
+                barData.groupBars(0, 0.09f, 0.01f);
+                barData.setValueTextColor(0xff000000);
 
                 IAxisValueFormatter valueFormatter = new IAxisValueFormatter() {
                     @Override
@@ -871,7 +888,7 @@ public class Stats3 extends Fragment {
                 c.setTimeInMillis(curr);
 
                 for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).student_id.equals(id)) {
+                    if (list.get(i).student_id.contains(id)) {
                         value_1 = list.get(i).activity_points;
                         vals3.add(value_1);
                     } else {
@@ -890,19 +907,21 @@ public class Stats3 extends Fragment {
                 long time = date.getTime() - 21*86400000;
                 date.setTime(time);
 
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
                 for (int i = 0; i < vals3.size(); i++) {
                     val1 = val1 + vals3.get(i);
                     val2 = val2 + vals4.get(i);
                     if (i == 6 || i == 13 || i == 20 || i == 27) {
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
                         label = dateFormat.format(date);
                         date.setTime(date.getTime() + 7*86400000);
 
-                        vals1.add(new Entry(val1, xVals.size()));
-                        vals2.add(new Entry(val2, xVals.size()));
+                        vals1.add(new Entry(xVals.size(), val1));
+                        vals2.add(new Entry(xVals.size(), val2));
 
-                        vals5.add(new BarEntry(val1, xVals.size()));
-                        vals6.add(new BarEntry(val2, xVals.size()));
+                        vals5.add(new BarEntry(xVals.size(), val1));
+                        vals6.add(new BarEntry(xVals.size(), val2));
 
                         xVals.add(label);
 
@@ -914,26 +933,27 @@ public class Stats3 extends Fragment {
                 LineDataSet set1 = getLineDataSet(vals1, name);
                 LineDataSet set2 = getLineDataSet(vals2, compareTo.getText().toString());
 
-                LineData lineData = new LineData();
+                LineData lineData = new LineData(set1);
                 lineData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
                 lineData.setDrawValues(false);
-                lineData.addDataSet(set1);
                 lineData.addDataSet(set2);
 
                 BarDataSet barDataSet1 = getBarDataSet(vals5,name);
                 BarDataSet barDataSet2 = getBarDataSet(vals6,compareTo.getText().toString());
 
-                BarData barData = new BarData();
+                BarData barData = new BarData(barDataSet1);
                 barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
                 barData.setDrawValues(true);
-                barData.setValueTextColor(0xff000000);
-                barData.addDataSet(barDataSet1);
                 barData.addDataSet(barDataSet2);
+                barData.setBarWidth(0.40f);
+                barData.groupBars(0, 0.09f, 0.01f);
+                barData.setValueTextColor(0xff000000);
 
                 IAxisValueFormatter valueFormatter1 = new IAxisValueFormatter() {
                     @Override
                     public String getFormattedValue(float value, AxisBase axis) {
                         if(xVals.size() > value)
+
                             return xVals.get((int)value);
                         else
                             return "";
@@ -979,6 +999,13 @@ public class Stats3 extends Fragment {
         lineDataSet.setCircleColor(0xFF8864C8);
         lineDataSet.setColor(0xFF8864C8);
         lineDataSet.setFillColor(0xFF8864C8);
+        lineDataSet.setValueTextColor(0xFF8864C8);
+        if(!name.equals(getString(R.string.me))) {
+            lineDataSet.setColor(0xFF3791ee);
+            lineDataSet.setFillColor(0xFF3791ee);
+            lineDataSet.setCircleColor(0xFF3791ee);
+            lineDataSet.setValueTextColor(0xFF3791ee);
+        }
         lineDataSet.setFillAlpha(0);
         lineDataSet.setDrawValues(false);
         lineDataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
@@ -990,11 +1017,14 @@ public class Stats3 extends Fragment {
     public BarDataSet getBarDataSet(ArrayList<BarEntry> vals2, String name) {
         BarDataSet barDataSet = new BarDataSet(vals2,name);
         barDataSet.setColor(0xFF8864C8);
+        barDataSet.setValueTextColor(0xFF8864C8);
+        if(!name.equals(getString(R.string.me))) {
+            barDataSet.setColor(0xFF3791ee);
+            barDataSet.setValueTextColor(0xFF3791ee);
+        }
         barDataSet.setDrawValues(true);
         barDataSet.setValueTextSize(50);
-        barDataSet.setValueTextColor(0xff000000);
         barDataSet.setValueTextSize(14f);
-
         return barDataSet;
     }
 }

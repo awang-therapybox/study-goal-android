@@ -34,7 +34,7 @@ public class ModuleAdapter2 extends BaseAdapter {
         for (int i = 0; i < moduleList.size(); i++) {
             this.moduleList.add(moduleList.get(i).name);
         }
-        this.moduleList.add(0, context.getString(R.string.any_module));
+        this.moduleList.add(0, context.getString(R.string.anymodule));
         this.moduleList.addAll(1, this.coursesList);
         inflater = LayoutInflater.from(context);
     }

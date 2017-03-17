@@ -390,389 +390,9 @@ public class NetworkManager {
         }
     }
 
-    //TODO INCEPE DE AICI
-
-    public List<ED> get_ED_for_time_period_module_and_compareTo_allActivity(String time_period, String compareValue , String compareType){
-        Future<List<ED>> future = executorService.submit(new get_ED_for_time_period_module_and_compareTo_allActivity(time_period, compareValue, compareType));
-        try {
-            return future.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<ED>();
-        }
-    }
-
-    private class get_ED_for_time_period_module_and_compareTo_allActivity implements Callable<List<ED>> {
-
-        String time_period;
-        String compareValue;
-        String compareType;
-
-        get_ED_for_time_period_module_and_compareTo_allActivity(String time_period, String compareValue, String compareType) {
-            this.time_period = time_period;
-            this.compareValue = compareValue;
-            this.compareType = compareType;
-        }
-
-        @Override
-        public List<ED> call() throws Exception {
-
-            List<ED> engagement_list = new ArrayList<>();
-            try {
-                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period + "&compareType=" + compareType + "&compareValue=" + compareValue
-                        + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
-
-                URL url = new URL(apiURL);
-                HttpsURLConnection urlConnection;
-                urlConnection = (HttpsURLConnection) url.openConnection();
-                urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
-                urlConnection.setSSLSocketFactory(context.getSocketFactory());
-                urlConnection.setRequestMethod("GET");
-
-                int responseCode = urlConnection.getResponseCode();
-                forbidden(responseCode);
-                if (responseCode != 200) {
-                    Log.e("time_period_m_compare", "Code: " + responseCode);
-                    return engagement_list;
-                }
-
-                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                is.close();
-
-                switch (time_period) {
-                    case "7d": {
-                        //TODO: WELP
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONArray jsonArray = new JSONArray(sb.toString());
-
-                        for (int j = 0 ; j < jsonArray.length() ; j++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(j);
-                            JSONObject jsonObject1 = jsonObject.getJSONObject("VALUES");
-                            for (int i = 0; i < jsonObject1.length(); i++) {
-                                ED item = new ED();
-                                item.student_id = jsonObject.getString("STUDENT_ID");
-                                c.setTimeInMillis(c.getTimeInMillis() + 86400000 * -i);
-                                item.day = String.valueOf(c.get(Calendar.DAY_OF_WEEK));
-                                item.position = String.valueOf(i).replace("-","");
-                                item.activity_points = jsonObject1.getInt(String.valueOf(-i));
-                                engagement_list.add(item);
-                            }
-                        }
-                        break;
-                    }
-                    case "28d": {
-                        //TODO: WELP
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONArray jsonArray = new JSONArray(sb.toString());
-                        int temp = jsonArray.length();
-                        for (int j = 0 ; j < jsonArray.length() ; j++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(j);
-                            JSONObject jsonObject1 = jsonObject.getJSONObject("VALUES");
-                            for (int i = 0; i < jsonObject1.length(); i++) {
-                                ED item = new ED();
-                                item.student_id = jsonObject.getString("STUDENT_ID");
-                                c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600 * 24)) * 1000);
-                                item.week = (((c.get(Calendar.MONTH) + 1) < 10) ? ("0" + (c.get(Calendar.MONTH) + 1)) : ((c.get(Calendar.MONTH) + 1) + "")) + "/" + ((c.get(Calendar.DAY_OF_MONTH) < 10) ? ("0" + c.get(Calendar.DAY_OF_MONTH)) : (c.get(Calendar.DAY_OF_MONTH)));
-                                item.activity_points = jsonObject1.getInt(String.valueOf(-i));
-                                item.position = String.valueOf(i).replace("-","");
-                                engagement_list.add(item);
-                            }
-                        }
-                        break;
-                    }
-                    case "overall": {
-                        JSONObject jsonObject = new JSONObject(sb.toString());
-                        JSONArray jsonArray = jsonObject.getJSONArray("result");
-                        for (int i = 0 ; i < jsonArray.length() ; i++){
-                            JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-                            JSONArray jsonArray1 = jsonObject1.getJSONArray("data");
-                            for (int j = 0 ; j < jsonArray1.length() ; j++){
-                                JSONObject jsonObject2 = jsonArray1.getJSONObject(j);
-                                ED item = new ED();
-                                item.date = jsonObject1.getString("_id");
-                                item.activity_points = jsonObject2.getInt("totalPoints");
-                                item.student_id = jsonObject2.getString("record");
-                                engagement_list.add(item);
-                            }
-                        }
-                        break;
-                    }
-                }
-                return engagement_list;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return engagement_list;
-            }
-
-        }
-    }
-
-    public List<ED> get_ED_for_time_period_module_and_compareTo(String time_period, String filterType,String filterValue, String compareValue , String compareType) {
-        Future<List<ED>> future = executorService.submit(new get_ED_for_time_period_module_and_compareTo(time_period, filterType,filterValue, compareValue, compareType));
-        try {
-            return future.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<ED>();
-        }
-    }
-
-    private class get_ED_for_time_period_module_and_compareTo implements Callable<List<ED>> {
-
-        String time_period;
-        String filterValue;
-        String compareValue;
-        String filterType;
-        String compareType;
-
-        get_ED_for_time_period_module_and_compareTo(String time_period, String filterType, String filterValue,String compareValue, String compareType) {
-            this.time_period = time_period;
-            this.filterType = filterType;
-            this.compareValue = compareValue;
-            this.filterValue = filterValue;
-            this.compareType = compareType;
-        }
-
-        @Override
-        public List<ED> call() {
-            List<ED> engagement_list = new ArrayList<>();
-            try {
-
-                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period + "&filterType=" + filterType + "&filterValue=" + filterValue + "&compareType=" + compareType + "&compareValue=" + compareValue
-                        + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
-
-                URL url = new URL(apiURL);
-
-                HttpsURLConnection urlConnection;
-                urlConnection = (HttpsURLConnection) url.openConnection();
-                urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
-                urlConnection.setSSLSocketFactory(context.getSocketFactory());
-                urlConnection.setRequestMethod("GET");
-
-                int responseCode = urlConnection.getResponseCode();
-                forbidden(responseCode);
-                if (responseCode != 200) {
-                    Log.e("time_period_m_compare", "Code: " + responseCode);
-                    return engagement_list;
-                }
-
-                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                is.close();
-
-                switch (time_period) {
-                    case "7d": {
-                        //TODO: WELP
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONArray jsonArray = new JSONArray(sb.toString());
-
-                        for (int j = 0 ; j < jsonArray.length() ; j++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(j);
-                            JSONObject jsonObject1 = jsonObject.getJSONObject("VALUES");
-                            for (int i = 0; i < jsonObject1.length(); i++) {
-                                ED item = new ED();
-                                item.student_id = jsonObject.getString("STUDENT_ID");
-                                c.setTimeInMillis(c.getTimeInMillis() + 86400000 * -i);
-                                item.day = String.valueOf(c.get(Calendar.DAY_OF_WEEK));
-                                item.position = String.valueOf(i).replace("-","");
-                                item.activity_points = jsonObject1.getInt(String.valueOf(-i));
-                                engagement_list.add(item);
-                            }
-                        }
-                        break;
-                    }
-                    case "28d": {
-                        //TODO: WELP
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONArray jsonArray = new JSONArray(sb.toString());
-                        int temp = jsonArray.length();
-                        for (int j = 0 ; j < jsonArray.length() ; j++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(j);
-                            JSONObject jsonObject1 = jsonObject.getJSONObject("VALUES");
-                            for (int i = 0; i < jsonObject1.length(); i++) {
-                                ED item = new ED();
-                                item.student_id = jsonObject.getString("STUDENT_ID");
-                                c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600 * 24)) * 1000);
-                                item.week = (((c.get(Calendar.MONTH) + 1) < 10) ? ("0" + (c.get(Calendar.MONTH) + 1)) : ((c.get(Calendar.MONTH) + 1) + "")) + "/" + ((c.get(Calendar.DAY_OF_MONTH) < 10) ? ("0" + c.get(Calendar.DAY_OF_MONTH)) : (c.get(Calendar.DAY_OF_MONTH)));
-                                item.activity_points = jsonObject1.getInt(String.valueOf(-i));
-                                item.position = String.valueOf(i).replace("-","");
-                                engagement_list.add(item);
-                            }
-                        }
-                        break;
-                    }
-                    case "overall": {
-                        JSONObject jsonObject = new JSONObject(sb.toString());
-                        JSONArray jsonArray = jsonObject.getJSONArray("result");
-                        for (int i = 0 ; i < jsonArray.length() ; i++){
-                            JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-                            JSONArray jsonArray1 = jsonObject1.getJSONArray("data");
-                            for (int j = 0 ; j < jsonArray1.length() ; j++){
-                                JSONObject jsonObject2 = jsonArray1.getJSONObject(j);
-                                ED item = new ED();
-                                item.date = jsonObject1.getString("_id");
-                                item.activity_points = jsonObject2.getInt("totalPoints");
-                                item.student_id = jsonObject2.getString("record");
-                                engagement_list.add(item);
-                            }
-                        }
-                        break;
-                    }
-                }
-                return engagement_list;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return engagement_list;
-            }
-        }
-    }
-
-    public List<ED> get_ED_for_time_period_module_and_compareTo_average(String time_period, String filterType,String filterValue , String compareType) {
-        Future<List<ED>> future = executorService.submit(new get_ED_for_time_period_module_and_compareTo_average(time_period, filterType,filterValue, compareType));
-        try {
-            return future.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-    }
-
-    private class get_ED_for_time_period_module_and_compareTo_average implements Callable<List<ED>> {
-
-        String time_period;
-        String filterValue;
-        String filterType;
-        String compareType;
-
-        get_ED_for_time_period_module_and_compareTo_average(String time_period, String filterType, String filterValue,String compareType) {
-            this.time_period = time_period;
-            this.filterType = filterType;
-            this.filterValue = filterValue;
-            this.compareType = compareType;
-        }
-
-        @Override
-        public List<ED> call() {
-            List<ED> engagement_list = new ArrayList<>();
-            try {
-
-                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period + "&filterType=" + filterType + "&filterValue=" + filterValue + "&compareType=" + compareType
-                        + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
-
-                URL url = new URL(apiURL);
-
-                HttpsURLConnection urlConnection;
-                urlConnection = (HttpsURLConnection) url.openConnection();
-                urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
-                urlConnection.setSSLSocketFactory(context.getSocketFactory());
-                urlConnection.setRequestMethod("GET");
-
-                int responseCode = urlConnection.getResponseCode();
-                forbidden(responseCode);
-                if (responseCode != 200) {
-                    Log.e("time_period_m_compare", "Code: " + responseCode);
-                    return engagement_list;
-                }
-
-                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                is.close();
-
-                switch (time_period) {
-                    case "7d": {
-                        //TODO: WELP
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONArray jsonArray = new JSONArray(sb.toString());
-
-                        for (int j = 0 ; j < jsonArray.length() ; j++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(j);
-                            JSONObject jsonObject1 = jsonObject.getJSONObject("VALUES");
-                            for (int i = 0; i < jsonObject1.length(); i++) {
-                                ED item = new ED();
-                                item.student_id = jsonObject.getString("STUDENT_ID");
-                                c.setTimeInMillis(c.getTimeInMillis() + 86400000 * -i);
-                                item.day = String.valueOf(c.get(Calendar.DAY_OF_WEEK));
-                                item.position = String.valueOf(i).replace("-","");
-                                item.activity_points = jsonObject1.getInt(String.valueOf(-i));
-                                engagement_list.add(item);
-                            }
-                        }
-                        break;
-                    }
-                    case "28d": {
-                        //TODO: WELP
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONArray jsonArray = new JSONArray(sb.toString());
-                        int temp = jsonArray.length();
-                        for (int j = 0 ; j < jsonArray.length() ; j++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(j);
-                            JSONObject jsonObject1 = jsonObject.getJSONObject("VALUES");
-                            for (int i = 0; i < jsonObject1.length(); i++) {
-                                ED item = new ED();
-                                item.student_id = jsonObject.getString("STUDENT_ID");
-                                c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600 * 24)) * 1000);
-                                item.week = (((c.get(Calendar.MONTH) + 1) < 10) ? ("0" + (c.get(Calendar.MONTH) + 1)) : ((c.get(Calendar.MONTH) + 1) + "")) + "/" + ((c.get(Calendar.DAY_OF_MONTH) < 10) ? ("0" + c.get(Calendar.DAY_OF_MONTH)) : (c.get(Calendar.DAY_OF_MONTH)));
-                                item.activity_points = jsonObject1.getInt(String.valueOf(-i));
-                                item.position = String.valueOf(i).replace("-","");
-                                engagement_list.add(item);
-                            }
-                        }
-                        break;
-                    }
-                    case "overall": {
-                        JSONObject jsonObject = new JSONObject(sb.toString());
-                        JSONArray jsonArray = jsonObject.getJSONArray("result");
-                        for (int i = 0 ; i < jsonArray.length() ; i++){
-                            JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-                            JSONArray jsonArray1 = jsonObject1.getJSONArray("data");
-                            for (int j = 0 ; j < jsonArray1.length() ; j++){
-                                JSONObject jsonObject2 = jsonArray1.getJSONObject(j);
-                                ED item = new ED();
-                                item.date = jsonObject1.getString("_id");
-                                item.activity_points = jsonObject2.getInt("totalPoints");
-                                item.student_id = jsonObject2.getString("record");
-                                engagement_list.add(item);
-                            }
-                        }
-                        break;
-                    }
-                }
-                return engagement_list;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return engagement_list;
-            }
-        }
-    }
-
-    public List<ED> get_ED() {
+    public List<ED> getEngagementGraph(String scope, String compareType, String compareValue, String filterType, String filterValue, boolean isCourse) {
         language = LinguisticManager.getInstance().getLanguageCode();
-        Future<List<ED>> future = executorService.submit(new get_ED());
+        Future<List<ED>> future = executorService.submit(new getEngagementGraph(scope,compareType,compareValue,filterType,filterValue, isCourse));
         try {
             return future.get();
         } catch (Exception e) {
@@ -781,21 +401,36 @@ public class NetworkManager {
         }
     }
 
-    private class get_ED implements Callable<List<ED>> {
+    private class getEngagementGraph implements Callable<List<ED>> {
 
         ArrayList<ED> engagement_list;
+        String scope;
+        String compareType;
+        String compareValue;
+        String filterType;
+        String filterValue;
+        boolean isCourse;
 
-        get_ED() {
+        getEngagementGraph(String scope, String compareType, String compareValue, String filterType, String filterValue, boolean isCourse) {
             engagement_list = new ArrayList<>();
+            this.scope = scope;
+            this.compareType = compareType;
+            this.compareValue = compareValue;
+            this.filterType = filterType;
+            this.filterValue = filterValue;
+            this.isCourse = isCourse;
         }
 
         @Override
         public List<ED> call() throws Exception {
-
             try {
-
                 String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?"
-                        + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
+                        + "scope=" + this.scope
+                        + "&compareType=" + this.compareType
+                        + "&compareValue=" + this.compareValue
+                        + "&filterType=" + this.filterType
+                        + "&filterValue=" + this.filterValue
+                        ;
 
                 URL url = new URL(apiURL);
 
@@ -805,16 +440,29 @@ public class NetworkManager {
                 urlConnection.setRequestMethod("GET");
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
 
+                Log.e("getEngagementGraph","Compare graph: "+apiURL);
+
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
                 if (responseCode != 200) {
-                    Log.e("get_ED_for_time_period", "Code: " + responseCode);
+
+                    InputStream is = new BufferedInputStream(urlConnection.getErrorStream());
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    is.close();
+
+                    Log.e("getEngagementGraph","Compare graph: "+sb.toString());
+                    Log.e("getEngagementGraph", "Code: " + responseCode);
+
                     return engagement_list;
                 }
 
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                 StringBuilder sb = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -822,275 +470,122 @@ public class NetworkManager {
                 }
                 is.close();
 
-                JSONArray jsonArray = new JSONObject(sb.toString()).getJSONArray("result");
+                Log.e("Jisc","Compare graph: "+sb.toString());
 
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    ED item = new ED();
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    item.day = jsonObject.getString("_id").replace("-", "/");
-                    JSONArray jsonArray1 = jsonObject.getJSONArray("data");
-                    JSONObject jsonObject1 = jsonArray1.getJSONObject(0);
-                    item.activity_points = jsonObject1.getInt("totalPoints");
-                    engagement_list.add(item);
-                }
-                Collections.sort(engagement_list, new Comparator<ED>() {
-                    @Override
-                    public int compare(ED s1, ED s2) {
-                        return s1.day.compareToIgnoreCase(s2.day);
-                    }
-                });
-
-                return engagement_list;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return engagement_list;
-            }
-        }
-    }
-
-    public List<ED> get_ED_for_time_and_course(String time_period , String filterType , String filterValue){
-        language = LinguisticManager.getInstance().getLanguageCode();
-        Future<List<ED>> future = executorService.submit(new get_ED_for_time_and_course(time_period,filterType,filterValue));
-        try {
-            return future.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-    }
-
-    private class get_ED_for_time_and_course implements Callable<List<ED>>{
-
-        ArrayList<ED> engagement_list;
-        String time_period;
-        String filterType;
-        String filterValue;
-
-        get_ED_for_time_and_course(String time_period , String filterType , String filterValue){
-            this.time_period = time_period;
-            this.filterType = filterType;
-            this.filterValue = filterValue;
-            engagement_list = new ArrayList<>();
-        }
-
-        @Override
-        public List<ED> call() throws Exception {
-            try {
-                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?filterType=" + filterType + "&filterValue=" + filterValue + "&scope=" + time_period
-                        + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
-
-                URL url = new URL(apiURL);
-
-                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-                urlConnection.setSSLSocketFactory(context.getSocketFactory());
-                urlConnection.setRequestMethod("GET");
-                urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
-
-                int responseCode = urlConnection.getResponseCode();
-                forbidden(responseCode);
-                if (responseCode != 200) {
-                    Log.e("get_ED_for_time_period", "Code: " + responseCode);
-                    return engagement_list;
-                }
-
-                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                is.close();
-
-                switch (time_period) {
-                    case "7d": {
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONObject jsonObject = new JSONObject(sb.toString());
-                        Iterator<String> iterator = jsonObject.keys();
-                        int temp = jsonObject.length();
-                        while (iterator.hasNext()) {
-                            String key = iterator.next();
-                            ED item = new ED();
-                            c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600 * 24)) * 1000);
-                            item.day = LinguisticManager.getInstance().getWeekDay(c.get(Calendar.DAY_OF_WEEK));
-                            item.activity_points = jsonObject.getInt(key);
-                            temp--;
-                            engagement_list.add(item);
-                        }
-                        break;
-                    }
-                    case "28d": {
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONObject jsonObject = new JSONObject(sb.toString());
-                        Iterator<String> iterator = jsonObject.keys();
-                        int temp = jsonObject.length();
-                        while (iterator.hasNext()) {
-                            String key = iterator.next();
-                            ED item = new ED();
-                            c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600 * 24)) * 1000);
-                            item.day = (((c.get(Calendar.MONTH) + 1) < 10) ? ("0" + (c.get(Calendar.MONTH) + 1)) : ((c.get(Calendar.MONTH) + 1) + "")) + "/" + ((c.get(Calendar.DAY_OF_MONTH) < 10) ? ("0" + c.get(Calendar.DAY_OF_MONTH)) : (c.get(Calendar.DAY_OF_MONTH)));
-                            item.activity_points = jsonObject.getInt(key);
-                            temp--;
-                            engagement_list.add(item);
-                        }
-                        break;
-                    }
-                    case "overall": {
-                        JSONArray jsonArray = new JSONObject(sb.toString()).getJSONArray("result");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            ED item = new ED();
-                            JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            JSONArray jsonArray1 = new JSONObject(jsonObject.toString()).getJSONArray("data");
-                            JSONObject jsonObject1 = jsonArray1.getJSONObject(0);
-                            item.day = jsonObject.getString("_id").replace("-", "/");
-                            item.activity_points = jsonObject1.getInt("totalPoints");
-                            engagement_list.add(item);
-                        }
-                        Collections.sort(engagement_list, new Comparator<ED>() {
-                            @Override
-                            public int compare(ED s1, ED s2) {
-                                return s1.day.compareToIgnoreCase(s2.day);
+                if(compareType.length() == 0) {
+                    switch (this.scope) {
+                        case "7d": {
+                            Calendar c = Calendar.getInstance();
+                            Calendar g = Calendar.getInstance();
+                            JSONObject jsonObject = new JSONObject(sb.toString());
+                            Iterator<String> iterator = jsonObject.keys();
+                            int temp = jsonObject.length();
+                            while (iterator.hasNext()) {
+                                String key = iterator.next();
+                                ED item = new ED();
+                                c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600 * 24)) * 1000);
+                                item.day = LinguisticManager.getInstance().getWeekDay(c.get(Calendar.DAY_OF_WEEK));
+                                item.activity_points = jsonObject.getInt(key);
+                                temp--;
+                                engagement_list.add(item);
                             }
-                        });
-                        break;
-                    }
-                }
-
-                return engagement_list;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return engagement_list;
-            }
-        }
-    }
-
-
-    public List<ED> get_ED_for_time_period(String time_period) {
-        language = LinguisticManager.getInstance().getLanguageCode();
-        Future<List<ED>> future = executorService.submit(new get_ED_for_time_period(time_period));
-        try {
-            return future.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-    }
-
-    private class get_ED_for_time_period implements Callable<List<ED>> {
-
-        ArrayList<ED> engagement_list;
-        String time_period;
-
-        get_ED_for_time_period(String time_period) {
-            this.time_period = time_period;
-            engagement_list = new ArrayList<>();
-        }
-
-        @Override
-        public List<ED> call() {
-            try {
-
-                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?scope=" + time_period
-                        + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
-
-                URL url = new URL(apiURL);
-
-                HttpsURLConnection urlConnection;
-                urlConnection = (HttpsURLConnection) url.openConnection();
-                urlConnection.setSSLSocketFactory(context.getSocketFactory());
-                urlConnection.setRequestMethod("GET");
-                urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
-
-                int responseCode = urlConnection.getResponseCode();
-                forbidden(responseCode);
-                if (responseCode != 200) {
-                    Log.e("get_ED_for_time_period", "Code: " + responseCode);
-                    return engagement_list;
-                }
-
-                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                is.close();
-
-                switch (time_period) {
-                    case "24h": {
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONObject jsonObject = new JSONObject(sb.toString());
-                        Iterator<String> iterator = jsonObject.keys();
-                        int temp = jsonObject.length();
-                        while (iterator.hasNext()) {
-                            String key = iterator.next();
-                            ED item = new ED();
-                            c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600)) * 1000);
-                            item.hour = c.get(Calendar.HOUR_OF_DAY) + ":00";
-                            item.activity_points = jsonObject.getInt(key);
-                            temp--;
-                            engagement_list.add(item);
+                            break;
                         }
-                        break;
-                    }
-                    case "7d": {
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONObject jsonObject = new JSONObject(sb.toString());
-                        Iterator<String> iterator = jsonObject.keys();
-                        int temp = jsonObject.length();
-                        while (iterator.hasNext()) {
-                            String key = iterator.next();
-                            ED item = new ED();
-                            c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600 * 24)) * 1000);
-                            item.day = LinguisticManager.getInstance().getWeekDay(c.get(Calendar.DAY_OF_WEEK));
-                            item.activity_points = jsonObject.getInt(key);
-                            temp--;
-                            engagement_list.add(item);
-                        }
-                        break;
-                    }
-                    case "28d": {
-                        Calendar c = Calendar.getInstance();
-                        Calendar g = Calendar.getInstance();
-                        JSONObject jsonObject = new JSONObject(sb.toString());
-                        Iterator<String> iterator = jsonObject.keys();
-                        int temp = jsonObject.length();
-                        while (iterator.hasNext()) {
-                            String key = iterator.next();
-                            ED item = new ED();
-                            c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600 * 24)) * 1000);
-                            item.day = (((c.get(Calendar.MONTH) + 1) < 10) ? ("0" + (c.get(Calendar.MONTH) + 1)) : ((c.get(Calendar.MONTH) + 1) + "")) + "/" + ((c.get(Calendar.DAY_OF_MONTH) < 10) ? ("0" + c.get(Calendar.DAY_OF_MONTH)) : (c.get(Calendar.DAY_OF_MONTH)));
-                            item.activity_points = jsonObject.getInt(key);
-                            temp--;
-                            engagement_list.add(item);
-                        }
-                        break;
-                    }
-                    case "overall": {
-                        JSONArray jsonArray = new JSONObject(sb.toString()).getJSONArray("result");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            ED item = new ED();
-                            JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            JSONArray jsonArray1 = new JSONObject(jsonObject.toString()).getJSONArray("data");
-                            JSONObject jsonObject1 = jsonArray1.getJSONObject(0);
-                            item.day = jsonObject.getString("_id").replace("-", "/");
-                            item.activity_points = jsonObject1.getInt("totalPoints");
-                            engagement_list.add(item);
-                        }
-                        Collections.sort(engagement_list, new Comparator<ED>() {
-                            @Override
-                            public int compare(ED s1, ED s2) {
-                                return s1.day.compareToIgnoreCase(s2.day);
+                        case "28d": {
+                            Calendar c = Calendar.getInstance();
+                            Calendar g = Calendar.getInstance();
+                            JSONObject jsonObject = new JSONObject(sb.toString());
+                            Iterator<String> iterator = jsonObject.keys();
+                            int temp = jsonObject.length();
+                            while (iterator.hasNext()) {
+                                String key = iterator.next();
+                                ED item = new ED();
+                                c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600 * 24)) * 1000);
+                                item.day = (((c.get(Calendar.MONTH) + 1) < 10) ? ("0" + (c.get(Calendar.MONTH) + 1)) : ((c.get(Calendar.MONTH) + 1) + "")) + "/" + ((c.get(Calendar.DAY_OF_MONTH) < 10) ? ("0" + c.get(Calendar.DAY_OF_MONTH)) : (c.get(Calendar.DAY_OF_MONTH)));
+                                item.activity_points = jsonObject.getInt(key);
+                                temp--;
+                                engagement_list.add(item);
                             }
-                        });
-                        break;
+                            break;
+                        }
+                        case "overall": {
+                            JSONArray jsonArray = new JSONObject(sb.toString()).getJSONArray("result");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                ED item = new ED();
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                JSONArray jsonArray1 = new JSONObject(jsonObject.toString()).getJSONArray("data");
+                                JSONObject jsonObject1 = jsonArray1.getJSONObject(0);
+                                item.day = jsonObject.getString("_id").replace("-", "/");
+                                item.activity_points = jsonObject1.getInt("totalPoints");
+                                engagement_list.add(item);
+                            }
+                            Collections.sort(engagement_list, new Comparator<ED>() {
+                                @Override
+                                public int compare(ED s1, ED s2) {
+                                    return s1.day.compareToIgnoreCase(s2.day);
+                                }
+                            });
+                            break;
+                        }
+                    }
+                } else {
+                    switch (this.scope) {
+                        case "7d": {
+                            Calendar c = Calendar.getInstance();
+                            JSONArray jsonArray = new JSONArray(sb.toString());
+
+                            for (int j = 0 ; j < jsonArray.length() ; j++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(j);
+                                JSONObject jsonObject1 = jsonObject.getJSONObject("VALUES");
+                                for (int i = 0; i < jsonObject1.length(); i++) {
+                                    ED item = new ED();
+                                    item.student_id = jsonObject.getString("STUDENT_ID");
+                                    c.setTimeInMillis(c.getTimeInMillis() + 86400000 * -i);
+                                    item.day = String.valueOf(c.get(Calendar.DAY_OF_WEEK));
+                                    item.position = String.valueOf(i).replace("-","");
+                                    item.activity_points = jsonObject1.getInt(String.valueOf(-i));
+                                    engagement_list.add(item);
+                                }
+                            }
+                            break;
+                        }
+                        case "28d": {
+                            Calendar c = Calendar.getInstance();
+                            Calendar g = Calendar.getInstance();
+                            JSONArray jsonArray = new JSONArray(sb.toString());
+                            int temp = jsonArray.length();
+                            for (int j = 0 ; j < jsonArray.length() ; j++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(j);
+                                JSONObject jsonObject1 = jsonObject.getJSONObject("VALUES");
+                                for (int i = 0; i < jsonObject1.length(); i++) {
+                                    ED item = new ED();
+                                    item.student_id = jsonObject.getString("STUDENT_ID");
+                                    c.setTimeInMillis((g.getTimeInMillis() / 1000 - (temp * 3600 * 24)) * 1000);
+                                    item.week = (((c.get(Calendar.MONTH) + 1) < 10) ? ("0" + (c.get(Calendar.MONTH) + 1)) : ((c.get(Calendar.MONTH) + 1) + "")) + "/" + ((c.get(Calendar.DAY_OF_MONTH) < 10) ? ("0" + c.get(Calendar.DAY_OF_MONTH)) : (c.get(Calendar.DAY_OF_MONTH)));
+                                    item.activity_points = jsonObject1.getInt(String.valueOf(-i));
+                                    item.position = String.valueOf(i).replace("-","");
+                                    engagement_list.add(item);
+                                }
+                            }
+                            break;
+                        }
+                        case "overall": {
+                            JSONObject jsonObject = new JSONObject(sb.toString());
+                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            for (int i = 0 ; i < jsonArray.length() ; i++){
+                                JSONObject jsonObject1 = jsonArray.getJSONObject(i);
+                                JSONArray jsonArray1 = jsonObject1.getJSONArray("data");
+                                for (int j = 0 ; j < jsonArray1.length() ; j++){
+                                    JSONObject jsonObject2 = jsonArray1.getJSONObject(j);
+                                    ED item = new ED();
+                                    item.date = jsonObject1.getString("_id");
+                                    item.activity_points = jsonObject2.getInt("totalPoints");
+                                    item.student_id = jsonObject2.getString("record");
+                                    engagement_list.add(item);
+                                }
+                            }
+                            break;
+                        }
                     }
                 }
 
@@ -4122,9 +3617,9 @@ public class NetworkManager {
                 }
                 is.close();
 
-                JSONObject jsonObject = new JSONObject(sb.toString());
-                Log.e("JISC","Modules: "+jsonObject.toString());
+                Log.e("JISC","Modules: "+sb.toString());
 
+                JSONObject jsonObject = new JSONObject(sb.toString());
                 ActiveAndroid.beginTransaction();
 
                 try {
@@ -4133,25 +3628,27 @@ public class NetworkManager {
                     if(!DataManager.getInstance().user.isStaff) {
                         JSONArray jsonObject2 = jsonObject.getJSONArray("modules");
                         for (int i = 0; i < jsonObject2.length(); i++) {
-                            Module modules = new Module();
-                            String sModule = jsonObject2.get(i).toString();
-                            String[] separated = sModule.split(":");
 
-                            modules.id = separated[0].replace("\"", "").replace("{", "").replace("}", "");
-                            modules.name = separated[1].replace("\"", "").replace("{", "").replace("}", "");
+                            JSONObject object = jsonObject2.getJSONObject(i);
 
-                            modules.save();
+                            Module module = new Module();
+                            module.id = object.keys().next();
+                            module.name = object.getString(module.id);
+                            module.save();
                         }
                     }
 
+                    new Delete().from(Courses.class).execute();
                     JSONArray jsonObject3 = jsonObject.getJSONArray("courses");
-                    for (int j = 0; j < jsonObject3.length(); j++) {
-                        Courses courses = new Courses();
-                        courses.id = ""+j;
-                        courses.name = jsonObject3.getString(j);
-                        if (new Select().from(Courses.class).where("course_id = ?", courses.id).execute().size() == 0) {
-                            courses.save();
-                        }
+                    for (int i = 0; i < jsonObject3.length(); i++) {
+
+                        JSONObject object = jsonObject3.getJSONObject(i);
+
+                        Courses course = new Courses();
+                        course.id = object.keys().next();
+                        course.name = object.getString(course.id);
+                        course.save();
+
                     }
 
                     ActiveAndroid.setTransactionSuccessful();

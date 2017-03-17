@@ -87,7 +87,6 @@ public class LoginActivity extends Activity {
             }
         }).start();
 
-        //Init the user
         if (!getSharedPreferences("jisc", Context.MODE_PRIVATE).contains("guid")) {
             getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("guid", UUID.randomUUID().toString().toUpperCase()).apply();
         }
@@ -97,19 +96,20 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick(View v) {
                 String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0ODgzNjU2NzcsImp0aSI6IjFtbjhnU3YrWk9mVzJlYXV1NmVrN0Rzbm1MUjA0dDRyT0V0SEQ5Z1BGdk09IiwiaXNzIjoiaHR0cDpcL1wvc3AuZGF0YVwvYXV0aCIsIm5iZiI6MTQ4ODM2NTY2NywiZXhwIjoxNjYyNTY0NTY2NywiZGF0YSI6eyJlcHBuIjoiIiwicGlkIjoiZGVtb3VzZXJAZGVtby5hYy51ayIsImFmZmlsaWF0aW9uIjoic3R1ZGVudEBkZW1vLmFjLnVrIn19.xM6KkBFvHW7vtf6dF-X4f_6G3t_KGPVNylN_rMJROsh1MXIg9sK5j77L0Jzg1JR8fhXZf-0jFMnZz6FMotAeig";
+
                 DataManager.getInstance().set_jwt(token);
 
                 if (NetworkManager.getInstance().checkIfUserRegistered()) {
                     if (NetworkManager.getInstance().login()) {
                         DataManager.getInstance().institution = "1";
                         DataManager.getInstance().user.isDemo = true;
+
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         LoginActivity.this.finish();
                     } else {
                         //TODO: Need more information about the register flow so i can deal with other situations
                     }
-
                 }
             }
         });
@@ -232,6 +232,7 @@ public class LoginActivity extends Activity {
 
                     if(view.getTag().equals("demo")) {
                         String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0ODgzNjU2NzcsImp0aSI6IjFtbjhnU3YrWk9mVzJlYXV1NmVrN0Rzbm1MUjA0dDRyT0V0SEQ5Z1BGdk09IiwiaXNzIjoiaHR0cDpcL1wvc3AuZGF0YVwvYXV0aCIsIm5iZiI6MTQ4ODM2NTY2NywiZXhwIjoxNjYyNTY0NTY2NywiZGF0YSI6eyJlcHBuIjoiIiwicGlkIjoiZGVtb3VzZXJAZGVtby5hYy51ayIsImFmZmlsaWF0aW9uIjoic3R1ZGVudEBkZW1vLmFjLnVrIn19.xM6KkBFvHW7vtf6dF-X4f_6G3t_KGPVNylN_rMJROsh1MXIg9sK5j77L0Jzg1JR8fhXZf-0jFMnZz6FMotAeig";
+//                        String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0ODg0NDkxNzksImp0aSI6IjdnOHFHVWlDKzRIdTdyN2ZUcTBOcldjaUpGTzByR1wvdUhpZVhvN0NBSjZvPSIsImlzcyI6Imh0dHA6XC9cL3NwLmRhdGFcL2F1dGgiLCJuYmYiOjE0ODg0NDkxNjksImV4cCI6MTQ5MjU5NjM2OSwiZGF0YSI6eyJlcHBuIjoiIiwicGlkIjoiczE1MTI0OTNAZ2xvcy5hYy51ayIsImFmZmlsaWF0aW9uIjoic3RhZmZAZ2xvcy5hYy51ayJ9fQ.xO_Yk6ZgTWgg0UHVXglFKD1tMP2wq98b8IU4alaGQvjtlYcjoz5W8gZbAX0Gcktl0nDs_bkvsB1g5OaYkkY6yg";
                         DataManager.getInstance().set_jwt(token);
 
                         if (NetworkManager.getInstance().checkIfUserRegistered()) {
@@ -244,7 +245,6 @@ public class LoginActivity extends Activity {
                             } else {
                                 //TODO: Need more information about the register flow so i can deal with other situations
                             }
-
                         }
                         return;
                     }
