@@ -124,6 +124,73 @@ public class NetworkManager {
         }
     }
 
+    public boolean deleteFeed(String feedId) {
+        language = LinguisticManager.getInstance().getLanguageCode();
+        Future<Boolean> future = executorService.submit(new deleteFeed(feedId));
+        try {
+            return future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private class deleteFeed implements Callable<Boolean> {
+        String feedId;
+
+        deleteFeed(String feedId) {
+           this.feedId = feedId;
+        }
+
+        @Override
+        public Boolean call() {
+            try {
+                String apiURL = host + "fn_delete_feed?student_id=" + DataManager.getInstance().user.id + "&feed_id=" + this.feedId + "&language=" + language
+                    + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.addRequestProperty("Authorization","Bearer " + DataManager.getInstance().get_jwt());
+                urlConnection.setRequestMethod("DELETE");
+
+                int responseCode = urlConnection.getResponseCode();
+                forbidden(responseCode);
+                if (responseCode != 200) {
+
+                    InputStream is = new BufferedInputStream(urlConnection.getErrorStream());
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    is.close();
+
+                    Log.e("deleteFeed", "ResponseCode = " + responseCode);
+                    Log.e("deleteFeed", "Response = " + sb.toString());
+
+                    return false;
+                }
+
+                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                is.close();
+
+                Log.e("deleteFeed", "Response = " + sb.toString());
+
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
     public Friend getStudentByEmail(String email) {
         language = LinguisticManager.getInstance().getLanguageCode();
         Future<Friend> future = executorService.submit(new getStudentByEmail(email));

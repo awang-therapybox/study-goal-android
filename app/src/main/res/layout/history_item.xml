@@ -1,6 +1,8 @@
 <com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/swipelayout"
-    android:layout_width="match_parent" android:layout_height="80dp">
+    android:layout_width="match_parent"
+    android:layout_height="80dp">
+
     <!-- Bottom View Start-->
     <LinearLayout
         android:id="@+id/bottom_wrapper"
@@ -55,18 +57,5 @@
             android:layout_gravity="center"
             android:textSize="14sp"
             android:textColor="@color/light_purple_text"/>
-
-        <!--<RelativeLayout-->
-            <!--android:id="@+id/history_item_ellipse"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_weight="1">-->
-            <!--<ImageView-->
-                <!--android:layout_centerInParent="true"-->
-                <!--android:layout_width="15dp"-->
-                <!--android:layout_height="15dp"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:src="@drawable/ellipse"/>-->
-        <!--</RelativeLayout>-->
     </LinearLayout>
 </com.daimajia.swipe.SwipeLayout>
