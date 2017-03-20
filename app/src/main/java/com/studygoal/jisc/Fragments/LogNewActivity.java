@@ -327,7 +327,6 @@ public class LogNewActivity extends Fragment implements View.OnClickListener {
                 //duration = 1;
                 params.put("time_spent", duration + "");
 
-                System.out.println("ADD_ACTIVITY: " + params.toString());
                 String responseCode = NetworkManager.getInstance().addActivity(params);
                 if (responseCode.equals("403")) {
                     Snackbar.make(mainView.findViewById(R.id.container), R.string.already_added_activity, Snackbar.LENGTH_LONG).show();

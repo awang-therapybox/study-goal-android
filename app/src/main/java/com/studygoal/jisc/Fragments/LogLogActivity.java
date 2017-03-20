@@ -327,6 +327,20 @@ public class LogLogActivity extends Fragment implements View.OnClickListener {
 
                     }
                 } else {
+                    if(DataManager.getInstance().user.isDemo) {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LogLogActivity.this.getActivity());
+                        alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.demo_mode_saveactivitylog) + "</font>"));
+                        alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
+                        return;
+                    }
+
                     if(module.getText().toString().equals(DataManager.getInstance().mainActivity.getString(R.string.no_module))) {
                         Snackbar.make(DataManager.getInstance().mainActivity.findViewById(R.id.drawer_layout), R.string.no_module_selected, Snackbar.LENGTH_LONG).show();
                         return;

@@ -97,7 +97,8 @@ public class MainActivity extends FragmentActivity {
             if(DataManager.getInstance().user.isSocial) {
                 adapter.values = new String[]{"0", getString(R.string.feed), getString(R.string.log), getString(R.string.target), getString(R.string.logout)};
             } else {
-                adapter.values = new String[]{"0", getString(R.string.feed), getString(R.string.check_in), getString(R.string.stats), getString(R.string.log), getString(R.string.target), getString(R.string.logout)};
+//                adapter.values = new String[]{"0", getString(R.string.feed), getString(R.string.check_in), getString(R.string.stats), getString(R.string.log), getString(R.string.target), getString(R.string.logout)};
+                adapter.values = new String[]{"0", getString(R.string.feed), getString(R.string.stats), getString(R.string.log), getString(R.string.target), getString(R.string.logout)};
             }
 
             adapter.notifyDataSetChanged();

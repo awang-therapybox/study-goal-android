@@ -259,7 +259,6 @@ public class LoginActivity extends Activity {
                     webView.loadUrl("about:blank");
 
                     final Institution institution = (Institution) view.getTag();
-
                     final CheckBox checkBoxLogged = (CheckBox) findViewById(R.id.choose_keeplogged);
 
                     String url = "https://sp.data.alpha.jisc.ac.uk/Shibboleth.sso/Login?entityID=https://" +

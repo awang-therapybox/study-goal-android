@@ -148,19 +148,19 @@ public class LogActivityHistory extends Fragment {
 
     public void deleteLog(final ActivityHistory activityHistory, final int finalPosition) {
 
-//        if(DataManager.getInstance().user.isDemo) {
-//            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LogActivityHistory.this.getActivity());
-//            alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.demo_mode_deleteactivitylog) + "</font>"));
-//            alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    dialog.dismiss();
-//                }
-//            });
-//            AlertDialog alertDialog = alertDialogBuilder.create();
-//            alertDialog.show();
-//            return;
-//        }
+        if(DataManager.getInstance().user.isDemo) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LogActivityHistory.this.getActivity());
+            alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.demo_mode_deleteactivitylog) + "</font>"));
+            alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+            return;
+        }
 
         final HashMap<String, String> params = new HashMap<>();
         params.put("log_id", activityHistory.id);
