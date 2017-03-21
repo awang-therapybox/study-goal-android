@@ -102,6 +102,7 @@ public class Stats3 extends Fragment {
         barchart.setPinchZoom(false);
         barchart.setDrawGridBackground(false);
         barchart.getAxisRight().setEnabled(false);
+        barchart.setFitBars(true);
 
         YAxis yAxis = lineChart.getAxisLeft();
         yAxis.setTypeface(DataManager.getInstance().myriadpro_regular);
@@ -121,7 +122,7 @@ public class Stats3 extends Fragment {
         xAxis.setAxisLineColor(Color.BLACK);
         xAxis.setTextSize(14f);
         xAxis.setGranularity(1f);
-        xAxis.setAxisMinimum(0.0f);
+        xAxis.setAxisMinimum(-0.2f);
 
         Legend legend = lineChart.getLegend();
         legend.setTextSize(14f);
@@ -146,7 +147,7 @@ public class Stats3 extends Fragment {
         xAxis.setDrawLabels(true);
         xAxis.setAxisLineColor(Color.BLACK);
         xAxis.setGranularity(1f);
-        xAxis.setAxisMinimum(0.0f);
+        xAxis.setAxisMinimum(-0.5f);
 
         legend = barchart.getLegend();
         legend.setTextSize(14f);
@@ -692,7 +693,7 @@ public class Stats3 extends Fragment {
                 IAxisValueFormatter valueFormatter = new IAxisValueFormatter() {
                     @Override
                     public String getFormattedValue(float value, AxisBase axis) {
-                        if(xVals.size() > value)
+                        if(xVals.size() > value && value >= 0)
                             return xVals.get((int)value);
                         else
                             return "";
@@ -755,7 +756,7 @@ public class Stats3 extends Fragment {
                 IAxisValueFormatter valueFormatter1 = new IAxisValueFormatter() {
                     @Override
                     public String getFormattedValue(float value, AxisBase axis) {
-                        if(xVals.size() > value)
+                        if(xVals.size() > value && value >= 0)
                             return xVals.get((int)value);
                         else
                             return "";
@@ -847,7 +848,7 @@ public class Stats3 extends Fragment {
                 IAxisValueFormatter valueFormatter = new IAxisValueFormatter() {
                     @Override
                     public String getFormattedValue(float value, AxisBase axis) {
-                        if(xVals.size() > value)
+                        if(xVals.size() > value && value >= 0)
                             return xVals.get((int)value);
                         else
                             return "";
@@ -952,7 +953,7 @@ public class Stats3 extends Fragment {
                 IAxisValueFormatter valueFormatter1 = new IAxisValueFormatter() {
                     @Override
                     public String getFormattedValue(float value, AxisBase axis) {
-                        if(xVals.size() > value)
+                        if(xVals.size() > value && value >= 0)
 
                             return xVals.get((int)value);
                         else
@@ -985,6 +986,7 @@ public class Stats3 extends Fragment {
         barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
         barData.setDrawValues(true);
         barData.setValueTextColor(0xff000000);
+        barData.setBarWidth(0.70f);
 
         return barData;
     }

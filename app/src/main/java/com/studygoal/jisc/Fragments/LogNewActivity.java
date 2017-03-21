@@ -462,7 +462,7 @@ public class LogNewActivity extends Fragment implements View.OnClickListener {
                 Snackbar.make(mainView.findViewById(R.id.container), R.string.activity_started, Snackbar.LENGTH_LONG).show();
 
                 timestamp = System.currentTimeMillis();
-                int reminder = (Integer.parseInt(reminder_textView.getText().toString().split(":")[0]) * 60) + Integer.parseInt(reminder_textView.getText().toString().split(":")[1]);
+                int reminder = Integer.parseInt(reminder_textView.getText().toString());
                 timer = new Timer();
                 timertask = new TimerTask() {
                     @Override
@@ -512,14 +512,11 @@ public class LogNewActivity extends Fragment implements View.OnClickListener {
                 if(reminder != 0) {
                     Intent intent = new Intent(DataManager.getInstance().mainActivity, NotificationAlarm.class);
                     //TODO: Bug Samsung devices - old code works on all except samsung
-//                    pendingIntent = PendingIntent.getBroadcast(getActivity(), 0,
-//                            intent, PendingIntent.FLAG_ONE_SHOT);
                     pendingIntent = PendingIntent.getBroadcast(DataManager.getInstance().mainActivity, 0,
                             intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    am.set(AlarmManager.RTC_WAKEUP,
-                            System.currentTimeMillis() + reminder * 1000, pendingIntent);
+                    am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + reminder * 1000, pendingIntent);
 
-                    //TODO: BUGFIX AICI
+                    //TODO: BUGFIX
                 }
                 break;
             }
