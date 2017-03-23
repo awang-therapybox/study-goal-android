@@ -10,156 +10,252 @@
         android:layout_height="match_parent"
         android:src="@drawable/tmp_login_background"
         android:scaleType="centerCrop"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone">
+        android:layout_height="match_parent">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/mini_logo2"/>
+            android:src="@drawable/mini_logo"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/login_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="70dp"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/jisc_header_logo"/>
 
         <TextView
-            android:id="@+id/activity_login_demo_mode"
+            android:id="@+id/login_logo_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/demo_mode"
+            android:text="@string/study_goal"
             android:textColor="#FFF"
-            android:textSize="14sp"
-            android:padding="10dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="10dp"
+            android:textSize="50sp"
+            android:layout_marginTop="20dp"
             android:layout_gravity="center"/>
-    </RelativeLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:orientation="vertical">
-        <TextView
-            android:id="@+id/activity_login_choose_institution_text"
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/choose_your_institute"
-            android:textColor="#FFF"
-            android:textSize="20sp"
-            android:layout_gravity="center"/>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:background="@drawable/round_corners"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="15dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp">
-            <ImageView
-                android:id="@+id/activity_login_institution_icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/institution_icon"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="10dp"/>
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/appCompatTextView"
-                android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginTop="70dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/login_step_1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginStart="5dp"
-                android:layout_toEndOf="@+id/activity_login_institution_icon"
-                style="@style/AppSpinner"/>
-            <RelativeLayout
-                android:id="@+id/activity_login_institution_spinner_over"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="20dp"
-                android:background="#F7F7F7"
-                android:layout_toEndOf="@+id/activity_login_institution_icon">
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
                 <TextView
-                    android:id="@+id/choose_institution"
+                    android:id="@+id/login_step_1_imastudent"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:text="@string/login_imastudent_member"
+                    android:textColor="#2d7ac4"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:background="@drawable/round_corners_transparent_2"/>
+
+                <TextView
+                    android:id="@+id/login_step_1_imastaff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="55dp"
+                    android:text="@string/login_imastaff_member"
+                    android:textColor="#2d7ac4"
+                    android:gravity="center"
+                    android:layout_marginTop="30dp"
+                    android:textSize="20sp"
+                    android:paddingStart="70dp"
+                    android:paddingEnd="70dp"
+                    android:background="@drawable/round_corners_transparent_2"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/login_step_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <CheckBox
+                    android:id="@+id/login_check_rememberme"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
-                    android:textColorHint="@color/text_hint_color"
-                    android:textColor="@color/dark_grey"
-                    android:hint="@string/tap_to_select"
-                    android:layout_centerVertical="true"/>
-            </RelativeLayout>
-        </RelativeLayout>
-        <CheckBox
-            android:id="@+id/choose_staff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_gravity="center"
-            android:text="@string/login_imastaff_member"
-            android:buttonTint="#ffffff"
-            android:textColor="#ffffff"/>
-        <CheckBox
-            android:id="@+id/choose_keeplogged"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center"
-            android:text="@string/login_keeplogged"
-            android:buttonTint="#ffffff"
-            android:textColor="#ffffff"/>
+                    android:layout_marginTop="20dp"
+                    android:text="@string/login_keeplogged"
+                    android:textSize="20sp"
+                    android:buttonTint="#ffffff"
+                    android:textColor="#ffffff"/>
+                <CheckBox
+                    android:id="@+id/login_check_dontrememberme"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:text="@string/login_donot_keeplogged"
+                    android:textSize="20sp"
+                    android:buttonTint="#ffffff"
+                    android:textColor="#ffffff"/>
+            </LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
+
     <LinearLayout
-        android:id="@+id/institutions"
+        android:id="@+id/login_step_3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="20dp"
+        android:layout_marginTop="45dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
         android:orientation="vertical"
-        android:visibility="invisible"
-        android:background="@drawable/round_corners_transparent">
+        android:visibility="visible"
+        android:weightSum="10">
+
+        <TextView
+            android:id="@+id/login_searchinstitution_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/login_search_institution"
+            android:textColor="#FFF"
+            android:textSize="25sp"
+            android:layout_marginBottom="10dp"
+            />
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@drawable/round_corner_grey_hallow">
-            <RelativeLayout
-                android:id="@+id/inst"
-                android:layout_width="40dp"
-                android:layout_height="40dp">
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/institution_icon"/>
-            </RelativeLayout>
+            android:layout_height="50dp"
+            android:background="@drawable/round_corners_transparent_2">
+
             <EditText
                 android:id="@+id/search_field"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_toStartOf="@+id/close"
-                android:layout_toEndOf="@+id/inst"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:textSize="20sp"
                 android:hint="@string/search"
                 android:textColor="@color/dark_grey"
                 android:textColorHint="@color/light_grey"
                 android:background="@android:color/transparent"
                 android:maxLines="1" />
             <RelativeLayout
-                android:id="@+id/close"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_alignParentEnd="true">
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="10dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true">
                 <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_centerInParent="true"
-                    android:src="@drawable/close"/>
+                    android:padding="10dp"
+                    android:src="@drawable/search_icon_gray"/>
             </RelativeLayout>
         </RelativeLayout>
         <ListView
             android:id="@+id/list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="0dp"
+            android:layout_weight="10"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/round_corners_transparent_3"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/login_institutionnotlisted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/login_institution_not_listed"
+                android:textColor="#FFF"
+                android:textSize="25sp"
+                android:layout_marginBottom="10dp"
+                />
+
+            <TextView
+                android:id="@+id/login_signinwith"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/login_institution_signinwith"
+                android:textColor="#FFF"
+                android:textSize="25sp"
+                android:layout_marginBottom="10dp"
+                />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:weightSum="3">
+                
+                <ImageView
+                    android:id="@+id/login_with_facebook"
+                    android:layout_width="0dp"
+                    android:layout_height="55dp"
+                    android:layout_weight="1"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:src="@drawable/fb_icon"/>
+
+                <ImageView
+                    android:id="@+id/login_with_twitter"
+                    android:layout_width="0dp"
+                    android:layout_height="55dp"
+                    android:layout_weight="1"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:src="@drawable/tw_icon"/>
+
+                <ImageView
+                    android:id="@+id/login_with_google"
+                    android:layout_width="0dp"
+                    android:layout_height="55dp"
+                    android:layout_weight="1"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:src="@drawable/gp_icon"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/login_demomode"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="@string/demo_mode"
+                android:textColor="#FFF"
+                android:gravity="center"
+                android:textSize="25sp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/rounded_corners_transparent_4"
+                />
+
+        </LinearLayout>
+
     </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/blackout"
         android:layout_width="match_parent"
@@ -167,6 +263,7 @@
         android:visibility="invisible"
         android:background="#88000000">
     </RelativeLayout>
+
     <WebView
         android:id="@+id/webview"
         android:visibility="gone"

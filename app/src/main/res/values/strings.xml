@@ -403,14 +403,19 @@
     <string name="login_with_twitter">login with Twitter</string>
     <string name="facebook_app_id">1841301559462853</string>
     <string name="facebook_error_email">In order to continue, the app needs EMAIL permission.</string>
-    <string name="login_imastaff_member">I\'m a staff member</string>
-    <string name="login_keeplogged">Keep me logged in</string>
+    <string name="login_imastaff_member">I\'m a member of staff</string>
+    <string name="login_imastudent_member">I\'m a student</string>
+    <string name="login_keeplogged">Remember me &amp; keep me logged in</string>
+    <string name="login_donot_keeplogged">I\'d like to log in with my username and password everytime</string>
+    <string name="login_search_institution">SEARCH INSTITUTION</string>
+    <string name="login_institution_not_listed">Institution not listed?</string>
+    <string name="login_institution_signinwith">Sign in with</string>
     <string name="check_in">Check-in</string>
     <string name="send_pin_title">Send PIN</string>
     <string name="alert_invalid_pin">Oops. PIN wasn\'t recognised. Please try again.</string>
     <string name="alert_valid_pin">Thanks. You\'ve just successfully checked in.</string>
     <string name="alert_invalid_pin_staff">"Check-in section is for demonstration purposes, and your PIN was not validated. This section is active for student users.</string>
-    <string name="demo_mode">Demo</string>
+    <string name="demo_mode">Demo Mode</string>
     <string name="demo_mode_postfeed">Login to start posting messages.</string>
     <string name="demo_mode_sendfriendrequest">Login to start adding friends.</string>
     <string name="demo_mode_setcheckinpin">Check-In option will be available to participating institutions.</string>
@@ -427,4 +432,6 @@
     <string name="add_module">Add Module</string>
     <string name="module_name_invalid">Please add a valid Module Name</string>
     <string name="confirm_delete_feed">Are you sure you want to delete item this from feed?</string>
+
+    <string name="study_goal">Study Goal</string>
 </resources>

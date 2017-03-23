@@ -61,7 +61,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ForgotPassword" />
-        <activity android:name=".SocialActivity"></activity>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="21d350a22cfbb1eb4c5ca00b104aab7d33fc6d2a" />
