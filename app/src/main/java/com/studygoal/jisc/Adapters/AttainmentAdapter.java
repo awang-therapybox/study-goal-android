@@ -54,19 +54,13 @@ public class AttainmentAdapter extends BaseAdapter {
         name.setTypeface(DataManager.getInstance().myriadpro_regular);
         percent.setTypeface(DataManager.getInstance().myriadpro_regular);
 
-        if(position == 0 && DataManager.getInstance().user.affiliation.contains("glos.ac.uk")) {
+        if(position >= list.size() && DataManager.getInstance().user.affiliation.contains("glos.ac.uk")) {
 
             name.setText(DataManager.getInstance().mainActivity.getString(R.string.attainment_info));
             percent.setVisibility(View.GONE);
 
         } else {
-            Attainment attainment;
-            if(DataManager.getInstance().user.affiliation.contains("glos.ac.uk")) {
-                attainment = list.get(position-1);
-            } else {
-                attainment = list.get(position);
-            }
-
+            Attainment attainment = list.get(position);
             percent.setVisibility(View.VISIBLE);
             name.setText(Utils.attainmentDate(attainment.date) + " " + attainment.module);
             percent.setText(attainment.percent);
