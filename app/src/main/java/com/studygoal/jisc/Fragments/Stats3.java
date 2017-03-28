@@ -322,6 +322,7 @@ public class Stats3 extends Fragment {
                         } else {
                             compareTo.setOnClickListener(null);
                             compareTo.setAlpha(0.5f);
+                            compareTo.setText(getString(R.string.no_one));
                         }
 
                         new Thread(new Runnable() {
