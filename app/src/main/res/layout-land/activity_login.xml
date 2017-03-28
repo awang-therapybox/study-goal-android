@@ -211,6 +211,7 @@
                 android:weightSum="3">
 
                 <ImageView
+                    android:id="@+id/login_with_facebook"
                     android:layout_width="0dp"
                     android:layout_height="55dp"
                     android:layout_weight="1"
@@ -219,6 +220,7 @@
                     android:src="@drawable/fb_icon"/>
 
                 <ImageView
+                    android:id="@+id/login_with_twitter"
                     android:layout_width="0dp"
                     android:layout_height="55dp"
                     android:layout_weight="1"
@@ -227,6 +229,7 @@
                     android:src="@drawable/tw_icon"/>
 
                 <ImageView
+                    android:id="@+id/login_with_google"
                     android:layout_width="0dp"
                     android:layout_height="55dp"
                     android:layout_weight="1"
