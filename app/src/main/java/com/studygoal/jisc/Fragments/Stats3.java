@@ -839,7 +839,6 @@ public class Stats3 extends Fragment {
                 BarData barData = new BarData(barDataSet1);
                 barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
                 barData.setDrawValues(true);
-                barData.setValueTextColor(0xff000000);
                 barData.addDataSet(barDataSet2);
                 barData.setBarWidth(0.40f);
                 barData.groupBars(0, 0.09f, 0.01f);
@@ -879,6 +878,8 @@ public class Stats3 extends Fragment {
                 String name = getString(R.string.me);
 
                 String id = DataManager.getInstance().user.jisc_student_id;
+                if(DataManager.getInstance().user.isDemo)
+                    id = DataManager.getInstance().user.id;
 
                 Integer value_1;
                 Integer value_2;
