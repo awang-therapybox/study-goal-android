@@ -277,8 +277,6 @@ public class Stats3 extends Fragment {
             }
         };
 
-//        getData();
-
         final TextView description = (TextView) mainView.findViewById(R.id.description);
         description.setTypeface(DataManager.getInstance().myriadpro_regular);
         description.setText(R.string.last_week);
@@ -313,8 +311,20 @@ public class Stats3 extends Fragment {
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                        String titleText = ((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString();
+
+                        List<Courses> coursesList = new Select().from(Courses.class).execute();
+
+                        for (int j = 0; j < coursesList.size(); j++) {
+                            String courseName = coursesList.get(j).name;
+                            if(courseName.equals(titleText)) {
+                                return;
+                            }
+                        }
+
                         dialog.dismiss();
-                        module.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
+                        module.setText(titleText);
 
                         if(!module.getText().toString().equals(getString(R.string.anymodule))) {
                             compareTo.setOnClickListener(compareToListener);
@@ -787,6 +797,8 @@ public class Stats3 extends Fragment {
 
                 String name = getString(R.string.me);
                 String id = DataManager.getInstance().user.jisc_student_id;
+                //hardcoded for demo user
+                id = "1000";
 
                 Integer value_1;
                 Integer value_2;
@@ -879,6 +891,7 @@ public class Stats3 extends Fragment {
                 String name = getString(R.string.me);
 
                 String id = DataManager.getInstance().user.jisc_student_id;
+                id = "1000";
 
                 Integer value_1;
                 Integer value_2;
