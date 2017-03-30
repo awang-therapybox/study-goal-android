@@ -629,18 +629,21 @@ public class Stats3 extends Fragment {
 
         String compareValue;
         String compareType;
-        if (compareTo.getText().toString().contains("Top")) {
-            compareValue = "10";
-            compareType = "top";
-        } else if (!compareTo.getText().toString().equals(getString(R.string.no_one))
-                && !compareTo.getText().toString().equals(getString(R.string.top10))
+//        if (compareTo.getText().toString().contains("Top")) {
+//            compareValue = "10";
+//            compareType = "top";
+//        } else
+            if (!compareTo.getText().toString().equals(getString(R.string.no_one))
+//                && !compareTo.getText().toString().equals(getString(R.string.top10))
                 && !compareTo.getText().toString().equals(getString(R.string.average))) {
             compareValue = ((Friend) new Select().from(Friend.class).where("name = ?", compareTo.getText().toString()).executeSingle()).jisc_student_id.replace("[", "").replace("]", "").replace("\"", "");
             compareType = "friend";
-        } else if (compareTo.getText().toString().contains("Average")){
+        }
+        else if (compareTo.getText().toString().equals(getString(R.string.average))){
             compareValue = "";
             compareType = "average";
-        } else {
+        }
+        else {
             compareType = "";
             compareValue = "";
         }
@@ -796,9 +799,7 @@ public class Stats3 extends Fragment {
                 ArrayList<BarEntry> vals6 = new ArrayList<>();
 
                 String name = getString(R.string.me);
-                String id = DataManager.getInstance().user.jisc_student_id;
-                //hardcoded for demo user
-                id = "1000";
+                String id = "1000";
 
                 Integer value_1;
                 Integer value_2;
@@ -890,8 +891,7 @@ public class Stats3 extends Fragment {
 
                 String name = getString(R.string.me);
 
-                String id = DataManager.getInstance().user.jisc_student_id;
-                id = "1000";
+                String id = "1000";
 
                 Integer value_1;
                 Integer value_2;
