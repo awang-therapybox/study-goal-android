@@ -545,16 +545,23 @@ public class MainActivity extends FragmentActivity {
 
 
     public void showProgressBar(@Nullable String text) {
-        blackout.setVisibility(View.VISIBLE);
-        blackout.requestLayout();
-        blackout.setOnClickListener(null);
+        if(blackout != null) {
+            blackout.setVisibility(View.VISIBLE);
+            blackout.requestLayout();
+            blackout.setOnClickListener(null);
+        }
     }
 
     public void showProgressBar2(@Nullable String text) {
-        blackout.setVisibility(View.VISIBLE);
-        blackout.findViewById(R.id.progressbar).setVisibility(View.GONE);
-        blackout.requestLayout();
-        blackout.setOnClickListener(null);
+        if(blackout != null) {
+            blackout.setVisibility(View.VISIBLE);
+
+            if(blackout.findViewById(R.id.progress_bar) != null)
+                blackout.findViewById(R.id.progressbar).setVisibility(View.GONE);
+
+            blackout.requestLayout();
+            blackout.setOnClickListener(null);
+        }
     }
 
     public void hideProgressBar() {

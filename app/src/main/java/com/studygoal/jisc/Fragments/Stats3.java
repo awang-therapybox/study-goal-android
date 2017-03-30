@@ -800,8 +800,6 @@ public class Stats3 extends Fragment {
 
                 String name = getString(R.string.me);
                 String id = DataManager.getInstance().user.jisc_student_id;
-                if(DataManager.getInstance().user.isDemo)
-                    id = "1000";
 
                 Integer value_1;
                 Integer value_2;
@@ -812,7 +810,14 @@ public class Stats3 extends Fragment {
                 c.setTimeInMillis(curr);
 
                 for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).student_id.contains(id)) {
+                    if (
+                            (!DataManager.getInstance().user.isDemo
+                                && list.get(i).student_id.contains(id))
+                        ||
+                                    (DataManager.getInstance().user.isDemo
+                                            && list.get(i).student_id.equals(id))
+                            )
+                    {
                         value_1 = list.get(i).activity_points;
                         vals3.add(value_1);
                     } else {
@@ -894,8 +899,6 @@ public class Stats3 extends Fragment {
                 String name = getString(R.string.me);
 
                 String id = DataManager.getInstance().user.jisc_student_id;
-                if(DataManager.getInstance().user.isDemo)
-                    id = "1000";
 
                 Integer value_1;
                 Integer value_2;
@@ -906,7 +909,14 @@ public class Stats3 extends Fragment {
                 c.setTimeInMillis(curr);
 
                 for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).student_id.contains(id)) {
+                    if (
+                            (!DataManager.getInstance().user.isDemo
+                                    && list.get(i).student_id.contains(id))
+                                    ||
+                                    (DataManager.getInstance().user.isDemo
+                                            && list.get(i).student_id.equals(id))
+                            )
+                    {
                         value_1 = list.get(i).activity_points;
                         vals3.add(value_1);
                     } else {
