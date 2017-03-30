@@ -799,7 +799,9 @@ public class Stats3 extends Fragment {
                 ArrayList<BarEntry> vals6 = new ArrayList<>();
 
                 String name = getString(R.string.me);
-                String id = "1000";
+                String id = DataManager.getInstance().user.jisc_student_id;
+                if(DataManager.getInstance().user.isDemo)
+                    id = "1000";
 
                 Integer value_1;
                 Integer value_2;
@@ -891,7 +893,9 @@ public class Stats3 extends Fragment {
 
                 String name = getString(R.string.me);
 
-                String id = "1000";
+                String id = DataManager.getInstance().user.jisc_student_id;
+                if(DataManager.getInstance().user.isDemo)
+                    id = "1000";
 
                 Integer value_1;
                 Integer value_2;
