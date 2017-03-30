@@ -61,13 +61,6 @@ public class InstitutionsAdapter extends BaseAdapter {
             name.setText(context.getString(R.string.institution_no_listed));
 
             view.setTag("no institution");
-        } else {
-            TextView name = (TextView) view.findViewById(R.id.name);
-            name.setTypeface(DataManager.getInstance().myriadpro_bold);
-            name.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            name.setText(context.getString(R.string.demo_mode));
-
-            view.setTag("demo");
         }
 
         return view;
