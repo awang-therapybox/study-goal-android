@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.vision.text.Text;
 import com.studygoal.jisc.Adapters.AttainmentAdapter;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.LinguisticManager;
@@ -517,6 +518,12 @@ public class Stats extends Fragment {
         });
         android.app.AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+
+        if(DataManager.getInstance().user.affiliation.equals("staff@glos.ac.uk")) {
+            TextView attainment_info = (TextView)mainView.findViewById(R.id.attainment_info);
+            attainment_info.setTypeface(DataManager.getInstance().myriadpro_regular);
+            attainment_info.setText("IMPORTANT: All marks/grades indicated with '**' are subject to moderation and confirmation by a Board of Examiners. These marks/grades are therefore provisional and subject to change.");
+        }
 
         return mainView;
     }
