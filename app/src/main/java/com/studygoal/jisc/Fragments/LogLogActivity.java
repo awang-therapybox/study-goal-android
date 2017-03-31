@@ -148,7 +148,6 @@ public class LogLogActivity extends Fragment implements View.OnClickListener {
         date = ((TextView)mainView.findViewById(R.id.log_activity_text_date));
         date.setTypeface(DataManager.getInstance().myriadpro_regular);
 
-
         chooseActivity = (AppCompatTextView) mainView.findViewById(R.id.log_activity_chooseActivity_textView);
         chooseActivity.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
         chooseActivity.setTypeface(DataManager.getInstance().myriadpro_regular);

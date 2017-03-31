@@ -2049,6 +2049,12 @@ public class NetworkManager {
         @Override
         public Boolean call() {
             try {
+
+                ActiveAndroid.beginTransaction();
+                new Delete().from(Friend.class).execute();
+                ActiveAndroid.setTransactionSuccessful();
+                ActiveAndroid.endTransaction();
+
                 String apiURL = host + "fn_list_friends?student_id=" + student_id + "&language=" + language
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
@@ -2098,9 +2104,9 @@ public class NetworkManager {
 
                 ActiveAndroid.beginTransaction();
                 try {
-                    new Delete().from(Friend.class).execute();
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
+
                         Friend item = new Friend();
                         item.id = jsonObject.getInt("id") + "";
                         item.jisc_student_id = jsonObject.getString("jisc_student_id");
@@ -2120,8 +2126,8 @@ public class NetworkManager {
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    ActiveAndroid.endTransaction();
                 }
+                ActiveAndroid.endTransaction();
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
