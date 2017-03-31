@@ -986,7 +986,7 @@ public class Stats3 extends Fragment {
     public BarData getBarData(ArrayList<BarEntry> vals2, String name) {
         BarData barData = new BarData(getBarDataSet(vals2, name));
         barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-        barData.setDrawValues(true);
+        barData.setDrawValues(false);
         barData.setValueTextColor(0xff000000);
         barData.setBarWidth(0.70f);
 
@@ -1026,7 +1026,7 @@ public class Stats3 extends Fragment {
             barDataSet.setColor(0xFF3791ee);
             barDataSet.setValueTextColor(0xFF3791ee);
         }
-        barDataSet.setDrawValues(true);
+        barDataSet.setDrawValues(false);
         barDataSet.setValueTextSize(50);
         barDataSet.setValueTextSize(14f);
         return barDataSet;
