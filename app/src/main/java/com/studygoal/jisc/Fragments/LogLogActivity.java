@@ -1,5 +1,6 @@
 package com.studygoal.jisc.Fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -13,10 +14,12 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -24,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
@@ -139,6 +143,34 @@ public class LogLogActivity extends Fragment implements View.OnClickListener {
                 }
             }
         };
+
+        final View contentView = container;
+        contentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            private int mPreviousHeight;
+
+            @Override
+            public void onGlobalLayout() {
+                int newHeight = contentView.getHeight();
+                if (mPreviousHeight != 0) {
+                    if (mPreviousHeight > newHeight) {
+                        // Height decreased: keyboard was shown
+                        Log.e("Jisc","is Shown");
+
+                        mainView.findViewById(R.id.content_scroll).setPadding(0, 0, 0, 200);
+                        ScrollView scrollView = (ScrollView) mainView.findViewById(R.id.log_fragment_container);
+                        scrollView.scrollTo(0, mainView.findViewById(R.id.content_scroll).getHeight());
+
+                    } else if (mPreviousHeight < newHeight) {
+                        // Height increased: keyboard was hidden
+                        Log.e("Jisc","is not shown");
+                        mainView.findViewById(R.id.content_scroll).setPadding(0, 0, 0, 0);
+                    } else {
+                        // No change
+                    }
+                }
+                mPreviousHeight = newHeight;
+            }
+        });
 
         hours_spent.addTextChangedListener(hoursWatcher);
         minutes_spent.addTextChangedListener(minutesWatcher);
