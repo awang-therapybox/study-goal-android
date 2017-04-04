@@ -53,7 +53,7 @@ public class DataManager {
     public String institution;
     public android.app.Activity currActivity;
     public boolean toast = false;
-    public boolean checkForbidden = true;
+    public boolean checkForbidden = false;
 
 
     public static DataManager getInstance() {

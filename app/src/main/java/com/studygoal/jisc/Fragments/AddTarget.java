@@ -2,9 +2,11 @@ package com.studygoal.jisc.Fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatTextView;
@@ -12,17 +14,21 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
@@ -69,7 +75,7 @@ public class AddTarget extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View mainView = inflater.inflate(R.layout.target_addtarget, container, false);
+        final View mainView = inflater.inflate(R.layout.target_addtarget, container, false);
         DataManager.getInstance().reload();
         body = mainView.findViewById(R.id.addtarget_container);
 
@@ -114,6 +120,8 @@ public class AddTarget extends Fragment implements View.OnClickListener {
             }
         };
 
+        because = ((EditText)mainView.findViewById(R.id.addtarget_edittext_because));
+
         TextWatcher minutesWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -135,6 +143,42 @@ public class AddTarget extends Fragment implements View.OnClickListener {
                 }
             }
         };
+
+        final View contentView = container;
+        contentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            private int mPreviousHeight;
+
+            @Override
+            public void onGlobalLayout() {
+                int newHeight = contentView.getHeight();
+                if (mPreviousHeight != 0) {
+                    if (mPreviousHeight > newHeight) {
+
+                        // Height decreased: keyboard was shown
+                        mainView.findViewById(R.id.content_scroll).setPadding(0, 0, 0, 200);
+
+                        if(because.isFocused()) {
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //Do something after 100ms
+
+                                    ScrollView scrollView = (ScrollView) mainView.findViewById(R.id.addtarget_container);
+                                    scrollView.scrollTo(0, mainView.findViewById(R.id.content_scroll).getHeight());
+                                }
+                            }, 100);
+                        }
+
+                    } else if (mPreviousHeight < newHeight) {
+                        mainView.findViewById(R.id.content_scroll).setPadding(0, 0, 0, 0);
+                    } else {
+                        // No change
+                    }
+                }
+                mPreviousHeight = newHeight;
+            }
+        });
 
         hours = ((EditText) mainView.findViewById(R.id.addtarget_text_timer_1));
         hours.setTypeface(DataManager.getInstance().myriadpro_regular);
@@ -160,7 +204,6 @@ public class AddTarget extends Fragment implements View.OnClickListener {
 
 
         ((TextView)mainView.findViewById(R.id.addtarget_text_because_title)).setTypeface(DataManager.getInstance().myriadpro_regular);
-        because = ((EditText)mainView.findViewById(R.id.addtarget_edittext_because));
         because.setTypeface(DataManager.getInstance().myriadpro_regular);
         because.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View view, MotionEvent event) {
@@ -433,6 +476,12 @@ public class AddTarget extends Fragment implements View.OnClickListener {
                 break;
             }
             case R.id.addtarget_save_btn: {
+                View view = getActivity().getCurrentFocus();
+                if(view!=null) {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+
                 if(isInEditMode) {
 
                     if(DataManager.getInstance().user.isDemo) {

@@ -1,6 +1,8 @@
 package com.studygoal.jisc.Fragments;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.vision.text.Text;
 import com.studygoal.jisc.Adapters.AttainmentAdapter;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.LinguisticManager;
@@ -50,8 +53,14 @@ public class Stats extends Fragment {
                 NetworkManager.getInstance().getAssignmentRanking();
                 adapter.list = new Select().from(Attainment.class).execute();
                 for(int i = 0; i < adapter.list.size(); i++) {
-                    if(Integer.parseInt(adapter.list.get(i).percent.substring(0, adapter.list.get(i).percent.length()-1))==0) adapter.list.remove(i);
+
+                    Attainment attainment = adapter.list.get(i);
+
+                    if(attainment.percent.length() > 1
+                            && Integer.parseInt(attainment.percent.substring(0, attainment.percent.length()-1))==0)
+                        adapter.list.remove(i);
                 }
+
                 DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -60,6 +69,7 @@ public class Stats extends Fragment {
                 });
             }
         }).start();
+
         if(!DataManager.getInstance().mainActivity.isLandscape) {
             ((TextView) mainView.findViewById(R.id.overall)).setText(getActivity().getString(R.string.overall));
             ((TextView) mainView.findViewById(R.id.this_week)).setText(getActivity().getString(R.string.this_week));
@@ -107,9 +117,7 @@ public class Stats extends Fragment {
                 }
             }).start();
         } else {
-//            ((TextView) mainView.findViewById(R.id.overall)).setText(getActivity().getString(R.string.overall));
             ((TextView) mainView.findViewById(R.id.overall2)).setText(getActivity().getString(R.string.overall));
-//            ((TextView) mainView.findViewById(R.id.this_week)).setText(getActivity().getString(R.string.this_week));
             ((TextView) mainView.findViewById(R.id.this_week2)).setText(getActivity().getString(R.string.this_week));
 //            new Thread(new Runnable() {
 //                @Override
@@ -278,7 +286,6 @@ public class Stats extends Fragment {
             }
         });
 
-        //Lista pt attainment + refresh
         list = (ListView) mainView.findViewById(R.id.list);
         list.setOnTouchListener(new View.OnTouchListener() {
             // Setting on Touch Listener for handling the touch inside ScrollView
@@ -291,8 +298,6 @@ public class Stats extends Fragment {
         });
         adapter = new AttainmentAdapter(DataManager.getInstance().mainActivity);
         list.setAdapter(adapter);
-        //
-
 
         mainView.findViewById(R.id.graph).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -467,6 +472,7 @@ public class Stats extends Fragment {
             });
 
         }
+
         if(!DataManager.getInstance().mainActivity.isLandscape) {
             ((TextView) mainView.findViewById(R.id.graphs)).setTypeface(DataManager.getInstance().myriadpro_regular);
 
@@ -497,26 +503,46 @@ public class Stats extends Fragment {
             });
         } else {
 
-            ((TextView) mainView.findViewById(R.id.this_week_ap)).setTypeface(DataManager.getInstance().myriadpro_regular);
-            ((TextView) mainView.findViewById(R.id.this_week2)).setTypeface(DataManager.getInstance().myriadpro_regular);
-//            ((TextView) mainView.findViewById(R.id.overall)).setTypeface(DataManager.getInstance().myriadpro_regular);
-            ((TextView) mainView.findViewById(R.id.overall2)).setTypeface(DataManager.getInstance().myriadpro_regular);
-            ((TextView) mainView.findViewById(R.id.overall_ap)).setTypeface(DataManager.getInstance().myriadpro_regular);
-
-        }
-//        DataManager.getInstance().mainActivity.drawer.closeDrawer(GravityCompat.START);
-
-        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setMessage(R.string.statistics_admin_view);
-        alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.session_expired_title) + "</font>"));
-        alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+            TextView this_week_ap = (TextView) mainView.findViewById(R.id.this_week_ap);
+            if(this_week_ap != null) {
+                this_week_ap.setTypeface(DataManager.getInstance().myriadpro_regular);
             }
-        });
-        android.app.AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+            TextView this_week2 = (TextView) mainView.findViewById(R.id.this_week2);
+            if(this_week2 != null) {
+                this_week2.setTypeface(DataManager.getInstance().myriadpro_regular);
+            }
+            TextView overall2 = (TextView) mainView.findViewById(R.id.overall2);
+            if(overall2 != null) {
+                overall2.setTypeface(DataManager.getInstance().myriadpro_regular);
+            }
+            TextView overall_ap = (TextView) mainView.findViewById(R.id.overall_ap);
+            if(overall_ap != null) {
+                overall_ap.setTypeface(DataManager.getInstance().myriadpro_regular);
+            }
+        }
+
+        final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+        if(DataManager.getInstance().user.isStaff && preferences.getBoolean("stats_alert",true)) {
+
+            android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(getActivity());
+            alertDialogBuilder.setMessage(R.string.statistics_admin_view);
+            alertDialogBuilder.setPositiveButton("Don't show again", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putBoolean("stats_alert",false);
+                    editor.apply();
+                }
+            });
+            alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            android.app.AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
 
         return mainView;
     }

@@ -291,7 +291,6 @@ public class MainActivity extends FragmentActivity {
             }
         }).start();
 
-
         Intent intentService = new Intent(this, Syncronize.class);
         startService(intentService);
 
