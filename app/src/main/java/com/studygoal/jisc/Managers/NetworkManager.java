@@ -3913,23 +3913,25 @@ public class NetworkManager {
         }
     }
 
-    private boolean forbidden (int code){
-        if (code == 401){
-            //cookie manager context
-            if (DataManager.getInstance().checkForbidden) {
-//                deleteCache(appContext);
-                CookieManager.getInstance().removeAllCookies(null);
-                DataManager.getInstance().set_jwt("");
-                new Delete().from(CurrentUser.class).execute();
-                DataManager.getInstance().toast = true;
-                DataManager.getInstance().checkForbidden = false;
-                Intent intent = new Intent(DataManager.getInstance().currActivity, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                appContext.startActivity(intent);
-                DataManager.getInstance().currActivity.finish();
-                return false;
-            }
-        }
+    private boolean forbidden (int code) {
+
         return true;
+
+//        if (code == 401){
+//            //cookie manager context
+//            if (DataManager.getInstance().checkForbidden) {
+//                CookieManager.getInstance().removeAllCookies(null);
+//                DataManager.getInstance().set_jwt("");
+//                new Delete().from(CurrentUser.class).execute();
+//                DataManager.getInstance().toast = true;
+//                DataManager.getInstance().checkForbidden = false;
+//                Intent intent = new Intent(DataManager.getInstance().currActivity, LoginActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                appContext.startActivity(intent);
+//                DataManager.getInstance().currActivity.finish();
+//                return false;
+//            }
+//        }
+//        return true;
     }
 }
