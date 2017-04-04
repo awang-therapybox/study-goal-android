@@ -24,11 +24,27 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.studygoal.jisc.Adapters.InstitutionsAdapter;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
+import com.studygoal.jisc.Models.ActivityHistory;
+import com.studygoal.jisc.Models.Attainment;
+import com.studygoal.jisc.Models.CourseAttendant;
+import com.studygoal.jisc.Models.Courses;
+import com.studygoal.jisc.Models.CurrentUser;
+import com.studygoal.jisc.Models.Feed;
+import com.studygoal.jisc.Models.Friend;
 import com.studygoal.jisc.Models.Institution;
+import com.studygoal.jisc.Models.Mark;
+import com.studygoal.jisc.Models.Module;
+import com.studygoal.jisc.Models.PendingRequest;
+import com.studygoal.jisc.Models.ReceivedRequest;
+import com.studygoal.jisc.Models.RunningActivity;
+import com.studygoal.jisc.Models.StretchTarget;
+import com.studygoal.jisc.Models.Targets;
+import com.studygoal.jisc.Models.TrophyMy;
 import com.studygoal.jisc.Utils.Utils;
 
 import org.json.JSONObject;
@@ -95,7 +111,7 @@ public class LoginActivity extends Activity {
 
         webView.setVisibility(View.INVISIBLE);
         choose_institution = (TextView) findViewById(R.id.choose_institution);
-        //Fonts
+
         ((TextView) findViewById(R.id.choose_institution)).setTypeface(DataManager.getInstance().myriadpro_regular);
         choose_institution.setTypeface(DataManager.getInstance().myriadpro_regular);
 
@@ -198,6 +214,7 @@ public class LoginActivity extends Activity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
+                    resetDatabase();
                     if(view.getTag().equals("no institution")) {
 
                         Intent newIntent = new Intent(LoginActivity.this, SocialActivity.class);
@@ -428,4 +445,30 @@ public class LoginActivity extends Activity {
         findViewById(R.id.blackout).setVisibility(View.INVISIBLE);
     }
 
+    //reset database on new login
+    public void resetDatabase() {
+
+        ActiveAndroid.beginTransaction();
+
+        new Delete().from(CurrentUser.class).execute();
+        new Delete().from(Module.class).execute();
+        new Delete().from(ActivityHistory.class).execute();
+        new Delete().from(com.studygoal.jisc.Models.Activity.class).execute();
+        new Delete().from(Targets.class).execute();
+        new Delete().from(StretchTarget.class).execute();
+        new Delete().from(Feed.class).execute();
+        new Delete().from(Friend.class).execute();
+        new Delete().from(RunningActivity.class).execute();
+        new Delete().from(CourseAttendant.class).execute();
+        new Delete().from(PendingRequest.class).execute();
+        new Delete().from(ReceivedRequest.class).execute();
+        new Delete().from(Mark.class).execute();
+        new Delete().from(TrophyMy.class).execute();
+        new Delete().from(Attainment.class).execute();
+        new Delete().from(Courses.class).execute();
+
+        ActiveAndroid.setTransactionSuccessful();
+        ActiveAndroid.endTransaction();
+
+    }
 }
