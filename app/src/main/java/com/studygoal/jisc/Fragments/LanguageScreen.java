@@ -53,7 +53,7 @@ public class LanguageScreen extends Fragment {
         list.add(DataManager.getInstance().mainActivity.getString(R.string.welsh));
 
         final ListView listView = (ListView) mainView.findViewById(R.id.list);
-        listView.setAdapter(new GenericAdapter(DataManager.getInstance().mainActivity, selected_value.toUpperCase(), list));
+        listView.setAdapter(new GenericAdapter(DataManager.getInstance().mainActivity, selected_value, list));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

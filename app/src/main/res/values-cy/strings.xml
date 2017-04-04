@@ -173,8 +173,8 @@
     <string name="library">Llyfrgell</string>
     <string name="camera">Camera</string>
 
-    <string name="english">Saesneg</string>
-    <string name="welsh">Cymraeg</string>
+    <string name="english">SAESNEG</string>
+    <string name="welsh">CYMRAEG</string>
 
 
     <string name="edit_activity">Golygu</string>
