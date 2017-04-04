@@ -503,11 +503,22 @@ public class Stats extends Fragment {
             });
         } else {
 
-            ((TextView) mainView.findViewById(R.id.this_week_ap)).setTypeface(DataManager.getInstance().myriadpro_regular);
-            ((TextView) mainView.findViewById(R.id.this_week2)).setTypeface(DataManager.getInstance().myriadpro_regular);
-            ((TextView) mainView.findViewById(R.id.overall2)).setTypeface(DataManager.getInstance().myriadpro_regular);
-            ((TextView) mainView.findViewById(R.id.overall_ap)).setTypeface(DataManager.getInstance().myriadpro_regular);
-
+            TextView this_week_ap = (TextView) mainView.findViewById(R.id.this_week_ap);
+            if(this_week_ap != null) {
+                this_week_ap.setTypeface(DataManager.getInstance().myriadpro_regular);
+            }
+            TextView this_week2 = (TextView) mainView.findViewById(R.id.this_week2);
+            if(this_week2 != null) {
+                this_week2.setTypeface(DataManager.getInstance().myriadpro_regular);
+            }
+            TextView overall2 = (TextView) mainView.findViewById(R.id.overall2);
+            if(overall2 != null) {
+                overall2.setTypeface(DataManager.getInstance().myriadpro_regular);
+            }
+            TextView overall_ap = (TextView) mainView.findViewById(R.id.overall_ap);
+            if(overall_ap != null) {
+                overall_ap.setTypeface(DataManager.getInstance().myriadpro_regular);
+            }
         }
 
         final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
