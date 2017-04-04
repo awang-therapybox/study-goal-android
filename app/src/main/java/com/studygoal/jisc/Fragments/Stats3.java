@@ -2,18 +2,18 @@ package com.studygoal.jisc.Fragments;
 
 import android.app.Dialog;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatTextView;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -21,20 +21,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.studygoal.jisc.Adapters.GenericAdapter;
 import com.studygoal.jisc.Adapters.ModuleAdapter2;
 import com.studygoal.jisc.MainActivity;
@@ -46,6 +32,9 @@ import com.studygoal.jisc.Models.Friend;
 import com.studygoal.jisc.Models.Module;
 import com.studygoal.jisc.R;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -57,14 +46,14 @@ import java.util.Random;
 
 public class Stats3 extends Fragment {
 
-
-    public LineChart lineChart;
-    public BarChart barchart;
     AppCompatTextView module;
     AppCompatTextView period;
     AppCompatTextView compareTo;
     RelativeLayout chart_layout;
     List<ED> list;
+    boolean isBar;
+    WebView webView;
+    float webviewHeight;
 
     @Override
     public void onResume() {
@@ -78,80 +67,16 @@ public class Stats3 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View mainView = inflater .inflate(R.layout.stats3, container, false);
 
-        lineChart = (LineChart) mainView.findViewById(R.id.chart);
-        barchart = (BarChart) mainView.findViewById(R.id.barchart);
+        isBar = false;
+        webView = (WebView) mainView.findViewById(R.id.chart_web);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        webView.setPadding(0, 0, 0, 0);
+        webView.getSettings().setLoadWithOverviewMode(true);
+        webView.getSettings().setUseWideViewPort(true);
+        webView.setInitialScale(1);
+
         chart_layout = (RelativeLayout) mainView.findViewById(R.id.chart_layout);
-
-//        graph_scroll = (HorizontalScrollView) mainView.findViewById(R.id.horizontal_graph_scroll);
-
-        // no description text
-        lineChart.getDescription().setEnabled(false);
-        barchart.getDescription().setEnabled(false);
-
-        // enable touch gestures
-        lineChart.setTouchEnabled(false);
-        lineChart.setDragEnabled(false);
-        lineChart.setScaleEnabled(false);
-        lineChart.setPinchZoom(false);
-        lineChart.setDrawGridBackground(false);
-        lineChart.getAxisRight().setEnabled(false);
-
-        barchart.setTouchEnabled(false);
-        barchart.setDragEnabled(false);
-        barchart.setScaleEnabled(false);
-        barchart.setPinchZoom(false);
-        barchart.setDrawGridBackground(false);
-        barchart.getAxisRight().setEnabled(false);
-        barchart.setFitBars(true);
-
-        YAxis yAxis = lineChart.getAxisLeft();
-        yAxis.setTypeface(DataManager.getInstance().myriadpro_regular);
-        yAxis.setTextColor(Color.BLACK);
-        yAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        yAxis.setDrawGridLines(true);
-        yAxis.setAxisLineColor(Color.TRANSPARENT);
-        yAxis.setTextSize(14f);
-        yAxis.setAxisMinimum(0.0f);
-        yAxis.setGranularity(1.0f);
-
-        XAxis xAxis = lineChart.getXAxis();
-        xAxis.setTypeface(DataManager.getInstance().myriadpro_regular);
-        xAxis.setTextColor(Color.BLACK);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-        xAxis.setAxisLineColor(Color.BLACK);
-        xAxis.setTextSize(14f);
-        xAxis.setGranularity(1f);
-        xAxis.setAxisMinimum(-0.2f);
-
-        Legend legend = lineChart.getLegend();
-        legend.setTextSize(14f);
-        legend.setTypeface(DataManager.getInstance().myriadpro_regular);
-
-        yAxis = barchart.getAxisLeft();
-        yAxis.setTypeface(DataManager.getInstance().myriadpro_regular);
-        yAxis.setTextSize(14f);
-        yAxis.setTextColor(Color.BLACK);
-        yAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        yAxis.setDrawGridLines(true);
-        yAxis.setAxisLineColor(Color.TRANSPARENT);
-        yAxis.setAxisMinimum(0.0f);
-        yAxis.setGranularity(1.0f);
-
-        xAxis = barchart.getXAxis();
-        xAxis.setTypeface(DataManager.getInstance().myriadpro_regular);
-        xAxis.setTextColor(Color.BLACK);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-        xAxis.setTextSize(14f);
-        xAxis.setDrawLabels(true);
-        xAxis.setAxisLineColor(Color.BLACK);
-        xAxis.setGranularity(1f);
-        xAxis.setAxisMinimum(-0.5f);
-
-        legend = barchart.getLegend();
-        legend.setTextSize(14f);
-        legend.setTypeface(DataManager.getInstance().myriadpro_regular);
 
         module = (AppCompatTextView) mainView.findViewById(R.id.module_list);
         module.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
@@ -414,14 +339,13 @@ public class Stats3 extends Fragment {
         mainView.findViewById(R.id.change_graph_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (lineChart.getVisibility() == View.VISIBLE){
-                    lineChart.setVisibility(View.INVISIBLE);
-                    barchart.setVisibility(View.VISIBLE);
+                //switch between bar / graph
+                if (isBar){
+                    isBar = false;
                     ((ImageView)v).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.line_graph));
 
                 }else{
-                    lineChart.setVisibility(View.VISIBLE);
-                    barchart.setVisibility(View.INVISIBLE);
+                    isBar = true;
                     ((ImageView)v).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.bar_graph));
                 }
 
@@ -595,7 +519,7 @@ public class Stats3 extends Fragment {
                 }
             }
             setData();
-            lineChart.invalidate();
+
             DataManager.getInstance().mainActivity.hideProgressBar();
             return;
         }
@@ -648,9 +572,26 @@ public class Stats3 extends Fragment {
         );
 
         setData();
-        lineChart.invalidate();
+
         DataManager.getInstance().mainActivity.hideProgressBar();
     }
+
+    //BAR DATA
+    /*
+    xAxis: {
+		min: 0,
+        title: {
+            text: null
+        }
+    },
+    series: [{
+        name: 'Me',
+        data: [20, 31, 50, 10, 25]
+    }, {
+        name: 'Average',
+        data: [25, 10, 50, 31, 20]
+    }]
+     */
 
     private void setData() {
 
@@ -658,22 +599,11 @@ public class Stats3 extends Fragment {
             list = new ArrayList<>();
         }
 
-        lineChart.setData(null);
-        lineChart.getXAxis().setValueFormatter(null);
-        lineChart.notifyDataSetChanged();
-        lineChart.invalidate();
-
-        barchart.setData(null);
-        barchart.getXAxis().setValueFormatter(null);
-        barchart.notifyDataSetChanged();
-        barchart.invalidate();
-
         if (compareTo.getText().toString().equals(getString(R.string.no_one))) {
             if (period.getText().toString().equals(getString(R.string.last_7_days))) {
 
                 final ArrayList<String> xVals = new ArrayList<>();
-                ArrayList<Entry> vals1 = new ArrayList<>();
-                ArrayList<BarEntry> vals2 = new ArrayList<>();
+                ArrayList<String> vals1 = new ArrayList<>();
 
                 String name = getString(R.string.me);
 
@@ -686,35 +616,24 @@ public class Stats3 extends Fragment {
                 for (int i = 0; i < list.size(); i++) {
                     String day = dateFormat.format(date);
                     date.setTime(date.getTime() + 86400000);
-                    vals1.add(new Entry(xVals.size(), list.get(i).activity_points));
-                    vals2.add(new BarEntry(xVals.size(), list.get(i).activity_points));
-                    xVals.add(day);
+                    vals1.add(""+list.get(i).activity_points+"");
+                    xVals.add("\'"+day+"\'");
                 }
 
-                IAxisValueFormatter valueFormatter = new IAxisValueFormatter() {
-                    @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
-                        if(xVals.size() > value && value >= 0)
-                            return xVals.get((int)value);
-                        else
-                            return "";
-                    }
-                };
+                String webData = "xAxis: { title: {text:null}, categories:[";
+                webData += TextUtils.join(",",xVals);
+                webData += "]}, series:[{name:\'"+name+"\',data: ["+TextUtils.join(",",vals1)+"]}]";
 
-                lineChart.getXAxis().setValueFormatter(valueFormatter);
-                lineChart.setData(getLineData(vals1, name));
-                lineChart.invalidate();
+                String html = getHighhartsString();
+                html = html.replace("<<<REPLACE_DATA_HERE>>>",webData);
 
-                barchart.getXAxis().setValueFormatter(valueFormatter);
-                barchart.setData(getBarData(vals2,name));
-                barchart.invalidate();
+                webView.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
+
 
             } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
 
-                ArrayList<Entry> vals1 = new ArrayList<>();
-                ArrayList<BarEntry> vals2 = new ArrayList<>();
-
-                final ArrayList<String> xVals = new ArrayList<>();
+                ArrayList<String> vals1 = new ArrayList<>();
+                ArrayList<String> xVals = new ArrayList<>();
 
                 Integer val1 = 0;
 
@@ -732,8 +651,7 @@ public class Stats3 extends Fragment {
                 for (int i = 0; i < list.size(); i++) {
                     val1 = val1 + list.get(i).activity_points;
                     if (i == 6 || i == 13 || i == 20 || i == 27){
-                        vals1.add(new Entry(xVals.size(), val1));
-                        vals2.add(new BarEntry(xVals.size(), val1));
+                        vals1.add(""+val1);
 
                         day = dateFormat.format(calendar.getTime());
                         String month1 = dateFormatM.format(calendar.getTime());
@@ -747,30 +665,21 @@ public class Stats3 extends Fragment {
                             day += "-"+dateFormat.format(calendar.getTime());
                         }
                         calendar.add(Calendar.DATE, 1);
-                        xVals.add(day);
+                        xVals.add("\'"+day+"\'");
                         val1 = 0;
                     }
                 }
 
                 String name = getString(R.string.me);
 
-                IAxisValueFormatter valueFormatter1 = new IAxisValueFormatter() {
-                    @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
-                        if(xVals.size() > value && value >= 0)
-                            return xVals.get((int)value);
-                        else
-                            return "";
-                    }
-                };
+                String webData = "xAxis: { title: {text:null}, categories:[";
+                webData += TextUtils.join(",",xVals);
+                webData += "]}, series:[{name:\'"+name+"\',data: ["+TextUtils.join(",",vals1)+"]}]";
 
-                lineChart.getXAxis().setValueFormatter(valueFormatter1);
-                lineChart.setData(getLineData(vals1, name));
-                lineChart.invalidate();
+                String html = getHighhartsString();
+                html = html.replace("<<<REPLACE_DATA_HERE>>>",webData);
 
-                barchart.getXAxis().setValueFormatter(valueFormatter1);
-                barchart.setData(getBarData(vals2, name));
-                barchart.invalidate();
+                webView.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
             }
         } else {
             if (period.getText().toString().equals(getString(R.string.last_7_days))) {
@@ -780,11 +689,8 @@ public class Stats3 extends Fragment {
                 ArrayList<Integer> vals3 = new ArrayList<>();
                 ArrayList<Integer> vals4 = new ArrayList<>();
 
-                ArrayList<Entry> vals1 = new ArrayList<>();
-                ArrayList<Entry> vals2 = new ArrayList<>();
-
-                ArrayList<BarEntry> vals5 = new ArrayList<>();
-                ArrayList<BarEntry> vals6 = new ArrayList<>();
+                ArrayList<String> vals1 = new ArrayList<>();
+                ArrayList<String> vals2 = new ArrayList<>();
 
                 String name = getString(R.string.me);
                 String id = DataManager.getInstance().user.jisc_student_id;
@@ -818,50 +724,19 @@ public class Stats3 extends Fragment {
                 for (int i = 0; i < vals3.size(); i++) {
                     day = dateFormat.format(date);
                     date.setTime(date.getTime() + 86400000);
-                    vals1.add(new Entry(xVals.size(), vals3.get(i)));
-                    vals2.add(new Entry(xVals.size(), vals4.get(i)));
-
-                    vals5.add(new BarEntry(xVals.size(), vals3.get(i)));
-                    vals6.add(new BarEntry(xVals.size(), vals4.get(i)));
-                    xVals.add(day);
+                    vals1.add(""+vals3.get(i));
+                    vals2.add(""+vals4.get(i));
+                    xVals.add("\'"+day+"\'");
                 }
 
-                LineDataSet set1 = getLineDataSet(vals1, name);
-                LineDataSet set2 = getLineDataSet(vals2, compareTo.getText().toString());
+                String webData = "xAxis: { title: {text:null}, categories:[";
+                webData += TextUtils.join(",",xVals);
+                webData += "]}, series:[{name:\'"+name+"\',data: ["+TextUtils.join(",",vals1)+"]},{name:\'"+id+"\',data:"+TextUtils.join(",",vals2)+"}]";
 
-                LineData lineData = new LineData(set1);
-                lineData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                lineData.setDrawValues(false);
-                lineData.addDataSet(set2);
+                String html = getHighhartsString();
+                html = html.replace("<<<REPLACE_DATA_HERE>>>",webData);
 
-                BarDataSet barDataSet1 = getBarDataSet(vals5,name);
-                BarDataSet barDataSet2 = getBarDataSet(vals6,compareTo.getText().toString());
-
-                BarData barData = new BarData(barDataSet1);
-                barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                barData.setDrawValues(true);
-                barData.addDataSet(barDataSet2);
-                barData.setBarWidth(0.40f);
-                barData.groupBars(0, 0.09f, 0.01f);
-                barData.setValueTextColor(0xff000000);
-
-                IAxisValueFormatter valueFormatter = new IAxisValueFormatter() {
-                    @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
-                        if(xVals.size() > value && value >= 0)
-                            return xVals.get((int)value);
-                        else
-                            return "";
-                    }
-                };
-
-                lineChart.getXAxis().setValueFormatter(valueFormatter);
-                lineChart.setData(lineData);
-                lineChart.invalidate();
-
-                barchart.getXAxis().setValueFormatter(valueFormatter);
-                barchart.setData(barData);
-                barchart.invalidate();
+                webView.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
 
             } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
 
@@ -870,11 +745,11 @@ public class Stats3 extends Fragment {
                 ArrayList<Integer> vals3 = new ArrayList<>();
                 ArrayList<Integer> vals4 = new ArrayList<>();
 
-                ArrayList<Entry> vals1 = new ArrayList<>();
-                ArrayList<Entry> vals2 = new ArrayList<>();
+                ArrayList vals1 = new ArrayList<>();
+                ArrayList vals2 = new ArrayList<>();
 
-                ArrayList<BarEntry> vals5 = new ArrayList<>();
-                ArrayList<BarEntry> vals6 = new ArrayList<>();
+                ArrayList vals5 = new ArrayList<>();
+                ArrayList vals6 = new ArrayList<>();
 
                 String name = getString(R.string.me);
 
@@ -920,11 +795,11 @@ public class Stats3 extends Fragment {
                         label = dateFormat.format(date);
                         date.setTime(date.getTime() + 7*86400000);
 
-                        vals1.add(new Entry(xVals.size(), val1));
-                        vals2.add(new Entry(xVals.size(), val2));
-
-                        vals5.add(new BarEntry(xVals.size(), val1));
-                        vals6.add(new BarEntry(xVals.size(), val2));
+//                        vals1.add(new Entry(xVals.size(), val1));
+//                        vals2.add(new Entry(xVals.size(), val2));
+//
+//                        vals5.add(new BarEntry(xVals.size(), val1));
+//                        vals6.add(new BarEntry(xVals.size(), val2));
 
                         xVals.add(label);
 
@@ -932,103 +807,33 @@ public class Stats3 extends Fragment {
                         val2 = 0;
                     }
                 }
-
-                LineDataSet set1 = getLineDataSet(vals1, name);
-                LineDataSet set2 = getLineDataSet(vals2, compareTo.getText().toString());
-
-                LineData lineData = new LineData(set1);
-                lineData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                lineData.setDrawValues(false);
-                lineData.addDataSet(set2);
-
-                BarDataSet barDataSet1 = getBarDataSet(vals5,name);
-                BarDataSet barDataSet2 = getBarDataSet(vals6,compareTo.getText().toString());
-
-                BarData barData = new BarData(barDataSet1);
-                barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                barData.setDrawValues(true);
-                barData.addDataSet(barDataSet2);
-                barData.setBarWidth(0.40f);
-                barData.groupBars(0, 0.09f, 0.01f);
-                barData.setValueTextColor(0xff000000);
-
-                IAxisValueFormatter valueFormatter1 = new IAxisValueFormatter() {
-                    @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
-                        if(xVals.size() > value && value >= 0)
-
-                            return xVals.get((int)value);
-                        else
-                            return "";
-                    }
-                };
-
-                lineChart.getXAxis().setValueFormatter(valueFormatter1);
-                lineChart.setData(lineData);
-                lineChart.invalidate();
-
-                barchart.getXAxis().setValueFormatter(valueFormatter1);
-                barchart.setData(barData);
-                barchart.invalidate();
             }
         }
     }
 
-    public LineData getLineData(ArrayList<Entry> vals1, String name) {
+    public String getHighhartsString() {
 
-        LineData data = new LineData(getLineDataSet(vals1, name));
-        data.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-        data.setDrawValues(false);
+        try {
 
-        return data;
-    }
+            String path;
+            if(isBar) {
+                path = "highcharts/bargraph.html";
+            } else {
+                path = "highcharts/linegraph.html";
+            }
 
-    public BarData getBarData(ArrayList<BarEntry> vals2, String name) {
-        BarData barData = new BarData(getBarDataSet(vals2, name));
-        barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-        barData.setDrawValues(false);
-        barData.setValueTextColor(0xff000000);
-        barData.setBarWidth(0.70f);
-
-        return barData;
-    }
-
-    public LineDataSet getLineDataSet(ArrayList<Entry> vals1, String name) {
-        LineDataSet lineDataSet = new LineDataSet(vals1, name);
-        lineDataSet.setCubicIntensity(0.0f);
-        lineDataSet.setDrawFilled(true);
-        lineDataSet.setDrawCircles(false);
-        lineDataSet.setCircleRadius(3f);
-        lineDataSet.setLineWidth(2f);
-        lineDataSet.setCircleColor(0xFF8864C8);
-        lineDataSet.setColor(0xFF8864C8);
-        lineDataSet.setFillColor(0xFF8864C8);
-        lineDataSet.setValueTextColor(0xFF8864C8);
-        if(!name.equals(getString(R.string.me))) {
-            lineDataSet.setColor(0xFF3791ee);
-            lineDataSet.setFillColor(0xFF3791ee);
-            lineDataSet.setCircleColor(0xFF3791ee);
-            lineDataSet.setValueTextColor(0xFF3791ee);
+            StringBuilder buf = new StringBuilder();
+            InputStream json = DataManager.getInstance().mainActivity.getAssets().open(path);
+            BufferedReader in = new BufferedReader(new InputStreamReader(json, "UTF-8"));
+            String str;
+            while ((str=in.readLine()) != null) {
+                buf.append(str);
+            }
+            in.close();
+            return buf.toString();
+        } catch (Exception e) {
+            return "";
         }
-        lineDataSet.setFillAlpha(0);
-        lineDataSet.setDrawValues(false);
-        lineDataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
-        lineDataSet.setDrawHorizontalHighlightIndicator(true);
 
-        return lineDataSet;
-    }
-
-    public BarDataSet getBarDataSet(ArrayList<BarEntry> vals2, String name) {
-        BarDataSet barDataSet = new BarDataSet(vals2,name);
-        barDataSet.setColor(0xFF8864C8);
-        barDataSet.setValueTextColor(0xFF8864C8);
-        if(!name.equals(getString(R.string.me))) {
-            barDataSet.setColor(0xFF3791ee);
-            barDataSet.setValueTextColor(0xFF3791ee);
-        }
-        barDataSet.setDrawValues(false);
-        barDataSet.setValueTextSize(50);
-        barDataSet.setValueTextSize(14f);
-        return barDataSet;
     }
 }
