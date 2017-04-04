@@ -811,12 +811,10 @@ public class Stats3 extends Fragment {
 
                 for (int i = 0; i < list.size(); i++) {
                     if (
-                            (!DataManager.getInstance().user.isDemo
-                                && list.get(i).student_id.contains(id))
-                        ||
-                                    (DataManager.getInstance().user.isDemo
-                                            && list.get(i).student_id.equals(id))
-                            )
+                            (DataManager.getInstance().user.isDemo
+                                    && list.get(i).student_id.equals(id)) ||
+                                    (!DataManager.getInstance().user.isDemo
+                                            && list.get(i).student_id.contains(id)))
                     {
                         value_1 = list.get(i).activity_points;
                         vals3.add(value_1);
@@ -910,13 +908,12 @@ public class Stats3 extends Fragment {
 
                 for (int i = 0; i < list.size(); i++) {
                     if (
-                            (!DataManager.getInstance().user.isDemo
-                                    && list.get(i).student_id.contains(id))
-                                    ||
-                                    (DataManager.getInstance().user.isDemo
-                                            && list.get(i).student_id.equals(id))
-                            )
+                            (DataManager.getInstance().user.isDemo
+                                    && list.get(i).student_id.equals(id)) ||
+                                    (!DataManager.getInstance().user.isDemo
+                                            && list.get(i).student_id.contains(id)))
                     {
+
                         value_1 = list.get(i).activity_points;
                         vals3.add(value_1);
                     } else {
