@@ -634,7 +634,7 @@ public class Stats3 extends Fragment {
 //            compareValue = "10";
 //            compareType = "top";
 //        } else
-            if (!compareTo.getText().toString().equals(getString(R.string.no_one))
+        if (!compareTo.getText().toString().equals(getString(R.string.no_one))
 //                && !compareTo.getText().toString().equals(getString(R.string.top10))
                 && !compareTo.getText().toString().equals(getString(R.string.average))) {
             compareValue = ((Friend) new Select().from(Friend.class).where("name = ?", compareTo.getText().toString()).executeSingle()).jisc_student_id.replace("[", "").replace("]", "").replace("\"", "");
@@ -801,6 +801,9 @@ public class Stats3 extends Fragment {
 
                 String name = getString(R.string.me);
                 String id = DataManager.getInstance().user.jisc_student_id;
+                if(DataManager.getInstance().user.isDemo) {
+                    id = "demouser";
+                }
 
                 Integer value_1;
                 Integer value_2;
@@ -810,18 +813,25 @@ public class Stats3 extends Fragment {
                 Long curr = c.getTimeInMillis() - 518400000;
                 c.setTimeInMillis(curr);
 
-                for (int i = 0; i < list.size(); i++) {
-                    if (
-                            (DataManager.getInstance().user.isDemo
-                                    && list.get(i).student_id.equals(id)) ||
-                                    (!DataManager.getInstance().user.isDemo
-                                            && list.get(i).student_id.contains(id)))
-                    {
-                        value_1 = list.get(i).activity_points;
-                        vals3.add(value_1);
-                    } else {
-                        value_2 = list.get(i).activity_points;
-                        vals4.add(value_2);
+                if(DataManager.getInstance().user.isDemo) {
+                    for (int i = 0; i < list.size(); i++) {
+                        if(list.get(i).student_id.equals(id)) {
+                            value_1 = list.get(i).activity_points;
+                            vals3.add(value_1);
+                        } else {
+                            value_2 = list.get(i).activity_points;
+                            vals4.add(value_2);
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < list.size(); i++) {
+                        if(list.get(i).student_id.equals(id)) {
+                            value_1 = list.get(i).activity_points;
+                            vals3.add(value_1);
+                        } else {
+                            value_2 = list.get(i).activity_points;
+                            vals4.add(value_2);
+                        }
                     }
                 }
 
@@ -857,7 +867,6 @@ public class Stats3 extends Fragment {
 
                 BarData barData = new BarData(barDataSet1);
                 barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                barData.setDrawValues(true);
                 barData.addDataSet(barDataSet2);
                 barData.setBarWidth(0.40f);
                 barData.groupBars(0, 0.09f, 0.01f);
@@ -897,8 +906,9 @@ public class Stats3 extends Fragment {
                 String name = getString(R.string.me);
 
                 String id = DataManager.getInstance().user.jisc_student_id;
-                if(DataManager.getInstance().user.isDemo)
-                    id = DataManager.getInstance().user.id;
+                if(DataManager.getInstance().user.isDemo) {
+                    id = "demouser";
+                }
 
                 Integer value_1;
                 Integer value_2;
@@ -908,19 +918,25 @@ public class Stats3 extends Fragment {
                 Long curr = c.getTimeInMillis() - (3 * 518400000);
                 c.setTimeInMillis(curr);
 
-                for (int i = 0; i < list.size(); i++) {
-                    if (
-                            (DataManager.getInstance().user.isDemo
-                                    && list.get(i).student_id.equals(id)) ||
-                                    (!DataManager.getInstance().user.isDemo
-                                            && list.get(i).student_id.contains(id)))
-                    {
-
-                        value_1 = list.get(i).activity_points;
-                        vals3.add(value_1);
-                    } else {
-                        value_2 = list.get(i).activity_points;
-                        vals4.add(value_2);
+                if(DataManager.getInstance().user.isDemo) {
+                    for (int i = 0; i < list.size(); i++) {
+                        if(list.get(i).student_id.equals(id)) {
+                            value_1 = list.get(i).activity_points;
+                            vals3.add(value_1);
+                        } else {
+                            value_2 = list.get(i).activity_points;
+                            vals4.add(value_2);
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < list.size(); i++) {
+                        if(list.get(i).student_id.equals(id)) {
+                            value_1 = list.get(i).activity_points;
+                            vals3.add(value_1);
+                        } else {
+                            value_2 = list.get(i).activity_points;
+                            vals4.add(value_2);
+                        }
                     }
                 }
 
@@ -970,7 +986,7 @@ public class Stats3 extends Fragment {
 
                 BarData barData = new BarData(barDataSet1);
                 barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                barData.setDrawValues(true);
+                barData.setDrawValues(false);
                 barData.addDataSet(barDataSet2);
                 barData.setBarWidth(0.40f);
                 barData.groupBars(0, 0.09f, 0.01f);
