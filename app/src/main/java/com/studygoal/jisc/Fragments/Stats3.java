@@ -3,6 +3,7 @@ package com.studygoal.jisc.Fragments;
 import android.app.Dialog;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatTextView;
@@ -11,6 +12,7 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
@@ -31,6 +33,7 @@ import com.studygoal.jisc.Models.ED;
 import com.studygoal.jisc.Models.Friend;
 import com.studygoal.jisc.Models.Module;
 import com.studygoal.jisc.R;
+import com.studygoal.jisc.Utils.Utils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -73,8 +76,14 @@ public class Stats3 extends Fragment {
         webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webView.setPadding(0, 0, 0, 0);
         webView.getSettings().setLoadWithOverviewMode(true);
-        webView.getSettings().setUseWideViewPort(true);
-        webView.setInitialScale(1);
+        webView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                webviewHeight = Utils.pxToDp(webView.getHeight()-40);
+            }
+        });
+
+        webView.loadDataWithBaseURL("", "<html><head></head><body><div style=\"height:100%;width:100%;background:white;\"></div></body></html>", "text/html", "UTF-8", "");
 
         chart_layout = (RelativeLayout) mainView.findViewById(R.id.chart_layout);
 
@@ -201,8 +210,6 @@ public class Stats3 extends Fragment {
                 }
             }
         };
-
-//        getData();
 
         final TextView description = (TextView) mainView.findViewById(R.id.description);
         description.setTypeface(DataManager.getInstance().myriadpro_regular);
@@ -344,16 +351,24 @@ public class Stats3 extends Fragment {
                     isBar = false;
                     ((ImageView)v).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.line_graph));
 
-                }else{
+                } else {
                     isBar = true;
                     ((ImageView)v).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.bar_graph));
                 }
 
-                getData();
+                setData();
             }
         });
 
         mainView.findViewById(R.id.change_graph_btn).performClick();
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getData();
+            }
+        }, 100);
 
         return mainView;
     }
@@ -626,6 +641,7 @@ public class Stats3 extends Fragment {
 
                 String html = getHighhartsString();
                 html = html.replace("<<<REPLACE_DATA_HERE>>>",webData);
+                html = html.replace("height:1000px","height:"+webviewHeight+"px");
 
                 webView.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
 
@@ -678,6 +694,7 @@ public class Stats3 extends Fragment {
 
                 String html = getHighhartsString();
                 html = html.replace("<<<REPLACE_DATA_HERE>>>",webData);
+                html = html.replace("height:1000px","height:"+webviewHeight+"px");
 
                 webView.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
             }
@@ -694,6 +711,9 @@ public class Stats3 extends Fragment {
 
                 String name = getString(R.string.me);
                 String id = DataManager.getInstance().user.jisc_student_id;
+                if(DataManager.getInstance().user.isDemo) {
+                    id = "demouser";
+                }
 
                 Integer value_1;
                 Integer value_2;
@@ -703,13 +723,25 @@ public class Stats3 extends Fragment {
                 Long curr = c.getTimeInMillis() - 518400000;
                 c.setTimeInMillis(curr);
 
-                for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).student_id.contains(id)) {
-                        value_1 = list.get(i).activity_points;
-                        vals3.add(value_1);
-                    } else {
-                        value_2 = list.get(i).activity_points;
-                        vals4.add(value_2);
+                if(DataManager.getInstance().user.isDemo) {
+                    for (int i = 0; i < list.size(); i++) {
+                        if (list.get(i).student_id.equals(id)) {
+                            value_1 = list.get(i).activity_points;
+                            vals3.add(value_1);
+                        } else {
+                            value_2 = list.get(i).activity_points;
+                            vals4.add(value_2);
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < list.size(); i++) {
+                        if (list.get(i).student_id.contains(id)) {
+                            value_1 = list.get(i).activity_points;
+                            vals3.add(value_1);
+                        } else {
+                            value_2 = list.get(i).activity_points;
+                            vals4.add(value_2);
+                        }
                     }
                 }
 
@@ -731,10 +763,11 @@ public class Stats3 extends Fragment {
 
                 String webData = "xAxis: { title: {text:null}, categories:[";
                 webData += TextUtils.join(",",xVals);
-                webData += "]}, series:[{name:\'"+name+"\',data: ["+TextUtils.join(",",vals1)+"]},{name:\'"+id+"\',data:"+TextUtils.join(",",vals2)+"}]";
+                webData += "]}, series:[{name:\'"+name+"\',data: ["+TextUtils.join(",",vals1)+"]},{name:\'"+id+"\',data: ["+TextUtils.join(",",vals2)+"]}]";
 
                 String html = getHighhartsString();
                 html = html.replace("<<<REPLACE_DATA_HERE>>>",webData);
+                html = html.replace("height:1000px","height:"+webviewHeight+"px");
 
                 webView.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
 
@@ -745,17 +778,15 @@ public class Stats3 extends Fragment {
                 ArrayList<Integer> vals3 = new ArrayList<>();
                 ArrayList<Integer> vals4 = new ArrayList<>();
 
-                ArrayList vals1 = new ArrayList<>();
-                ArrayList vals2 = new ArrayList<>();
-
-                ArrayList vals5 = new ArrayList<>();
-                ArrayList vals6 = new ArrayList<>();
+                ArrayList<String> vals1 = new ArrayList<>();
+                ArrayList<String> vals2 = new ArrayList<>();
 
                 String name = getString(R.string.me);
 
                 String id = DataManager.getInstance().user.jisc_student_id;
-                if(DataManager.getInstance().user.isDemo)
-                    id = DataManager.getInstance().user.id;
+                if(DataManager.getInstance().user.isDemo) {
+                    id = "demouser";
+                }
 
                 Integer value_1;
                 Integer value_2;
@@ -765,13 +796,25 @@ public class Stats3 extends Fragment {
                 Long curr = c.getTimeInMillis() - (3 * 518400000);
                 c.setTimeInMillis(curr);
 
-                for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).student_id.contains(id)) {
-                        value_1 = list.get(i).activity_points;
-                        vals3.add(value_1);
-                    } else {
-                        value_2 = list.get(i).activity_points;
-                        vals4.add(value_2);
+                if(DataManager.getInstance().user.isDemo) {
+                    for (int i = 0; i < list.size(); i++) {
+                        if (list.get(i).student_id.equals(id)) {
+                            value_1 = list.get(i).activity_points;
+                            vals3.add(value_1);
+                        } else {
+                            value_2 = list.get(i).activity_points;
+                            vals4.add(value_2);
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < list.size(); i++) {
+                        if (list.get(i).student_id.contains(id)) {
+                            value_1 = list.get(i).activity_points;
+                            vals3.add(value_1);
+                        } else {
+                            value_2 = list.get(i).activity_points;
+                            vals4.add(value_2);
+                        }
                     }
                 }
 
@@ -795,18 +838,25 @@ public class Stats3 extends Fragment {
                         label = dateFormat.format(date);
                         date.setTime(date.getTime() + 7*86400000);
 
-//                        vals1.add(new Entry(xVals.size(), val1));
-//                        vals2.add(new Entry(xVals.size(), val2));
-//
-//                        vals5.add(new BarEntry(xVals.size(), val1));
-//                        vals6.add(new BarEntry(xVals.size(), val2));
+                        vals1.add(""+val1);
+                        vals2.add(""+val2);
 
-                        xVals.add(label);
+                        xVals.add("\'"+label+"\'");
 
                         val1 = 0;
                         val2 = 0;
                     }
                 }
+
+                String webData = "xAxis: { title: {text:null}, categories:[";
+                webData += TextUtils.join(",",xVals);
+                webData += "]}, series:[{name:\'"+name+"\',data: ["+TextUtils.join(",",vals1)+"]},{name:\'"+id+"\',data: ["+TextUtils.join(",",vals2)+"]}]";
+
+                String html = getHighhartsString();
+                html = html.replace("<<<REPLACE_DATA_HERE>>>",webData);
+                html = html.replace("height:1000px","height:"+webviewHeight+"px");
+
+                webView.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
             }
         }
     }
