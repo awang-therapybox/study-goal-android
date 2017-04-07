@@ -763,7 +763,7 @@ public class Stats3 extends Fragment {
 
                 String webData = "xAxis: { title: {text:null}, categories:[";
                 webData += TextUtils.join(",",xVals);
-                webData += "]}, series:[{name:\'"+name+"\',data: ["+TextUtils.join(",",vals1)+"]},{name:\'"+id+"\',data: ["+TextUtils.join(",",vals2)+"]}]";
+                webData += "]}, series:[{name:\'"+name+"\',data: ["+TextUtils.join(",",vals1)+"]},{name:\'"+compareTo.getText().toString()+"\',data: ["+TextUtils.join(",",vals2)+"]}]";
 
                 String html = getHighhartsString();
                 html = html.replace("<<<REPLACE_DATA_HERE>>>",webData);
@@ -850,7 +850,7 @@ public class Stats3 extends Fragment {
 
                 String webData = "xAxis: { title: {text:null}, categories:[";
                 webData += TextUtils.join(",",xVals);
-                webData += "]}, series:[{name:\'"+name+"\',data: ["+TextUtils.join(",",vals1)+"]},{name:\'"+id+"\',data: ["+TextUtils.join(",",vals2)+"]}]";
+                webData += "]}, series:[{name:\'"+name+"\',data: ["+TextUtils.join(",",vals1)+"]},{name:\'"+compareTo.getText().toString()+"\',data: ["+TextUtils.join(",",vals2)+"]}]";
 
                 String html = getHighhartsString();
                 html = html.replace("<<<REPLACE_DATA_HERE>>>",webData);
