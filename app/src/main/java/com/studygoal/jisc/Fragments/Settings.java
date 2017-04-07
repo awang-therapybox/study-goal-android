@@ -122,7 +122,7 @@ public class Settings extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto", "learning.analytics@jisc.ac.uk", null));
+                        "mailto", "support@jisclearninganalytics.freshdesk.com", null));
                 emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Bug/Feature idea " + DataManager.getInstance().institution);
                 emailIntent.putExtra(Intent.EXTRA_TEXT, "+" + getString(R.string.is_this_a_but_or_a_feature) + "\n" +
                         "+"+ getString(R.string.which_part)+"\n" +
