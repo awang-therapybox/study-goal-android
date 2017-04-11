@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<style type="text/css">
+${demo.css}
+		</style>
+	</head>
+	<body>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+
+<div id="container" style="width:1000px;height:1000px;margin:0;background-color:rgba(10,10,10,0.0);">
+</div>
+
+
+		<script type="text/javascript">
+Highcharts.chart('container', {
+
+    chart: {
+        type: 'solidgauge',
+        backgroundColor:'rgba(255, 255, 255, 0.1)'
+    },
+    title: {
+        text: ''
+    },
+	credits: {
+		enabled: false
+    },
+    tooltip: {
+        borderWidth: 0,
+        backgroundColor: 'none',
+        shadow: false,
+        style: {
+            fontSize: '0px'
+        }
+    },
+
+    pane: {
+        startAngle: 0,
+        endAngle: 360,
+        background: [{
+            outerRadius: '110%',
+            innerRadius: '75%',
+            backgroundColor: Highcharts.Color("#dbdbdb")
+                .setOpacity(1.0)
+                .get(),
+            borderWidth: 0
+        }]
+    },
+
+    yAxis: {
+    	showFirstLabel:false,
+        showLastLabel:false,
+        labels: {
+        	enabled: false
+        },
+        min: 0,
+        max: Y_MAX_VALUE,
+        lineWidth: 0,
+        minorGridLineWidth: 0,
+		lineColor: 'transparent',
+		minorTickLength: 0,
+   		tickLength: 0
+    },
+
+    plotOptions: {
+        solidgauge: {
+            dataLabels: {
+                enabled: false
+            },
+            linecap: 'round',
+            stickyTracking: false,
+            rounded: true
+        }
+    },
+
+    series: [{
+        name: '',
+        data: [{
+            color: '#b990d7',
+            radius: '110%',
+            innerRadius: '75%',
+            y: Y_VALUE
+        }]
+    }]
+});
+
+		</script>
+	</body>
+</html>

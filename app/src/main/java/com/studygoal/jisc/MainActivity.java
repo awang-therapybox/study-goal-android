@@ -257,9 +257,6 @@ public class MainActivity extends FragmentActivity {
         NetworkManager.getInstance().getAppSettings(DataManager.getInstance().user.id);
         NetworkManager.getInstance().getMyTrophies();
 
-        if (new Select().from(ActivityHistory.class).count() == 0) {
-            NetworkManager.getInstance().getActivityHistory(DataManager.getInstance().user.id);
-        }
 
         new Thread(new Runnable() {
             @Override
@@ -285,6 +282,7 @@ public class MainActivity extends FragmentActivity {
                     }
                 }
 
+                NetworkManager.getInstance().getActivityHistory(DataManager.getInstance().user.id);
                 NetworkManager.getInstance().getStretchTargets(DataManager.getInstance().user.id);
                 NetworkManager.getInstance().getFriends(DataManager.getInstance().user.id);
                 NetworkManager.getInstance().getFriendRequests(DataManager.getInstance().user.id);
