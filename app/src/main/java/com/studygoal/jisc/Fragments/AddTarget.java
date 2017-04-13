@@ -91,6 +91,7 @@ public class AddTarget extends Fragment implements View.OnClickListener {
 
         addModuleLayout = (RelativeLayout)mainView.findViewById(R.id.add_new_module_layout);
         addModuleLayout.setVisibility(View.GONE);
+
         ((EditText)mainView.findViewById(R.id.add_module_edit_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
         ((TextView)mainView.findViewById(R.id.add_module_button_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
         mainView.findViewById(R.id.add_module_button_text).setOnClickListener(this);
