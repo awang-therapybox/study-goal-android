@@ -24,6 +24,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.plus.Plus;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
 import com.twitter.sdk.android.Twitter;
@@ -229,7 +230,6 @@ public class SocialActivity extends AppCompatActivity implements GoogleApiClient
 
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
 
             email = acct.getEmail();
@@ -243,6 +243,7 @@ public class SocialActivity extends AppCompatActivity implements GoogleApiClient
             });
 
         } else {
+            Log.e("JISC","Handle: "+result.getStatus().getStatusCode());
             Log.e("JISC", "handleSignInResult:" + result.getStatus().getResolution());
         }
     }

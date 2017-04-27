@@ -268,20 +268,41 @@ public class Settings extends Fragment {
 
     public void refresh_image() {
 
-        if (NetworkManager.getInstance().login()) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).into(profile_image);
-                            Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
+        if(DataManager.getInstance().user.isSocial) {
 
-                        }
-                    });
-                }
-            }).start();
+            Integer response = NetworkManager.getInstance().loginSocial(DataManager.getInstance().user.email, DataManager.getInstance().user.password);
+
+            if (response == 200) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).into(profile_image);
+                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
+
+                            }
+                        });
+                    }
+                }).start();
+            }
+        } else {
+            if (NetworkManager.getInstance().login()) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).into(profile_image);
+                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
+
+                            }
+                        });
+                    }
+                }).start();
+            }
         }
     }
 

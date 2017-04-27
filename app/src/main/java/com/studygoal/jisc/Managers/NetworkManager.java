@@ -447,6 +447,8 @@ public class NetworkManager {
                     }
 
                     is.close();
+
+                    Log.e("Jisc","error: "+sb.toString());
                 }
 
                 BufferedInputStream is = new BufferedInputStream(urlConnection.getInputStream());
@@ -3217,6 +3219,7 @@ public class NetworkManager {
                 new Delete().from(CurrentUser.class).execute();
                 DataManager.getInstance().user = new CurrentUser();
                 DataManager.getInstance().user.id = jsonObject.getInt("id") + "";
+                DataManager.getInstance().user.password = password;
                 DataManager.getInstance().user.jisc_student_id = jsonObject.getString("id");
                 DataManager.getInstance().user.pid = jsonObject.getString("pid");
                 DataManager.getInstance().user.name = jsonObject.getString("name");
