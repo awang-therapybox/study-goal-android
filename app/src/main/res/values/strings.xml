@@ -427,4 +427,7 @@
     <string name="add_module">Add Module</string>
     <string name="module_name_invalid">Please add a valid Module Name</string>
     <string name="confirm_delete_feed">Are you sure you want to delete item this from feed?</string>
+
+    <string name="gps_network_not_enabled">Turn on location services to use this feature.</string>
+    <string name="open_location_settings">Take me to settings</string>
 </resources>
