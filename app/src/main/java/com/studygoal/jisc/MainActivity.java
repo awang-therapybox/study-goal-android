@@ -10,6 +10,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -667,18 +668,37 @@ public class MainActivity extends FragmentActivity {
 
     private void savebitmap(Bitmap bmp) {
         String extStorageDirectory = Environment.getExternalStorageDirectory().toString();
-        OutputStream outStream = null;
-        // String temp = null;
+        OutputStream outStream;
+
         File file = new File(extStorageDirectory, "temp.png");
         if (file.exists()) {
             file.delete();
             file = new File(extStorageDirectory, "temp.png");
-
         }
 
         try {
+
+            int w = bmp.getWidth();
+            int h = bmp.getHeight();
+            int nw;
+            int nh;
+
+            if(w >= 500 && h >= 500) {
+                if(w > h) {
+                    nw = 500;
+                    nh = (500 * h/w);
+                } else {
+                    nh = 500;
+                    nw = (500 * w/h);
+                }
+            } else {
+                nw = w;
+                nh = h;
+            }
+
             outStream = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+            bmp = Bitmap.createScaledBitmap(bmp,nw,nh,false);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
             outStream.flush();
             outStream.close();
 
@@ -724,10 +744,16 @@ public class MainActivity extends FragmentActivity {
                 final String imagePath = getRealPathFromURI(MainActivity.this, intent.getData());
                 showProgressBar(null);
 
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+                savebitmap(bitmap);
+
+                final String imagePath1 = Environment.getExternalStorageDirectory().toString() + "/temp.png";
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        if (NetworkManager.getInstance().updateProfileImage(imagePath)) {
+                        if (NetworkManager.getInstance().updateProfileImage(imagePath1)) {
                             MainActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
