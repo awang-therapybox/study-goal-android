@@ -761,6 +761,8 @@ public class MainActivity extends FragmentActivity {
                                     hideProgressBar();
                                 }
                             });
+                        } else {
+
                         }
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override

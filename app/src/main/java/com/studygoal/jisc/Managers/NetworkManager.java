@@ -385,7 +385,7 @@ public class NetworkManager {
                 urlConnection.setRequestProperty("Connection", "Keep-Alive");
                 urlConnection.setRequestProperty("Cache-Control", "no-cache");
                 urlConnection.setUseCaches(false);
-                urlConnection.setConnectTimeout(50000);
+                urlConnection.setConnectTimeout(20000);
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
@@ -428,13 +428,26 @@ public class NetworkManager {
 
                 Bitmap bm = BitmapFactory.decodeFile(path);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 
                 wr.write(baos.toByteArray());
                 wr.writeBytes(crlf + twoHyphens + boundary + twoHyphens + crlf);
 
                 wr.flush();
                 wr.close();
+
+                if(urlConnection.getResponseCode() != 200) {
+                    BufferedInputStream is = new BufferedInputStream(urlConnection.getErrorStream());
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+
+                    is.close();
+                }
 
                 BufferedInputStream is = new BufferedInputStream(urlConnection.getInputStream());
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
@@ -446,8 +459,6 @@ public class NetworkManager {
                 }
 
                 is.close();
-
-                Log.e("Jisc","Image response: "+sb.toString());
 
                 return true;
             } catch (Exception e) {
