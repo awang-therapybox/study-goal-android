@@ -242,7 +242,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         c.setTimeZone(TimeZone.getTimeZone("UTC"));
         long current_time = System.currentTimeMillis();
 
-        c.set(Integer.parseInt(item.created_date.split(" ")[0].split("-")[0]), Integer.parseInt(item.created_date.split(" ")[0].split("-")[1]) - 1, Integer.parseInt(item.created_date.split(" ")[0].split("-")[2]), Integer.parseInt(item.created_date.split(" ")[1].split(":")[0]), Integer.parseInt(item.created_date.split(" ")[1].split(":")[1]));
+        c.set(Integer.parseInt(item.created_date.split(" ")[0].split("-")[0]),
+                Integer.parseInt(item.created_date.split(" ")[0].split("-")[1]) - 1,
+                Integer.parseInt(item.created_date.split(" ")[0].split("-")[2]),
+                Integer.parseInt(item.created_date.split(" ")[1].split(":")[0]),
+                Integer.parseInt(item.created_date.split(" ")[1].split(":")[1]));
+
         long created_date = c.getTimeInMillis();
         long diff = (current_time - created_date) / 60000;
 
@@ -255,11 +260,13 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         else if (diff < 1440)
             feedViewHolder.time_ago.setText((diff / 60) + " " + context.getString(R.string.hours_ago));
         else
-            feedViewHolder.time_ago.setText(context.getString(R.string.on)+ " " + item.created_date.split(" ")[0].split("-")[2] + " " + LinguisticManager.getInstance().convertMonth(item.created_date.split(" ")[0].split("-")[1]) + " " + item.created_date.split(" ")[0].split("-")[0]);
+            feedViewHolder.time_ago.setText(
+                    context.getString(R.string.on)+ " "
+                            + item.created_date.split(" ")[0].split("-")[2] + " "
+                            + LinguisticManager.getInstance().convertMonth(item.created_date.split(" ")[0].split("-")[1]) + " " + item.created_date.split(" ")[0].split("-")[0]);
 
         feedViewHolder.feed.setText(item.message);
 
-        //Alte listener-uri
         if(item.activity_type.toLowerCase().equals("friend_request"))
             feedViewHolder.view.setOnClickListener(new View.OnClickListener() {
                 @Override

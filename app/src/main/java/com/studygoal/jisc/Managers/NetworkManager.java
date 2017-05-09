@@ -3809,7 +3809,6 @@ public class NetworkManager {
                 is.close();
 
                 JSONArray jsonArray = new JSONArray(sb.toString());
-                Log.e("JISC","Modules: "+jsonArray.toString());
 
                 ActiveAndroid.beginTransaction();
 
@@ -3842,6 +3841,7 @@ public class NetworkManager {
     public boolean addModule(HashMap<String, String> params) {
         language = LinguisticManager.getInstance().getLanguageCode();
         Future<Boolean> future = executorService.submit(new addModule(params));
+        Future<Boolean> future1 = executorService.submit(new getSocialModules());
         try {
             return future.get();
         } catch (Exception e) {
