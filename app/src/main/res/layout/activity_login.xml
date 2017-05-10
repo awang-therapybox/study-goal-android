@@ -125,16 +125,17 @@
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:orientation="vertical"
-        android:visibility="visible"
+        android:visibility="invisible"
         android:weightSum="10">
 
         <TextView
             android:id="@+id/login_searchinstitution_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/login_search_institution"
+            android:gravity="center"
             android:textColor="#FFF"
-            android:textSize="25sp"
+            android:textSize="20sp"
             android:layout_marginBottom="10dp"
             />
 
@@ -190,7 +191,7 @@
                 android:layout_gravity="center"
                 android:text="@string/login_institution_not_listed"
                 android:textColor="#FFF"
-                android:textSize="25sp"
+                android:textSize="15sp"
                 android:layout_marginBottom="10dp"
                 />
 
@@ -201,7 +202,7 @@
                 android:layout_gravity="center"
                 android:text="@string/login_institution_signinwith"
                 android:textColor="#FFF"
-                android:textSize="25sp"
+                android:textSize="15sp"
                 android:layout_marginBottom="10dp"
                 />
 
@@ -241,12 +242,13 @@
 
             <TextView
                 android:id="@+id/login_demomode"
-                android:layout_width="match_parent"
-                android:layout_height="55dp"
+                android:layout_width="280dp"
+                android:layout_height="45dp"
                 android:text="@string/demo_mode"
                 android:textColor="#FFF"
+                android:layout_gravity="center"
                 android:gravity="center"
-                android:textSize="25sp"
+                android:textSize="18sp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/rounded_corners_transparent_4"

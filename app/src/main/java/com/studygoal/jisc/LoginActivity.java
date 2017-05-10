@@ -208,11 +208,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
-        ((TextView) findViewById(R.id.login_searchinstitution_title)).setTypeface(DataManager.getInstance().myriadpro_regular);
+        ((TextView) findViewById(R.id.login_searchinstitution_title)).setTypeface(DataManager.getInstance().myriadpro_bold);
         ((EditText) findViewById(R.id.search_field)).setTypeface(DataManager.getInstance().myriadpro_regular);
-        ((TextView) findViewById(R.id.login_institutionnotlisted)).setTypeface(DataManager.getInstance().myriadpro_regular);
-        ((TextView) findViewById(R.id.login_signinwith)).setTypeface(DataManager.getInstance().myriadpro_regular);
-        ((TextView) findViewById(R.id.login_demomode)).setTypeface(DataManager.getInstance().myriadpro_regular);
+        ((TextView) findViewById(R.id.login_institutionnotlisted)).setTypeface(DataManager.getInstance().myriadpro_bold);
+        ((TextView) findViewById(R.id.login_signinwith)).setTypeface(DataManager.getInstance().myriadpro_bold);
+        ((TextView) findViewById(R.id.login_demomode)).setTypeface(DataManager.getInstance().myriadpro_bold);
 
         findViewById(R.id.login_demomode).setOnClickListener(new View.OnClickListener() {
             @Override
