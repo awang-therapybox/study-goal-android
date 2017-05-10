@@ -792,27 +792,18 @@ public class Stats3 extends Fragment {
 
                 String day;
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/d");
-                SimpleDateFormat dateFormatD = new SimpleDateFormat("d");
-                SimpleDateFormat dateFormatM = new SimpleDateFormat("MM");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
                 for (int i = 0; i < list.size(); i++) {
                     val1 = val1 + list.get(i).activity_points;
                     if (i == 6 || i == 13 || i == 20 || i == 27){
                         vals1.add(new Entry(xVals.size(), val1));
                         vals2.add(new BarEntry(xVals.size(), val1));
 
-                        day = dateFormat.format(calendar.getTime());
-                        String month1 = dateFormatM.format(calendar.getTime());
-
                         calendar.add(Calendar.DATE, 6);
-                        String month2 = dateFormatM.format(calendar.getTime());
-
-                        if(month1.equals(month2)) {
-                            day += "-"+dateFormatD.format(calendar.getTime());
-                        } else {
-                            day += "-"+dateFormat.format(calendar.getTime());
-                        }
+                        day = dateFormat.format(calendar.getTime());
                         calendar.add(Calendar.DATE, 1);
+
                         xVals.add(day);
                         val1 = 0;
                     }
