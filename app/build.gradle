@@ -68,7 +68,7 @@ dependencies {
     compile 'com.github.AndroidDeveloperLB:AutoFitTextView:4'
 
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
-    compile 'com.google.android.gms:play-services:10.2.0'
+    compile 'com.google.android.gms:play-services:10.2.4'
     compile('com.twitter.sdk.android:twitter:2.3.1@aar') {
         transitive = true;
     }

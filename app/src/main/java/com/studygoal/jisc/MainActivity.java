@@ -38,6 +38,8 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.lb.auto_fit_textview.AutoResizeTextView;
 import com.studygoal.jisc.Adapters.DrawerAdapter;
 import com.studygoal.jisc.Fragments.AddTarget;
@@ -58,6 +60,7 @@ import com.studygoal.jisc.Models.Module;
 import com.studygoal.jisc.Models.ReceivedRequest;
 import com.studygoal.jisc.Models.RunningActivity;
 import com.studygoal.jisc.Utils.CircleTransform;
+import com.studygoal.jisc.Utils.PushNotifications.RegistrationIntentService;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
@@ -70,6 +73,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends FragmentActivity {
+
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     public DrawerLayout drawer;
     public RelativeLayout friend, settings, addTarget, send, timer, back;
@@ -490,6 +495,24 @@ public class MainActivity extends FragmentActivity {
                 }
             }
         });
+
+        if (checkPlayServices()) {
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
+    }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            }
+            return false;
+        }
+        return true;
     }
 
     public void setTitle(String title) {

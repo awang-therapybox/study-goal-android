@@ -1,6 +1,7 @@
 <resources>
 
     <string name="app_name">Study Goal</string>
+    <string name="gcm_defaultSenderId">172717420956</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
