@@ -68,32 +68,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     public void onBindViewHolder(final FeedViewHolder feedViewHolder, final int i) {
         final Feed item = feedList.get(i);
 
-        feedViewHolder.share_layout.setVisibility(View.GONE);
-
         feedViewHolder.share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SocialManager.getInstance().shareOnFacebook(item.message);
-            }
-        });
-
-        feedViewHolder.facebook_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SocialManager.getInstance().shareOnFacebook(item.message);
-
-            }
-        });
-        feedViewHolder.twitter_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SocialManager.getInstance().shareOnTwitter(item.message);
-            }
-        });
-        feedViewHolder.mail_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SocialManager.getInstance().shareOnEmail(item.message);
+                SocialManager.getInstance().shareOnIntent(item.message);
             }
         });
 
@@ -104,7 +82,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 feedViewHolder.close.setVisibility(View.VISIBLE);
                 feedViewHolder.menu.setVisibility(View.VISIBLE);
                 feedViewHolder.feed.setVisibility(View.GONE);
-
             }
         });
 
@@ -298,7 +275,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         protected View close;
         View open;
         View bottom_bar;
-        View share_layout, facebook_btn, twitter_btn, mail_btn;
+        View facebook_btn, twitter_btn, mail_btn;
         View selfPost;
 
         SwipeLayout swipelayout;
@@ -329,7 +306,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 open = v.findViewById(R.id.feed_item_option);
                 bottom_bar = v.findViewById(R.id.feed_item_bottom_bar);
                 share = v.findViewById(R.id.feed_item_share);
-                share_layout = v.findViewById(R.id.share_layout);
                 facebook_btn = v.findViewById(R.id.facebook_btn);
                 twitter_btn = v.findViewById(R.id.twitter_btn);
                 mail_btn = v.findViewById(R.id.mail_btn);

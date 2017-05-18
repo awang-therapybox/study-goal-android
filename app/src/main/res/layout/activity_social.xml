@@ -64,7 +64,6 @@
                 android:textColorHint="@color/text_hint_color"
                 android:textColor="@color/dark_grey"
                 android:hint="@string/login_with_google" />
-
         </LinearLayout>
 
         <LinearLayout
