@@ -3,9 +3,11 @@ package com.studygoal.jisc;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -71,6 +73,8 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
+
+import static com.studygoal.jisc.Managers.DataManager.UPDATE_DEVICE;
 
 public class MainActivity extends FragmentActivity {
 
@@ -468,7 +472,9 @@ public class MainActivity extends FragmentActivity {
                         dialog.findViewById(R.id.dialog_ok).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+
                                 dialog.dismiss();
+
                                 android.webkit.CookieManager.getInstance().removeAllCookies(null);
                                 DataManager.getInstance().checkForbidden = false;
                                 DataManager.getInstance().set_jwt("");
@@ -477,6 +483,8 @@ public class MainActivity extends FragmentActivity {
                                 getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_checked", "").apply();
                                 getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_staff", "").apply();
                                 getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", "").apply();
+
+                                unregisterReceiver(updateDevice);
 
                                 new Delete().from(CurrentUser.class).execute();
                                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -496,6 +504,9 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
+        this.registerReceiver(this.updateDevice, new IntentFilter(UPDATE_DEVICE));
+        sendBroadcast(new Intent(UPDATE_DEVICE));
+        
         if (checkPlayServices()) {
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
@@ -513,6 +524,24 @@ public class MainActivity extends FragmentActivity {
             return false;
         }
         return true;
+        
+    }
+
+    BroadcastReceiver updateDevice = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    NetworkManager.getInstance().updateDeviceDetails();
+                }
+            }).start();
+        }
+    };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     public void setTitle(String title) {

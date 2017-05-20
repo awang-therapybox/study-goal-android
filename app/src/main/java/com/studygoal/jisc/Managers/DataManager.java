@@ -26,6 +26,8 @@ public class DataManager {
     public Context context;
     public CurrentUser user;
 
+    public static final String UPDATE_DEVICE = "update_device_alert";
+
     private static DataManager ourInstance = new DataManager();
     public Typeface myriadpro_regular;
     public Typeface myriadpro_bold;

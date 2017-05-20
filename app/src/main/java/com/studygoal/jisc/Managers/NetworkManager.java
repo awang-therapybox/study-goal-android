@@ -1,17 +1,16 @@
 package com.studygoal.jisc.Managers;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.util.Log;
-import android.webkit.CookieManager;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
-import com.activeandroid.query.Select;
-import com.studygoal.jisc.LoginActivity;
+import com.studygoal.jisc.BuildConfig;
 import com.studygoal.jisc.Models.ActivityHistory;
 import com.studygoal.jisc.Models.Attainment;
 import com.studygoal.jisc.Models.Courses;
@@ -36,7 +35,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -132,6 +130,77 @@ public class NetworkManager {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public void updateDeviceDetails() {
+        try {
+            URL url = new URL(host + "fn_register_device");
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("POST");
+            urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
+            urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(true);
+
+            HashMap<String,String> params = new HashMap<>();
+            params.put("student_id",DataManager.getInstance().user.id);
+            params.put("version",BuildConfig.VERSION_NAME);
+            params.put("build",""+BuildConfig.VERSION_CODE);
+            params.put("bundle_identifier",""+ BuildConfig.APPLICATION_ID);
+            params.put("is_active", (DataManager.getInstance().get_jwt().length() > 0?"1":"0"));
+            params.put("is_social", (DataManager.getInstance().user.isSocial?"yes":"no"));
+            params.put("device_token    ", Build.SERIAL);
+            params.put("platform", "android");
+
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(appContext);
+            params.put("push_token",sharedPreferences.getString("push_token",""));
+
+            String urlParameters = "";
+            Iterator it = params.entrySet().iterator();
+            for (int i = 0; it.hasNext(); i++) {
+                Map.Entry entry = (Map.Entry) it.next();
+                if (i == 0)
+                    urlParameters += entry.getKey() + "=" + entry.getValue();
+                else
+                    urlParameters += "&" + entry.getKey() + "=" + entry.getValue();
+            }
+
+            DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+            wr.writeBytes(urlParameters);
+            wr.flush();
+            wr.close();
+
+            int responseCode = urlConnection.getResponseCode();
+            forbidden(responseCode);
+            if (responseCode != 200) {
+
+                InputStream is = new BufferedInputStream(urlConnection.getErrorStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                is.close();
+
+                Log.e("JISC", "Error: " + sb.toString());
+
+            }
+
+            InputStream is = new BufferedInputStream(urlConnection.getInputStream());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            is.close();
+
+            Log.e("JISC", ": " + sb.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
         }
     }
 
@@ -3108,6 +3177,8 @@ public class NetworkManager {
                 is.close();
 
                 JSONObject jsonObject = new JSONObject(sb.toString());
+
+                Log.e("Jisc", jsonObject.toString());
 
                 new Delete().from(CurrentUser.class).execute();
                 DataManager.getInstance().user = new CurrentUser();
