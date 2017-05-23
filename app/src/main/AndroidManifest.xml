@@ -38,7 +38,9 @@
             android:name="AA_MODELS"
             android:value="com.studygoal.jisc.Models.Institution, com.studygoal.jisc.Models.CurrentUser, com.studygoal.jisc.Models.Module,                          com.studygoal.jisc.Models.ActivityHistory, com.studygoal.jisc.Models.Activity, com.studygoal.jisc.Models.Targets,                                       com.studygoal.jisc.Models.StretchTarget, com.studygoal.jisc.Models.Feed, com.studygoal.jisc.Models.Friend,             com.studygoal.jisc.Models.RunningActivity, com.studygoal.jisc.Models.CourseAttendant, com.studygoal.jisc.Models.PendingRequest,             com.studygoal.jisc.Models.ReceivedRequest, com.studygoal.jisc.Models.Mark, com.studygoal.jisc.Models.Trophy, com.studygoal.jisc.Models.TrophyMy,             com.studygoal.jisc.Models.Attainment , com.studygoal.jisc.Models.Courses" />
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
 
         <activity
             android:name=".MainActivity"
@@ -65,8 +67,7 @@
         <activity android:name=".SocialActivity"/>
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="aabe6f656cd29919a8d107f1347dc2c158eff1d7"
-            />
+            android:value="aabe6f656cd29919a8d107f1347dc2c158eff1d7" />
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"

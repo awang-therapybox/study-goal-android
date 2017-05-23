@@ -149,7 +149,7 @@ public class NetworkManager {
             params.put("bundle_identifier",""+ BuildConfig.APPLICATION_ID);
             params.put("is_active", (DataManager.getInstance().get_jwt().length() > 0?"1":"0"));
             params.put("is_social", (DataManager.getInstance().user.isSocial?"yes":"no"));
-            params.put("device_token    ", Build.SERIAL);
+            params.put("device_token", Build.SERIAL);
             params.put("platform", "android");
 
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(appContext);
@@ -184,7 +184,6 @@ public class NetworkManager {
                 is.close();
 
                 Log.e("JISC", "Error: " + sb.toString());
-
             }
 
             InputStream is = new BufferedInputStream(urlConnection.getInputStream());

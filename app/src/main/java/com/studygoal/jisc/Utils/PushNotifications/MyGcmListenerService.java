@@ -31,11 +31,7 @@ public class MyGcmListenerService extends GcmListenerService {
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Message: " + message);
 
-        if (from.startsWith("/topics/")) {
-            // message received from some topic.
-        } else {
-            // normal downstream message.
-        }
+
 
         // [START_EXCLUDE]
         /**
@@ -74,8 +70,7 @@ public class MyGcmListenerService extends GcmListenerService {
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
 
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(
                 0 /* ID of notification */,
