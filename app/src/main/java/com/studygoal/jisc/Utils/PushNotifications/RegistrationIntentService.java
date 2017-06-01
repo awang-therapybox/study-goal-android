@@ -32,7 +32,6 @@ public class RegistrationIntentService extends IntentService {
 
             sharedPreferences.edit().putString("push_token", token).apply();
         } catch (Exception e) {
-            Log.e(TAG, "Failed to complete token refresh", e);
             sharedPreferences.edit().putString("push_token", "").apply();
         }
 

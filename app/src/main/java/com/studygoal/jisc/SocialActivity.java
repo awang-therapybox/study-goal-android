@@ -199,7 +199,6 @@ public class SocialActivity extends AppCompatActivity implements GoogleApiClient
                         new GraphRequest.GraphJSONObjectCallback() {
                             @Override
                             public void onCompleted(JSONObject object, GraphResponse response) {
-                                Log.e("LoginActivity", response.toString());
 
                                 try {
                                     socialID = object.getString("id");
@@ -262,14 +261,11 @@ public class SocialActivity extends AppCompatActivity implements GoogleApiClient
             });
 
         } else {
-            Log.e("JISC","Handle: "+result.getStatus().getStatusCode());
-            Log.e("JISC", "handleSignInResult:" + result.getStatus().getResolution());
         }
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.e("JISC","connection result: "+connectionResult);
     }
 
     @Override
