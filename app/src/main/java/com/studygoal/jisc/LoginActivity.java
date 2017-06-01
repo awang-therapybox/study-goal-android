@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.activeandroid.ActiveAndroid;
@@ -78,11 +80,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     private WebView webView;
 
-    LinearLayout loginContent;
+    RelativeLayout loginContent;
 
     LinearLayout loginStep1;
-    LinearLayout loginStep2;
     LinearLayout loginStep3;
+    ImageView login_next_button;
 
     boolean isStaff;
     boolean rememberMe;
@@ -143,29 +145,41 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         DataManager.getInstance().guid = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("guid", "");
 
-        loginContent = (LinearLayout) findViewById(R.id.login_content);
+        loginContent = (RelativeLayout) findViewById(R.id.login_content);
         loginStep1 = (LinearLayout) findViewById(R.id.login_step_1);
-        loginStep2 = (LinearLayout) findViewById(R.id.login_step_2);
         loginStep3 = (LinearLayout) findViewById(R.id.login_step_3);
 
+        login_next_button = (ImageView)findViewById(R.id.login_next_button);
+        login_next_button.setVisibility(View.GONE);
         loginContent.setVisibility(View.VISIBLE);
         loginStep1.setVisibility(View.VISIBLE);
-        loginStep2.setVisibility(View.GONE);
         loginStep3.setVisibility(View.GONE);
 
         ((TextView) findViewById(R.id.login_logo_text)).setTypeface(Typeface.createFromAsset(getAssets(), "fonts/mmrtext.ttf"));
-        ((TextView) findViewById(R.id.login_step_1_imastudent)).setTypeface(DataManager.getInstance().myriadpro_regular);
-        ((TextView) findViewById(R.id.login_step_1_imastaff)).setTypeface(DataManager.getInstance().myriadpro_regular);
+        ((TextView) findViewById(R.id.login_step_1_imastudent)).setTypeface(DataManager.getInstance().myriadpro_bold);
+        ((TextView) findViewById(R.id.login_step_1_imastaff)).setTypeface(DataManager.getInstance().myriadpro_bold);
+
+        login_next_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginContent.setVisibility(View.GONE);
+                loginStep1.setVisibility(View.GONE);
+                loginStep3.setVisibility(View.VISIBLE);
+            }
+        });
 
         findViewById(R.id.login_step_1_imastudent).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LoginActivity.this.isStaff = false;
 
-                loginContent.setVisibility(View.VISIBLE);
-                loginStep1.setVisibility(View.GONE);
-                loginStep2.setVisibility(View.VISIBLE);
-                loginStep3.setVisibility(View.GONE);
+                login_next_button.setVisibility(View.VISIBLE);
+
+                findViewById(R.id.login_step_1_imastudent).setBackgroundResource(R.drawable.round_corners_transparent_2_selected);
+                ((TextView) findViewById(R.id.login_step_1_imastudent)).setTextColor(Color.parseColor("#ff5000"));
+
+                findViewById(R.id.login_step_1_imastaff).setBackgroundResource(R.drawable.round_corners_transparent_2);
+                ((TextView) findViewById(R.id.login_step_1_imastaff)).setTextColor(Color.parseColor("#ffffff"));
             }
         });
 
@@ -174,37 +188,26 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             public void onClick(View v) {
                 LoginActivity.this.isStaff = true;
 
-                loginContent.setVisibility(View.VISIBLE);
-                loginStep1.setVisibility(View.GONE);
-                loginStep2.setVisibility(View.VISIBLE);
-                loginStep3.setVisibility(View.GONE);
+                login_next_button.setVisibility(View.VISIBLE);
+
+                findViewById(R.id.login_step_1_imastudent).setBackgroundResource(R.drawable.round_corners_transparent_2);
+                ((TextView) findViewById(R.id.login_step_1_imastudent)).setTextColor(Color.parseColor("#ffffff"));
+
+                findViewById(R.id.login_step_1_imastaff).setBackgroundResource(R.drawable.round_corners_transparent_2_selected);
+                ((TextView) findViewById(R.id.login_step_1_imastaff)).setTextColor(Color.parseColor("#ff5000"));
             }
         });
 
         ((CheckBox) findViewById(R.id.login_check_rememberme)).setTypeface(DataManager.getInstance().myriadpro_regular);
-        ((CheckBox) findViewById(R.id.login_check_dontrememberme)).setTypeface(DataManager.getInstance().myriadpro_regular);
 
         findViewById(R.id.login_check_rememberme).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LoginActivity.this.rememberMe = true;
 
-                loginContent.setVisibility(View.GONE);
-                loginStep1.setVisibility(View.GONE);
-                loginStep2.setVisibility(View.GONE);
-                loginStep3.setVisibility(View.VISIBLE);
-            }
-        });
-
-        findViewById(R.id.login_check_dontrememberme).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LoginActivity.this.rememberMe = false;
-
-                loginContent.setVisibility(View.GONE);
-                loginStep1.setVisibility(View.GONE);
-                loginStep2.setVisibility(View.GONE);
-                loginStep3.setVisibility(View.VISIBLE);
+//                loginContent.setVisibility(View.GONE);
+//                loginStep1.setVisibility(View.GONE);
+//                loginStep3.setVisibility(View.VISIBLE);
             }
         });
 

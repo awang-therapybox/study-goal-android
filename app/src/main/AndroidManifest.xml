@@ -32,7 +32,7 @@
             android:value="learninganalitycs31.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="46" />
+            android:value="50" />
         <meta-data
             android:name="AA_MODELS"
             android:value="com.studygoal.jisc.Models.Institution, com.studygoal.jisc.Models.CurrentUser, com.studygoal.jisc.Models.Module,                          com.studygoal.jisc.Models.ActivityHistory, com.studygoal.jisc.Models.Activity, com.studygoal.jisc.Models.Targets,                                       com.studygoal.jisc.Models.StretchTarget, com.studygoal.jisc.Models.Feed, com.studygoal.jisc.Models.Friend,             com.studygoal.jisc.Models.RunningActivity, com.studygoal.jisc.Models.CourseAttendant, com.studygoal.jisc.Models.PendingRequest,             com.studygoal.jisc.Models.ReceivedRequest, com.studygoal.jisc.Models.Mark, com.studygoal.jisc.Models.Trophy, com.studygoal.jisc.Models.TrophyMy,             com.studygoal.jisc.Models.Attainment , com.studygoal.jisc.Models.Courses" />
@@ -48,7 +48,7 @@
             android:name=".LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustUnspecified"></activity>
+            android:windowSoftInputMode="stateAlwaysHidden|adjustUnspecified"/>
         <activity
             android:name=".TrophyDetails"
             android:theme="@style/AppTheme.NoActionBar" />
