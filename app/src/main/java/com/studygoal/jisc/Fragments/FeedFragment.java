@@ -55,7 +55,7 @@ public class FeedFragment extends Fragment {
                 NetworkManager.getInstance().getNewsFeed();
                 NetworkManager.getInstance().getFeed(DataManager.getInstance().user.id);
                 adapter.feedList = new Select().from(Feed.class).where("is_hidden = 0").execute();
-                adapter.newsList = new Select().from(News.class).execute();
+                adapter.newsList = new Select().from(News.class).where("read = 0").execute();
 
                 DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
                     @Override
@@ -81,7 +81,7 @@ public class FeedFragment extends Fragment {
             if(NetworkManager.getInstance().getFeed(DataManager.getInstance().user.id)) {
                 NetworkManager.getInstance().getNewsFeed();
                 adapter.feedList = new Select().from(Feed.class).where("is_hidden = 0").execute();
-                adapter.newsList = new Select().from(News.class).execute();
+                adapter.newsList = new Select().from(News.class).where("read = 0").execute();
                 adapter.notifyDataSetChanged();
             }
             Snackbar.make(layout, R.string.posted_message, Snackbar.LENGTH_LONG).show();
@@ -140,7 +140,7 @@ public class FeedFragment extends Fragment {
                         if(NetworkManager.getInstance().getFeed(DataManager.getInstance().user.id)) {
                             NetworkManager.getInstance().getNewsFeed();
                             adapter.feedList = new Select().from(Feed.class).where("is_hidden = 0").execute();
-                            adapter.newsList = new Select().from(News.class).execute();
+                            adapter.newsList = new Select().from(News.class).where("read = 0").execute();
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {

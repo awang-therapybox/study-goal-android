@@ -90,6 +90,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                         if (NetworkManager.getInstance().markNewsAsRead(item)) {
                             ActiveAndroid.beginTransaction();
                             item.read = "1";
+                            newsList.remove(item);
                             ActiveAndroid.setTransactionSuccessful();
                             ActiveAndroid.endTransaction();
                             notifyDataSetChanged();
