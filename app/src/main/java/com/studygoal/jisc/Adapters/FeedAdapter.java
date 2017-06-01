@@ -73,7 +73,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     public void onBindViewHolder(final FeedViewHolder feedViewHolder, final int i) {
 
         feedViewHolder.ontop.setBackgroundColor(Color.parseColor("#ffffff"));
-
+        feedViewHolder.ontop.setOnClickListener(null);
         if(i < newsList.size()) {
             final News item = newsList.get(i);
 
@@ -83,18 +83,20 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             feedViewHolder.open.setVisibility(View.GONE);
             feedViewHolder.profile_pic.setVisibility(View.GONE);
 
-            feedViewHolder.ontop.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(NetworkManager.getInstance().markNewsAsRead(item)) {
-                        ActiveAndroid.beginTransaction();
-                        item.read = "yes";
-                        ActiveAndroid.setTransactionSuccessful();
-                        ActiveAndroid.endTransaction();
-                        notifyDataSetChanged();
+            if(!item.read.equals("1")) {
+                feedViewHolder.ontop.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (NetworkManager.getInstance().markNewsAsRead(item)) {
+                            ActiveAndroid.beginTransaction();
+                            item.read = "1";
+                            ActiveAndroid.setTransactionSuccessful();
+                            ActiveAndroid.endTransaction();
+                            notifyDataSetChanged();
+                        }
                     }
-                }
-            });
+                });
+            }
 
             Calendar c = Calendar.getInstance();
             c.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -126,7 +128,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             feedViewHolder.feed.setText("You have a new message: "+item.message);
             feedViewHolder.feed.setTextSize(20);
 
-            if(item.read.equals("no")) {
+            if(!item.read.equals("1")) {
                 feedViewHolder.ontop.setBackgroundColor(Color.parseColor("#bad8f7"));
             } else {
                 feedViewHolder.ontop.setBackgroundColor(Color.parseColor("#ffffff"));
