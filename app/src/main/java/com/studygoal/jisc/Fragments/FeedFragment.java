@@ -18,6 +18,7 @@ import com.studygoal.jisc.Adapters.FeedAdapter;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
 import com.studygoal.jisc.Models.Feed;
+import com.studygoal.jisc.Models.News;
 import com.studygoal.jisc.R;
 import com.studygoal.jisc.Utils.EditTextCustom;
 
@@ -29,7 +30,9 @@ public class FeedFragment extends Fragment {
     FeedAdapter adapter;
     SwipeRefreshLayout layout;
 
-    public FeedFragment() {}
+    public FeedFragment() {
+
+    }
 
     @Override
     public void onResume() {
@@ -48,8 +51,11 @@ public class FeedFragment extends Fragment {
                         DataManager.getInstance().mainActivity.showProgressBar(null);
                     }
                 });
+
+                NetworkManager.getInstance().getNewsFeed();
                 NetworkManager.getInstance().getFeed(DataManager.getInstance().user.id);
                 adapter.feedList = new Select().from(Feed.class).where("is_hidden = 0").execute();
+                adapter.newsList = new Select().from(News.class).execute();
 
                 DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
                     @Override
@@ -73,7 +79,9 @@ public class FeedFragment extends Fragment {
         map.put("message", message);
         if(NetworkManager.getInstance().postFeedMessage(map)) {
             if(NetworkManager.getInstance().getFeed(DataManager.getInstance().user.id)) {
+                NetworkManager.getInstance().getNewsFeed();
                 adapter.feedList = new Select().from(Feed.class).where("is_hidden = 0").execute();
+                adapter.newsList = new Select().from(News.class).execute();
                 adapter.notifyDataSetChanged();
             }
             Snackbar.make(layout, R.string.posted_message, Snackbar.LENGTH_LONG).show();
@@ -130,7 +138,9 @@ public class FeedFragment extends Fragment {
                     @Override
                     public void run() {
                         if(NetworkManager.getInstance().getFeed(DataManager.getInstance().user.id)) {
+                            NetworkManager.getInstance().getNewsFeed();
                             adapter.feedList = new Select().from(Feed.class).where("is_hidden = 0").execute();
+                            adapter.newsList = new Select().from(News.class).execute();
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {

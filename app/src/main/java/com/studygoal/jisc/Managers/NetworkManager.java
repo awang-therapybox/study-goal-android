@@ -20,6 +20,7 @@ import com.studygoal.jisc.Models.Feed;
 import com.studygoal.jisc.Models.Friend;
 import com.studygoal.jisc.Models.Institution;
 import com.studygoal.jisc.Models.Module;
+import com.studygoal.jisc.Models.News;
 import com.studygoal.jisc.Models.PendingRequest;
 import com.studygoal.jisc.Models.ReceivedRequest;
 import com.studygoal.jisc.Models.StretchTarget;
@@ -2217,6 +2218,155 @@ public class NetworkManager {
         }
     }
 
+    public boolean getNewsFeed() {
+        language = LinguisticManager.getInstance().getLanguageCode();
+        Future<Boolean> future = executorService.submit(new getNewsFeed());
+        try {
+            return future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private class getNewsFeed implements Callable<Boolean> {
+
+        getNewsFeed() {
+        }
+
+        @Override
+        public Boolean call() {
+            try {
+                String apiURL = host + "fn_get_push_notifications?student_id="
+                        + DataManager.getInstance().user.id
+                        + "&language=" + language
+                        + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"&is_social=yes");
+                URL url = new URL(apiURL);
+
+                Log.e("Jisc","News: "+apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
+                urlConnection.setRequestMethod("GET");
+
+                int responseCode = urlConnection.getResponseCode();
+                if (responseCode != 200) {
+                    return false;
+                }
+
+                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                is.close();
+
+                Log.e("Jisc","News: "+sb.toString());
+
+                JSONArray jsonArray = new JSONArray(sb.toString());
+
+                ActiveAndroid.beginTransaction();
+                try {
+                    new Delete().from(News.class).execute();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        News item = new News();
+                        item.id = jsonObject.getString("id");
+                        item.message_from = jsonObject.getString("message_from");
+                        item.message = jsonObject.getString("message");
+                        item.created_date = jsonObject.getString("created");
+                        item.read = "no";
+                        item.save();
+                    }
+                    ActiveAndroid.setTransactionSuccessful();
+                } finally {
+                    ActiveAndroid.endTransaction();
+                }
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
+    public boolean markNewsAsRead(News item) {
+        language = LinguisticManager.getInstance().getLanguageCode();
+        Future<Boolean> future = executorService.submit(new markNewsAsRead(item.id));
+        try {
+            return future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private class markNewsAsRead implements Callable<Boolean> {
+
+        HashMap<String, String> params;
+        markNewsAsRead(String id) {
+            params = new HashMap<>();
+            params.put("student_id", DataManager.getInstance().user.id);
+            params.put("notification_id", id);
+            params.put("is_social", "yes");
+        }
+
+        @Override
+        public Boolean call() {
+            try {
+                String apiURL = host + "fn_update_notifications_read_status";
+                URL url = new URL(apiURL);
+
+                Log.e("Jisc","News: "+apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
+                urlConnection.setRequestMethod("PUT");
+
+                urlConnection.setDoInput(true);
+                urlConnection.setDoOutput(true);
+
+                String urlParameters = "";
+                Iterator it = params.entrySet().iterator();
+                for (int i = 0; it.hasNext(); i++) {
+                    Map.Entry entry = (Map.Entry) it.next();
+                    if (i == 0)
+                        urlParameters += entry.getKey() + "=" + entry.getValue();
+                    else
+                        urlParameters += "&" + entry.getKey() + "=" + entry.getValue();
+                }
+
+                DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+                wr.writeBytes(urlParameters);
+                wr.flush();
+                wr.close();
+
+                int responseCode = urlConnection.getResponseCode();
+                if (responseCode != 200) {
+                    return false;
+                }
+
+                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                is.close();
+
+                Log.e("Jisc","News: "+sb.toString());
+
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
     public boolean getFeed(String student_id) {
         language = LinguisticManager.getInstance().getLanguageCode();
         Future<Boolean> future = executorService.submit(new getFeed(student_id));
@@ -2259,14 +2409,15 @@ public class NetworkManager {
                 }
 
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                 StringBuilder sb = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
                     sb.append(line);
                 }
                 is.close();
+
+                Log.e("Jisc", "Feed: "+sb.toString());
 
                 JSONArray jsonArray = new JSONArray(sb.toString());
 
