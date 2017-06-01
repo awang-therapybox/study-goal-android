@@ -393,26 +393,20 @@ public class NetworkManager {
                 DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
 
                 wr.writeBytes(crlf + twoHyphens + boundary + crlf);
-
                 String header = "Content-Disposition: form-data; name=\"language\"";
                 wr.writeBytes(header);
                 wr.writeBytes(crlf);
                 wr.writeBytes(crlf);
                 wr.writeBytes(language);
 
-
-                if(DataManager.getInstance().user.isSocial) {
-                    wr.writeBytes(crlf + twoHyphens + boundary + crlf);
-
-                    header = "Content-Disposition: form-data; name=\"is_social\"";
-                    wr.writeBytes(header);
-                    wr.writeBytes(crlf);
-                    wr.writeBytes(crlf);
-                    wr.writeBytes((DataManager.getInstance().user.isStaff ? "yes" : "no"));
-                }
+                wr.writeBytes(crlf + twoHyphens + boundary + crlf);
+                header = "Content-Disposition: form-data; name=\"is_social\"";
+                wr.writeBytes(header);
+                wr.writeBytes(crlf);
+                wr.writeBytes(crlf);
+                wr.writeBytes((DataManager.getInstance().user.isStaff ? "yes" : "no"));
 
                 wr.writeBytes(crlf + twoHyphens + boundary + crlf);
-
                 header = "Content-Disposition: form-data; name=\"student_id\"";
                 wr.writeBytes(header);
                 wr.writeBytes(crlf);
@@ -420,7 +414,7 @@ public class NetworkManager {
                 wr.writeBytes(DataManager.getInstance().user.id);
 
                 wr.writeBytes(crlf + twoHyphens + boundary + crlf);
-                header = "Content-Disposition: attachment; name=\"profile_photo\"; filename=" + DataManager.getInstance().user.id + "_" + System.currentTimeMillis() + ".png" + crlf;
+                header = "Content-Disposition: attachment; name=\"image_data\"; filename=" + DataManager.getInstance().user.id + "_" + System.currentTimeMillis() + ".png" + crlf;
                 wr.writeBytes(header);
 
                 header = "Content-Type: image/png" + crlf + crlf;
