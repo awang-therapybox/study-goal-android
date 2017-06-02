@@ -2195,7 +2195,6 @@ public class NetworkManager {
                 is.close();
 
                 JSONArray jsonArray = new JSONArray(sb.toString());
-
                 ActiveAndroid.beginTransaction();
                 try {
                     new Delete().from(Feed.class).execute();

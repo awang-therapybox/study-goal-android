@@ -23,6 +23,7 @@ import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
 import com.daimajia.swipe.SwipeLayout;
+import com.studygoal.jisc.Fragments.FeedFragment;
 import com.studygoal.jisc.Fragments.LogLogActivity;
 import com.studygoal.jisc.LoginActivity;
 import com.studygoal.jisc.MainActivity;
@@ -47,11 +48,13 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     public List<Feed> feedList = new ArrayList<>();
     private Context context;
     SwipeRefreshLayout layout;
+    FeedFragment feedFragment;
 
-    public FeedAdapter(Context context, SwipeRefreshLayout layout) {
+    public FeedAdapter(Context context, SwipeRefreshLayout layout, FeedFragment feedFragment) {
         this.context = context;
         this.layout = layout;
         feedList = new ArrayList<>();
+        this.feedFragment = feedFragment;
     }
 
     @Override
@@ -125,10 +128,24 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         if (item.message_from.equals(DataManager.getInstance().user.id)) {
             feedViewHolder.share.setVisibility(View.VISIBLE);
             feedViewHolder.open.setVisibility(View.GONE);
+            feedViewHolder.editButton.setVisibility(View.GONE);
+            feedViewHolder.editButton.setOnClickListener(null);
+
             if (!DataManager.getInstance().user.profile_pic.equals("")) {
                 Glide.with(context).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(context)).placeholder(R.drawable.profilenotfound).into(feedViewHolder.profile_pic);
             } else {
                 Glide.with(context).load(R.drawable.profilenotfound).transform(new CircleTransform(context)).placeholder(R.drawable.profilenotfound).into(feedViewHolder.profile_pic);
+            }
+
+            if(item.activity_type.equals("message")) {
+                feedViewHolder.editButton.setVisibility(View.VISIBLE);
+                feedViewHolder.editButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        feedFragment.editMessage(item);
+                        feedViewHolder.swipelayout.close();
+                    }
+                });
             }
 
             feedViewHolder.swipelayout.setSwipeEnabled(true);
@@ -280,6 +297,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         SwipeLayout swipelayout;
         RelativeLayout deleteButton;
+        RelativeLayout editButton;
 
         protected View share;
 
@@ -295,6 +313,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             try {
                 swipelayout = (SwipeLayout) v.findViewById(R.id.swipelayout);
                 deleteButton = (RelativeLayout)v.findViewById(R.id.delete);
+                editButton = (RelativeLayout)v.findViewById(R.id.edit);
                 profile_pic = (ImageView) v.findViewById(R.id.feed_item_profile);
                 feed = (TextView) v.findViewById(R.id.feed_item_feed);
                 time_ago = (TextView) v.findViewById(R.id.feed_item_time_ago);

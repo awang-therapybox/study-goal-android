@@ -29,7 +29,7 @@ public class EditTextCustom extends EditText {
     public boolean onKeyPreIme(int keyCode, KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
             fragment.mainView.findViewById(R.id.overlay).callOnClick();
-            return true;  // So it is not propagated.
+            return true;
         }
         return super.dispatchKeyEvent(event);
     }
