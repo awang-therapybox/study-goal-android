@@ -48,7 +48,7 @@ public class Settings extends Fragment {
         super.onResume();
         DataManager.getInstance().mainActivity.setTitle(DataManager.getInstance().mainActivity.getString(R.string.settings));
         DataManager.getInstance().mainActivity.hideAllButtons();
-        DataManager.getInstance().mainActivity.showCertainButtons(7);
+        DataManager.getInstance().mainActivity.showCertainButtons(5);
 
         String selected_value = "";
         switch (DataManager.getInstance().home_screen.toLowerCase()) {

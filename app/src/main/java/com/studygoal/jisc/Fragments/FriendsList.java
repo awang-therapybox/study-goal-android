@@ -31,7 +31,7 @@ public class FriendsList extends Fragment {
         if(!DataManager.getInstance().isLandscape) {
             DataManager.getInstance().mainActivity.setTitle(DataManager.getInstance().mainActivity.getString(R.string.my_friends_title));
             DataManager.getInstance().mainActivity.hideAllButtons();
-            DataManager.getInstance().mainActivity.showCertainButtons(7);
+            DataManager.getInstance().mainActivity.showCertainButtons(5);
 
             new Thread(new Runnable() {
                 @Override
@@ -53,7 +53,7 @@ public class FriendsList extends Fragment {
             } catch (Exception ignored) {
                 DataManager.getInstance().mainActivity.setTitle(DataManager.getInstance().mainActivity.getString(R.string.my_friends_title));
                 DataManager.getInstance().mainActivity.hideAllButtons();
-                DataManager.getInstance().mainActivity.showCertainButtons(7);
+                DataManager.getInstance().mainActivity.showCertainButtons(5);
             }
             new Thread(new Runnable() {
                 @Override

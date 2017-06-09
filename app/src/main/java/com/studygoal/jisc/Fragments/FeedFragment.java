@@ -37,7 +37,7 @@ public class FeedFragment extends Fragment {
 
         DataManager.getInstance().mainActivity.setTitle(getString(R.string.feed));
         DataManager.getInstance().mainActivity.hideAllButtons();
-        DataManager.getInstance().mainActivity.showCertainButtons(1);
+        DataManager.getInstance().mainActivity.showCertainButtons(5);
 
         new Thread(new Runnable() {
             @Override

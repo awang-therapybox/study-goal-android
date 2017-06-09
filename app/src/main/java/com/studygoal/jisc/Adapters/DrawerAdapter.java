@@ -37,12 +37,14 @@ public class DrawerAdapter extends BaseAdapter {
         } else {
             values = new String[] {"0",
                     con.getString(R.string.feed),
+                    con.getString(R.string.friends),
                     con.getString(R.string.stats),
                     con.getString(R.string.graphs),
                     con.getString(R.string.attainment),
                     con.getString(R.string.points),
                     con.getString(R.string.log),
                     con.getString(R.string.target),
+                    con.getString(R.string.settings),
                     con.getString(R.string.logout)};
         }
     }
@@ -84,7 +86,7 @@ public class DrawerAdapter extends BaseAdapter {
             else
                 Glide.with(context).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(context)).into((ImageView) convertView.findViewById(R.id.imageView));
         } else {
-            if(statsOpened && position > 2 && position < 6) {
+            if(statsOpened && position > 3 && position < 7) {
                 convertView = inflater.inflate(R.layout.nav_item_sub, parent, false);
             } else {
                 convertView = inflater.inflate(R.layout.nav_item, parent, false);
@@ -101,7 +103,7 @@ public class DrawerAdapter extends BaseAdapter {
             ImageView arrow_button = (ImageView) convertView.findViewById(R.id.arrow_button);
             arrow_button.setVisibility(View.GONE);
 
-            if(!statsOpened && position > 2) {
+            if(!statsOpened && position > 3) {
                 position += 3;
             }
 
@@ -126,6 +128,12 @@ public class DrawerAdapter extends BaseAdapter {
             }
             if(values[position].equals(context.getString(R.string.logout))) {
                 iconResID = R.drawable.logout_icon;
+            }
+            if(values[position].equals(context.getString(R.string.friends))) {
+                iconResID = R.drawable.friend_icon_2;
+            }
+            if(values[position].equals(context.getString(R.string.settings))) {
+                iconResID = R.drawable.settings_2;
             }
 
             if(values[position].equals(context.getString(R.string.stats))) {

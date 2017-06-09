@@ -359,6 +359,9 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             public void onDrawerClosed(View drawerView) {
+                if(selectedPosition < 0)
+                    return;
+
                 if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.feed))) {
                             getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.main_fragment, new FeedFragment())
@@ -372,6 +375,16 @@ public class MainActivity extends FragmentActivity {
                     getSupportFragmentManager().beginTransaction()
                                         .replace(R.id.main_fragment, new StatsAttainment())
                                         .commit();
+
+                } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.friends))) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_fragment, new Friends())
+                            .commit();
+
+                }else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.settings))) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_fragment, new Settings())
+                            .commit();
 
                 } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.graphs))) {
                     getSupportFragmentManager().beginTransaction()
@@ -431,6 +444,9 @@ public class MainActivity extends FragmentActivity {
                     }
 
                     selectedPosition = position;
+                    if(!adapter.statsOpened && position > 2) {
+                        selectedPosition = position + 3;
+                    }
                     drawer.closeDrawer(GravityCompat.START);
 
                     if(adapter.selected_text.getText().toString().equals(MainActivity.this.getString(R.string.logout))) {
@@ -647,7 +663,7 @@ public class MainActivity extends FragmentActivity {
             }
             case 5: {
                 menu.setVisibility(View.VISIBLE);
-                settings.setVisibility(View.VISIBLE);
+//                settings.setVisibility(View.VISIBLE);
                 break;
             }
             case 6: {
