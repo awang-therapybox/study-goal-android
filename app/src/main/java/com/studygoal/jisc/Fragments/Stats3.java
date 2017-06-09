@@ -72,7 +72,7 @@ public class Stats3 extends Fragment {
         super.onResume();
         DataManager.getInstance().mainActivity.setTitle(getString(R.string.engagement_graph));
         DataManager.getInstance().mainActivity.hideAllButtons();
-        DataManager.getInstance().mainActivity.showCertainButtons(8);
+        DataManager.getInstance().mainActivity.showCertainButtons(5);
     }
 
     @Override

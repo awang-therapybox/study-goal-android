@@ -49,7 +49,9 @@ import com.studygoal.jisc.Fragments.LogNewActivity;
 import com.studygoal.jisc.Fragments.Settings;
 import com.studygoal.jisc.Fragments.Stats;
 import com.studygoal.jisc.Fragments.Stats2;
+import com.studygoal.jisc.Fragments.Stats3;
 import com.studygoal.jisc.Fragments.StatsAttainment;
+import com.studygoal.jisc.Fragments.StatsPoints;
 import com.studygoal.jisc.Fragments.TargetFragment;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
@@ -96,13 +98,6 @@ public class MainActivity extends FragmentActivity {
 
     public void refreshDrawer() {
         if (adapter != null) {
-            if(DataManager.getInstance().user.isSocial) {
-                adapter.values = new String[]{"0", getString(R.string.feed), getString(R.string.log), getString(R.string.target), getString(R.string.logout)};
-            } else {
-//                adapter.values = new String[]{"0", getString(R.string.feed), getString(R.string.check_in), getString(R.string.stats), getString(R.string.log), getString(R.string.target), getString(R.string.logout)};
-                adapter.values = new String[]{"0", getString(R.string.feed), getString(R.string.stats), getString(R.string.log), getString(R.string.target), getString(R.string.logout)};
-            }
-
             adapter.notifyDataSetChanged();
         }
     }
@@ -312,14 +307,7 @@ public class MainActivity extends FragmentActivity {
                     .replace(R.id.main_fragment, new FeedFragment())
                     .commit();
         } else if (DataManager.getInstance().home_screen.toLowerCase().equals("stats")) {
-            if (isLandscape)
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_fragment, new Stats())
-                        .commit();
-            else
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_fragment, new Stats2())
-                        .commit();
+
         } else if (DataManager.getInstance().home_screen.toLowerCase().equals("log")) {
             logFragment = new LogActivityHistory();
             getSupportFragmentManager().beginTransaction()
@@ -386,19 +374,20 @@ public class MainActivity extends FragmentActivity {
                                     .replace(R.id.main_fragment, new CheckInFragment())
                                     .commit();
                 } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.attainment))) {
-//                            if (isLandscape)
-//                                getSupportFragmentManager().beginTransaction()
-//                                        .replace(R.id.main_fragment, new Stats())
-//                                        .commit();
-//                            else
-//                                getSupportFragmentManager().beginTransaction()
-//                                        .replace(R.id.main_fragment, new Stats2())
-//                                        .commit();
 
                     getSupportFragmentManager().beginTransaction()
                                         .replace(R.id.main_fragment, new StatsAttainment())
                                         .commit();
 
+                } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.graphs))) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_fragment, new Stats3())
+                            .commit();
+
+                } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.points))) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_fragment, new StatsPoints())
+                            .commit();
                 } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.log))) {
                             logFragment = new LogActivityHistory();
                             getSupportFragmentManager().beginTransaction()
