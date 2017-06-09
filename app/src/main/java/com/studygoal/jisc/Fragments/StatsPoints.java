@@ -13,13 +13,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.studygoal.jisc.Adapters.ActivityPointsAdapter;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.LinguisticManager;
 import com.studygoal.jisc.Managers.NetworkManager;
 import com.studygoal.jisc.Managers.SocialManager;
+import com.studygoal.jisc.Models.ActivityPoints;
 import com.studygoal.jisc.R;
 
 public class StatsPoints extends Fragment {
@@ -27,6 +30,8 @@ public class StatsPoints extends Fragment {
     View mainView;
     SwipeRefreshLayout layout;
     boolean isThisWeek;
+    ActivityPointsAdapter adapter;
+    TextView activity_points_value;
 
     @Override
     public void onResume() {
@@ -41,6 +46,12 @@ public class StatsPoints extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mainView = inflater.inflate(R.layout.stats_points, container, false);
+
+        ListView activity_points_list_view = (ListView) mainView.findViewById(R.id.activity_points_list_view);
+        adapter = new ActivityPointsAdapter(getActivity());
+        activity_points_list_view.setAdapter(adapter);
+
+        activity_points_value = (TextView)mainView.findViewById(R.id.activity_points_value);
 
         isThisWeek = true;
 
@@ -105,11 +116,13 @@ public class StatsPoints extends Fragment {
 
     public void refreshView() {
 
+        DataManager.getInstance().mainActivity.showProgressBar(null);
+
         new Thread(new Runnable() {
             @Override
             public void run() {
                 NetworkManager.getInstance().getStudentActivityPoint(isThisWeek?"7d":"overall");
-                DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         call_refresh();
@@ -117,10 +130,19 @@ public class StatsPoints extends Fragment {
                 });
             }
         }).start();
-
     }
 
     private void call_refresh() {
 
+        DataManager.getInstance().mainActivity.hideProgressBar();
+
+        adapter.notifyDataSetChanged();
+
+        int value = 0;
+        for(ActivityPoints activityPoints: DataManager.getInstance().user.points) {
+            value += Integer.parseInt(activityPoints.points);
+        }
+
+        activity_points_value.setText(""+value);
     }
 }

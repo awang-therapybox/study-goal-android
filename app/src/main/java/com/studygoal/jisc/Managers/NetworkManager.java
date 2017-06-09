@@ -13,6 +13,7 @@ import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.studygoal.jisc.LoginActivity;
 import com.studygoal.jisc.Models.ActivityHistory;
+import com.studygoal.jisc.Models.ActivityPoints;
 import com.studygoal.jisc.Models.Attainment;
 import com.studygoal.jisc.Models.Courses;
 import com.studygoal.jisc.Models.CurrentUser;
@@ -1130,6 +1131,29 @@ public class NetworkManager {
                 is.close();
 
                 Log.e("Jisc","Activity Points: "+sb.toString());
+
+                JSONObject object = new JSONObject(sb.toString());
+                if(object.has("info")
+                        && object.get("info") instanceof JSONObject) {
+
+                    JSONObject array = object.getJSONObject("info");
+                    Iterator<?> keys = array.keys();
+
+                    DataManager.getInstance().user.points.clear();
+
+                    while( keys.hasNext() ) {
+                        String key = (String)keys.next();
+                        if ( array.get(key) instanceof JSONObject ) {
+                            JSONObject hash = array.getJSONObject(key);
+                            ActivityPoints activityPoints = new ActivityPoints();
+                            activityPoints.id = hash.getString("_id");
+                            activityPoints.key = key;
+                            activityPoints.points = hash.getString("points");
+
+                            DataManager.getInstance().user.points.add(activityPoints);
+                        }
+                    }
+                }
 
                 return true;
             } catch (Exception e) {

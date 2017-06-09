@@ -2,7 +2,6 @@ package com.studygoal.jisc;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,7 +23,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -47,8 +45,6 @@ import com.studygoal.jisc.Fragments.Friends;
 import com.studygoal.jisc.Fragments.LogActivityHistory;
 import com.studygoal.jisc.Fragments.LogNewActivity;
 import com.studygoal.jisc.Fragments.Settings;
-import com.studygoal.jisc.Fragments.Stats;
-import com.studygoal.jisc.Fragments.Stats2;
 import com.studygoal.jisc.Fragments.Stats3;
 import com.studygoal.jisc.Fragments.StatsAttainment;
 import com.studygoal.jisc.Fragments.StatsPoints;
@@ -65,11 +61,9 @@ import com.studygoal.jisc.Utils.CircleTransform;
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends FragmentActivity {

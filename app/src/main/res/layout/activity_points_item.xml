@@ -20,6 +20,11 @@
             android:textColor="#5c5c5c"
             android:textSize="13sp" />
 
+        <LinearLayout
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="#ffffff"/>
+
         <TextView
             android:id="@+id/count_title"
             android:layout_width="0dp"
@@ -29,6 +34,11 @@
             android:text="Count"
             android:textColor="#5c5c5c"
             android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="#ffffff"/>
 
         <TextView
             android:id="@+id/points_title"

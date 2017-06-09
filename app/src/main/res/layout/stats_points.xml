@@ -22,7 +22,7 @@
             android:textColor="#ffffff"
             android:textSize="30sp"
             android:textStyle="bold"
-            android:text="45"/>
+            android:text=""/>
 
         <TextView
             android:id="@+id/activity_points_title"
@@ -69,6 +69,7 @@
     </LinearLayout>
 
     <ListView
+        android:id="@+id/activity_points_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/segment_buttons"

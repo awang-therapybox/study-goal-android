@@ -2,8 +2,8 @@ package com.studygoal.jisc.Models;
 
 public class ActivityPoints {
 
-    String points;
-    String id;
-    String key;
+    public String points;
+    public String id;
+    public String key;
 
 }
