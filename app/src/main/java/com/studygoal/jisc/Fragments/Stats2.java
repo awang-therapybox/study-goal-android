@@ -73,7 +73,7 @@ public class Stats2 extends Fragment {
         final TextView activity_points_overall;
         (activity_points_overall = (TextView) mainView.findViewById(R.id.activity_points_2)).setTypeface(DataManager.getInstance().myriadpro_regular);
 
-        NetworkManager.getInstance().getStudentActivityPoint();
+        NetworkManager.getInstance().getStudentActivityPoint("");
         activity_points_thisweek.setText(DataManager.getInstance().user.last_week_activity_points);
         activity_points_overall.setText(DataManager.getInstance().user.overall_activity_points);
 
@@ -90,7 +90,7 @@ public class Stats2 extends Fragment {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        NetworkManager.getInstance().getStudentActivityPoint();
+                        NetworkManager.getInstance().getStudentActivityPoint("");
                         NetworkManager.getInstance().getAssignmentRanking();
 
                         DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {

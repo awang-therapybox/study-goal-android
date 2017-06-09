@@ -119,7 +119,7 @@ public class Stats extends Fragment {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    NetworkManager.getInstance().getStudentActivityPoint();
+                    NetworkManager.getInstance().getStudentActivityPoint("");
                     DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -219,7 +219,7 @@ public class Stats extends Fragment {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            NetworkManager.getInstance().getStudentActivityPoint();
+                            NetworkManager.getInstance().getStudentActivityPoint("");
                             DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {

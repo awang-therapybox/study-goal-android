@@ -1062,7 +1062,6 @@ public class NetworkManager {
                 }
                 double value = (((double) CL + 0.5 * (double) FI) / mapOfMarks.size()) * 100;
                 int topPercent = 100 - (int) value;
-//                int topPercent = (student_position*100)/total_unique;
                 return topPercent + "";
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1071,8 +1070,8 @@ public class NetworkManager {
         }
     }
 
-    public boolean getStudentActivityPoint() {
-        Future<Boolean> future = executorService.submit(new getStudentActivityPoint());
+    public boolean getStudentActivityPoint(String scope) {
+        Future<Boolean> future = executorService.submit(new getStudentActivityPoint(scope));
         try {
             return future.get();
         } catch (Exception e) {
@@ -1083,14 +1082,16 @@ public class NetworkManager {
 
     private class getStudentActivityPoint implements Callable<Boolean> {
 
-        getStudentActivityPoint() {
+        String scope;
+        getStudentActivityPoint(String s) {
+            scope = s;
         }
 
         @Override
         public Boolean call() {
             try {
 
-                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/activity/points?scope=overall"
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/activity/points?scope="+scope
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
@@ -1104,6 +1105,17 @@ public class NetworkManager {
                 forbidden(responseCode);
                 if (responseCode != 200) {
                     Log.e("getStudentActivityPoint", "Code: " + responseCode);
+
+                    InputStream is = new BufferedInputStream(urlConnection.getErrorStream());
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(
+                            is, "iso-8859-1"), 8);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    is.close();
+
                     return false;
                 }
 
@@ -1117,33 +1129,7 @@ public class NetworkManager {
                 }
                 is.close();
 
-                JSONObject jsonObject = new JSONObject(sb.toString());
-                DataManager.getInstance().user.overall_activity_points = jsonObject.getString("totalPoints");
-
-                url = new URL("https://app.analytics.alpha.jisc.ac.uk/v2/activity/points?scope=7d");
-                urlConnection = (HttpsURLConnection) url.openConnection();
-                urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setSSLSocketFactory(context.getSocketFactory());
-
-                responseCode = urlConnection.getResponseCode();
-                forbidden(responseCode);
-                if (responseCode != 200) {
-                    Log.e("getStudentActivityPoin2", "Code: " + responseCode);
-                    return false;
-                }
-
-                is = new BufferedInputStream(urlConnection.getInputStream());
-                reader = new BufferedReader(new InputStreamReader(
-                        is, "iso-8859-1"), 8);
-                sb = new StringBuilder();
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                is.close();
-
-                jsonObject = new JSONObject(sb.toString());
-                DataManager.getInstance().user.last_week_activity_points = jsonObject.getString("totalPoints");
+                Log.e("Jisc","Activity Points: "+sb.toString());
 
                 return true;
             } catch (Exception e) {

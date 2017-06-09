@@ -4,6 +4,8 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
+import java.util.ArrayList;
+
 @Table(name = "User")
 public class CurrentUser extends Model {
 
@@ -41,8 +43,10 @@ public class CurrentUser extends Model {
     public boolean isDemo;
 
     public String password;
+    public ArrayList<ActivityPoints> points;
 
     public CurrentUser() {
         super();
+        points = new ArrayList<>();
     }
 }
