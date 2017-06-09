@@ -25,22 +25,31 @@ public class DrawerAdapter extends BaseAdapter {
     public ImageView selected_image;
 
     public ImageView profile_pic;
+    public boolean statsOpened;
 
     public DrawerAdapter(Context con) {
         context = con;
         inflater = LayoutInflater.from(con);
+        statsOpened = false;
+
         if(DataManager.getInstance().user.isSocial) {
             values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
         } else {
-//            values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.check_in), con.getString(R.string.stats), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
-            values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.stats), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
+            values = new String[] {"0",
+                    con.getString(R.string.feed),
+                    con.getString(R.string.stats),
+                    con.getString(R.string.graphs),
+                    con.getString(R.string.attainment),
+                    con.getString(R.string.points),
+                    con.getString(R.string.log),
+                    con.getString(R.string.target),
+                    con.getString(R.string.logout)};
         }
-
     }
 
     //Numarul de rows
     public int getCount() {
-        return values.length;
+        return statsOpened?values.length:values.length-3;
     }
 
     @Override
@@ -75,13 +84,28 @@ public class DrawerAdapter extends BaseAdapter {
             else
                 Glide.with(context).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(context)).into((ImageView) convertView.findViewById(R.id.imageView));
         } else {
-            convertView = inflater.inflate(R.layout.nav_item, parent, false);
+            if(statsOpened && position > 2 && position < 6) {
+                convertView = inflater.inflate(R.layout.nav_item_sub, parent, false);
+            } else {
+                convertView = inflater.inflate(R.layout.nav_item, parent, false);
+            }
+
             TextView textView;
             ImageView imageView;
             textView = (TextView) convertView.findViewById(R.id.drawer_item_text);
             textView.setTypeface(DataManager.getInstance().myriadpro_regular);
-            textView.setText(values[position]);
             imageView = (ImageView) convertView.findViewById(R.id.drawer_item_icon);
+            imageView.setImageBitmap(null);
+
+            
+            ImageView arrow_button = (ImageView) convertView.findViewById(R.id.arrow_button);
+            arrow_button.setVisibility(View.GONE);
+
+            if(!statsOpened && position > 2) {
+                position += 3;
+            }
+
+            textView.setText(values[position]);
 
             int iconResID = -1;
 
@@ -104,7 +128,17 @@ public class DrawerAdapter extends BaseAdapter {
                 iconResID = R.drawable.logout_icon;
             }
 
-            Glide.with(context).load(iconResID).into(imageView);
+            if(values[position].equals(context.getString(R.string.stats))) {
+                arrow_button.setVisibility(View.VISIBLE);
+                if(statsOpened) {
+                    arrow_button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.arrow_button_up));
+                } else {
+                    arrow_button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.arrow_button));
+                }
+            }
+
+            if(iconResID != -1)
+                Glide.with(context).load(iconResID).into(imageView);
 
             if (DataManager.getInstance().fragment != null) {
                 if (DataManager.getInstance().fragment == position) {

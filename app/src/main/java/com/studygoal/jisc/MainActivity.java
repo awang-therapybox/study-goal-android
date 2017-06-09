@@ -415,16 +415,28 @@ public class MainActivity extends FragmentActivity {
         adapter = new DrawerAdapter(this);
         navigationView = (ListView) findViewById(R.id.nav_view);
         navigationView.setAdapter(adapter);
+        navigationView.setDivider(null);
+        navigationView.setDividerHeight(0);
         navigationView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 if (position != 0) {
+
+                    if(adapter.values[position].equals(getString(R.string.stats))) {
+                        adapter.statsOpened = !adapter.statsOpened;
+                        adapter.notifyDataSetChanged();
+                    }
+
                     adapter.selected_image.setColorFilter(0x00FFFFFF);
                     adapter.selected_text.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.light_grey));
                     adapter.selected_image = (ImageView) view.findViewById(R.id.drawer_item_icon);
                     adapter.selected_text = (TextView) view.findViewById(R.id.drawer_item_text);
                     adapter.selected_image.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
                     adapter.selected_text.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.default_blue));
+
+                    if(adapter.values[position].equals(getString(R.string.stats))) {
+                        return;
+                    }
 
                     for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
                         getSupportFragmentManager().popBackStackImmediate();

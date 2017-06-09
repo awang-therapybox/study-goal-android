@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="35dp"
     android:background="#FFF">
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,23 +19,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textColor="@color/light_grey"
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
-
     <ImageView
         android:id="@+id/arrow_button"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/arrow_button"
+        android:visibility="gone"
         android:layout_marginEnd="20dp"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#11000000"
-        android:layout_alignParentBottom="true"/>
 </RelativeLayout>

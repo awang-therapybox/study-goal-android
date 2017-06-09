@@ -108,6 +108,7 @@
     <string name="language">Language</string>
     <string name="course_engagement">Course Engagement</string>
     <string name="attainment">Attainment</string>
+    <string name="points">Points</string>
     <string name="activity_points">Activity Points</string>
     <string name="this_week">This Week</string>
     <string name="period">Period</string>
