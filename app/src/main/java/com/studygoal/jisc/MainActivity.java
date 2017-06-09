@@ -49,6 +49,7 @@ import com.studygoal.jisc.Fragments.LogNewActivity;
 import com.studygoal.jisc.Fragments.Settings;
 import com.studygoal.jisc.Fragments.Stats;
 import com.studygoal.jisc.Fragments.Stats2;
+import com.studygoal.jisc.Fragments.StatsAttainment;
 import com.studygoal.jisc.Fragments.TargetFragment;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
@@ -384,14 +385,18 @@ public class MainActivity extends FragmentActivity {
                             getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.main_fragment, new CheckInFragment())
                                     .commit();
-                } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.stats))) {
-                            if (isLandscape)
-                                getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.main_fragment, new Stats())
-                                        .commit();
-                            else
-                                getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.main_fragment, new Stats2())
+                } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.attainment))) {
+//                            if (isLandscape)
+//                                getSupportFragmentManager().beginTransaction()
+//                                        .replace(R.id.main_fragment, new Stats())
+//                                        .commit();
+//                            else
+//                                getSupportFragmentManager().beginTransaction()
+//                                        .replace(R.id.main_fragment, new Stats2())
+//                                        .commit();
+
+                    getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.main_fragment, new StatsAttainment())
                                         .commit();
 
                 } else if(adapter.values[selectedPosition].equals(MainActivity.this.getString(R.string.log))) {
