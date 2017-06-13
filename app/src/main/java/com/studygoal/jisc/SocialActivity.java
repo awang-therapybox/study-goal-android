@@ -9,6 +9,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.widget.TextView;
 
 import com.facebook.CallbackManager;
@@ -24,6 +26,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.plus.Plus;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
 import com.twitter.sdk.android.Twitter;
@@ -43,8 +46,10 @@ import io.fabric.sdk.android.Fabric;
 
 public class SocialActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TWITTER_KEY = "M0NKXVGquYoclGTcG81u49hka";
-    private static final String TWITTER_SECRET = "CCpca8rm2GuJFkuHmTdTiwBsTcWdv7Ybi5Qqi7POIA6BvCObY6";
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "8sRjZ9CSN89N1iHMyMZjfedeE";
+    private static final String TWITTER_SECRET = "GPRDOuvl9HBoIZVYZo7r5XlverGN6HAGNouJYhCDOVIYrd7lcT";
+
     TwitterAuthClient mTwitterAuthClient;
 
     CallbackManager callbackManager;
@@ -94,11 +99,24 @@ public class SocialActivity extends AppCompatActivity implements GoogleApiClient
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig));
 
+        CookieSyncManager.createInstance(this);
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.removeSessionCookie();
+        Twitter.getSessionManager().clearActiveSession();
+        Twitter.logOut();
+
         mTwitterAuthClient= new TwitterAuthClient();
         TextView login_with_twitter = (TextView)findViewById(R.id.login_with_twitter);
         login_with_twitter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                CookieSyncManager.createInstance(SocialActivity.this);
+                CookieManager cookieManager = CookieManager.getInstance();
+                cookieManager.removeSessionCookie();
+                Twitter.getSessionManager().clearActiveSession();
+                Twitter.logOut();
+
                 socialType = 2;
                 socialID = "";
                 email = "";
@@ -133,6 +151,8 @@ public class SocialActivity extends AppCompatActivity implements GoogleApiClient
                                 });
                                 AlertDialog alertDialog = alertDialogBuilder.create();
                                 alertDialog.show();
+
+                                exception.printStackTrace();
                             }
                         });
                     }
@@ -229,7 +249,6 @@ public class SocialActivity extends AppCompatActivity implements GoogleApiClient
 
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
 
             email = acct.getEmail();
@@ -243,6 +262,7 @@ public class SocialActivity extends AppCompatActivity implements GoogleApiClient
             });
 
         } else {
+            Log.e("JISC","Handle: "+result.getStatus().getStatusCode());
             Log.e("JISC", "handleSignInResult:" + result.getStatus().getResolution());
         }
     }

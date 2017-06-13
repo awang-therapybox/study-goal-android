@@ -23,6 +23,7 @@ import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
 import com.daimajia.swipe.SwipeLayout;
+import com.studygoal.jisc.Fragments.FeedFragment;
 import com.studygoal.jisc.Fragments.LogLogActivity;
 import com.studygoal.jisc.LoginActivity;
 import com.studygoal.jisc.MainActivity;
@@ -47,11 +48,13 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     public List<Feed> feedList = new ArrayList<>();
     private Context context;
     SwipeRefreshLayout layout;
+    FeedFragment feedFragment;
 
-    public FeedAdapter(Context context, SwipeRefreshLayout layout) {
+    public FeedAdapter(Context context, SwipeRefreshLayout layout, FeedFragment feedFragment) {
         this.context = context;
         this.layout = layout;
         feedList = new ArrayList<>();
+        this.feedFragment = feedFragment;
     }
 
     @Override
@@ -68,32 +71,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     public void onBindViewHolder(final FeedViewHolder feedViewHolder, final int i) {
         final Feed item = feedList.get(i);
 
-        feedViewHolder.share_layout.setVisibility(View.GONE);
-
         feedViewHolder.share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SocialManager.getInstance().shareOnFacebook(item.message);
-            }
-        });
-
-        feedViewHolder.facebook_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SocialManager.getInstance().shareOnFacebook(item.message);
-
-            }
-        });
-        feedViewHolder.twitter_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SocialManager.getInstance().shareOnTwitter(item.message);
-            }
-        });
-        feedViewHolder.mail_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SocialManager.getInstance().shareOnEmail(item.message);
+                SocialManager.getInstance().shareOnIntent(item.message);
             }
         });
 
@@ -104,7 +85,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 feedViewHolder.close.setVisibility(View.VISIBLE);
                 feedViewHolder.menu.setVisibility(View.VISIBLE);
                 feedViewHolder.feed.setVisibility(View.GONE);
-
             }
         });
 
@@ -148,10 +128,24 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         if (item.message_from.equals(DataManager.getInstance().user.id)) {
             feedViewHolder.share.setVisibility(View.VISIBLE);
             feedViewHolder.open.setVisibility(View.GONE);
+            feedViewHolder.editButton.setVisibility(View.GONE);
+            feedViewHolder.editButton.setOnClickListener(null);
+
             if (!DataManager.getInstance().user.profile_pic.equals("")) {
                 Glide.with(context).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(context)).placeholder(R.drawable.profilenotfound).into(feedViewHolder.profile_pic);
             } else {
                 Glide.with(context).load(R.drawable.profilenotfound).transform(new CircleTransform(context)).placeholder(R.drawable.profilenotfound).into(feedViewHolder.profile_pic);
+            }
+
+            if(item.activity_type.equals("message")) {
+                feedViewHolder.editButton.setVisibility(View.VISIBLE);
+                feedViewHolder.editButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        feedFragment.editMessage(item);
+                        feedViewHolder.swipelayout.close();
+                    }
+                });
             }
 
             feedViewHolder.swipelayout.setSwipeEnabled(true);
@@ -242,7 +236,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         c.setTimeZone(TimeZone.getTimeZone("UTC"));
         long current_time = System.currentTimeMillis();
 
-        c.set(Integer.parseInt(item.created_date.split(" ")[0].split("-")[0]), Integer.parseInt(item.created_date.split(" ")[0].split("-")[1]) - 1, Integer.parseInt(item.created_date.split(" ")[0].split("-")[2]), Integer.parseInt(item.created_date.split(" ")[1].split(":")[0]), Integer.parseInt(item.created_date.split(" ")[1].split(":")[1]));
+        c.set(Integer.parseInt(item.created_date.split(" ")[0].split("-")[0]),
+                Integer.parseInt(item.created_date.split(" ")[0].split("-")[1]) - 1,
+                Integer.parseInt(item.created_date.split(" ")[0].split("-")[2]),
+                Integer.parseInt(item.created_date.split(" ")[1].split(":")[0]),
+                Integer.parseInt(item.created_date.split(" ")[1].split(":")[1]));
+
         long created_date = c.getTimeInMillis();
         long diff = (current_time - created_date) / 60000;
 
@@ -255,11 +254,13 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         else if (diff < 1440)
             feedViewHolder.time_ago.setText((diff / 60) + " " + context.getString(R.string.hours_ago));
         else
-            feedViewHolder.time_ago.setText(context.getString(R.string.on)+ " " + item.created_date.split(" ")[0].split("-")[2] + " " + LinguisticManager.getInstance().convertMonth(item.created_date.split(" ")[0].split("-")[1]) + " " + item.created_date.split(" ")[0].split("-")[0]);
+            feedViewHolder.time_ago.setText(
+                    context.getString(R.string.on)+ " "
+                            + item.created_date.split(" ")[0].split("-")[2] + " "
+                            + LinguisticManager.getInstance().convertMonth(item.created_date.split(" ")[0].split("-")[1]) + " " + item.created_date.split(" ")[0].split("-")[0]);
 
         feedViewHolder.feed.setText(item.message);
 
-        //Alte listener-uri
         if(item.activity_type.toLowerCase().equals("friend_request"))
             feedViewHolder.view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -291,11 +292,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         protected View close;
         View open;
         View bottom_bar;
-        View share_layout, facebook_btn, twitter_btn, mail_btn;
+        View facebook_btn, twitter_btn, mail_btn;
         View selfPost;
 
         SwipeLayout swipelayout;
         RelativeLayout deleteButton;
+        RelativeLayout editButton;
 
         protected View share;
 
@@ -311,6 +313,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             try {
                 swipelayout = (SwipeLayout) v.findViewById(R.id.swipelayout);
                 deleteButton = (RelativeLayout)v.findViewById(R.id.delete);
+                editButton = (RelativeLayout)v.findViewById(R.id.edit);
                 profile_pic = (ImageView) v.findViewById(R.id.feed_item_profile);
                 feed = (TextView) v.findViewById(R.id.feed_item_feed);
                 time_ago = (TextView) v.findViewById(R.id.feed_item_time_ago);
@@ -322,7 +325,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 open = v.findViewById(R.id.feed_item_option);
                 bottom_bar = v.findViewById(R.id.feed_item_bottom_bar);
                 share = v.findViewById(R.id.feed_item_share);
-                share_layout = v.findViewById(R.id.share_layout);
                 facebook_btn = v.findViewById(R.id.facebook_btn);
                 twitter_btn = v.findViewById(R.id.twitter_btn);
                 mail_btn = v.findViewById(R.id.mail_btn);

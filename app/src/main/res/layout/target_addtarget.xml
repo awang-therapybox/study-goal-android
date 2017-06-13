@@ -159,7 +159,7 @@
                         android:textSize="50sp"
                         android:inputType="number"
                         android:background="@android:color/transparent"
-                        android:maxLength="1"
+                        android:maxLength="2"
                         android:text="0"
                         android:textColor="@color/login_btn_purple"/>
                     <TextView

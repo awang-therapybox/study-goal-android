@@ -445,7 +445,6 @@ public class LoginActivity extends Activity {
         findViewById(R.id.blackout).setVisibility(View.INVISIBLE);
     }
 
-    //reset database on new login
     public void resetDatabase() {
 
         ActiveAndroid.beginTransaction();
@@ -469,6 +468,5 @@ public class LoginActivity extends Activity {
 
         ActiveAndroid.setTransactionSuccessful();
         ActiveAndroid.endTransaction();
-
     }
 }

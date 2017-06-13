@@ -15,8 +15,7 @@ public class SocialManager {
     private SocialManager() {
     }
 
-    public void shareOnFacebook(String text) {
-
+    public void shareOnIntent(String text) {
         text += "\n" + R.string.sent_from;
         text = text.replace("You are", "I am");
         text = text.replace("You have added", "I have added");
@@ -28,38 +27,5 @@ public class SocialManager {
         shareIntent.putExtra(Intent.EXTRA_TEXT, text);
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, text);
         DataManager.getInstance().mainActivity.startActivity(shareIntent);
-    }
-
-    public void shareOnTwitter(String text) {
-        text += "\n" + R.string.sent_from;
-        text = text.replace("You are", "I am");
-        text = text.replace("You have added", "I have added");
-        text = text.replace("you have", "I have");
-        try
-        {
-            // Check if the Twitter app is installed on the phone.
-            DataManager.getInstance().mainActivity.getPackageManager().getPackageInfo("com.twitter.android", 0);
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setClassName("com.twitter.android", "com.twitter.android.composer.ComposerActivity");
-            intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_TEXT, text);
-            DataManager.getInstance().mainActivity.startActivity(intent);
-        }
-        catch (Exception e)
-        {
-            Snackbar.make(DataManager.getInstance().mainActivity.findViewById(R.id.drawer_layout), DataManager.getInstance().mainActivity.getString(R.string.twitter_not_available), Snackbar.LENGTH_LONG).show();
-        }
-    }
-
-    public void shareOnEmail(String text) {
-        text += "\n" + R.string.sent_from;
-        text = text.replace("You are", "I am");
-        text = text.replace("You have added", "I have added");
-        text = text.replace("you have", "I have");
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND);
-        intent.setType("message/rfc822");
-        intent.putExtra(Intent.EXTRA_TEXT, text);
-        DataManager.getInstance().mainActivity.startActivity(intent);
     }
 }
