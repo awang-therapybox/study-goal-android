@@ -1,6 +1,7 @@
 package com.studygoal.jisc.Adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,13 @@ public class AttainmentAdapter extends BaseAdapter {
         if(convertView == null) {
             convertView = inflater.inflate(R.layout.attainment_item, parent, false);
         }
+
+        if(position % 2 == 0) {
+            convertView.setBackgroundColor(Color.parseColor("#e3f0ff"));
+        } else {
+            convertView.setBackgroundColor(Color.parseColor("#f0f7ff"));
+        }
+
 
         TextView name = (TextView) convertView.findViewById(R.id.name);
         TextView percent = (TextView) convertView.findViewById(R.id.percent);
