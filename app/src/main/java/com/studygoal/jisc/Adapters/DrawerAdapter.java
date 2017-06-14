@@ -68,8 +68,7 @@ public class DrawerAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if(position == 0) {
             convertView = inflater.inflate(R.layout.nav_header_main, parent, false);
-            Glide.with(context).load(R.drawable.tmp_navheader).into((ImageView)convertView.findViewById(R.id.navheader));
-            ((ImageView) convertView.findViewById(R.id.navheader)).setColorFilter(0x99ae65d0);
+            Glide.with(context).load(R.drawable.menu_header_bg).into((ImageView)convertView.findViewById(R.id.navheader));
 
             TextView email = (TextView) convertView.findViewById(R.id.drawer_email);
             TextView studentId = (TextView) convertView.findViewById(R.id.drawer_studentId);
@@ -139,9 +138,9 @@ public class DrawerAdapter extends BaseAdapter {
             if(values[position].equals(context.getString(R.string.stats))) {
                 arrow_button.setVisibility(View.VISIBLE);
                 if(statsOpened) {
-                    arrow_button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.arrow_button_up));
+                    arrow_button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.arrow_button_new_up));
                 } else {
-                    arrow_button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.arrow_button));
+                    arrow_button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.arrow_button_new));
                 }
             }
 

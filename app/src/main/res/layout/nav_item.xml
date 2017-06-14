@@ -30,7 +30,7 @@
         android:layout_height="20dp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/arrow_button"
+        android:src="@drawable/arrow_button_new"
         android:layout_marginEnd="20dp"/>
 
     <LinearLayout
