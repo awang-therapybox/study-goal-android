@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -663,6 +664,9 @@ public class Stats3 extends Fragment {
             list = new ArrayList<>();
         }
 
+        ArrayList<ED> tempList = new ArrayList<>();
+        tempList.addAll(list);
+
         if (compareTo.getText().toString().equals(getString(R.string.no_one))) {
             if (period.getText().toString().equals(getString(R.string.last_7_days))) {
 
@@ -674,13 +678,13 @@ public class Stats3 extends Fragment {
                 Date date = new Date();
                 date.setTime(date.getTime() - 6*86400000);
 
-                Collections.reverse(list);
+                Collections.reverse(tempList);
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
-                for (int i = 0; i < list.size(); i++) {
+                for (int i = 0; i < tempList.size(); i++) {
                     String day = dateFormat.format(date);
                     date.setTime(date.getTime() + 86400000);
-                    vals1.add(""+list.get(i).activity_points+"");
+                    vals1.add(""+tempList.get(i).activity_points+"");
                     xVals.add("\'"+day+"\'");
                 }
 
@@ -702,7 +706,7 @@ public class Stats3 extends Fragment {
 
                 Integer val1 = 0;
 
-                Collections.reverse(list);
+                Collections.reverse(tempList);
 
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(new Date());
@@ -711,8 +715,8 @@ public class Stats3 extends Fragment {
                 String day;
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                for (int i = 0; i < list.size(); i++) {
-                    val1 = val1 + list.get(i).activity_points;
+                for (int i = 0; i < tempList.size(); i++) {
+                    val1 = val1 + tempList.get(i).activity_points;
                     if (i == 6 || i == 13 || i == 20 || i == 27){
                         vals1.add(""+val1);
 
@@ -734,6 +738,7 @@ public class Stats3 extends Fragment {
                 html = html.replace("<<<REPLACE_DATA_HERE>>>",webData);
                 html = html.replace("height:1000px","height:"+webviewHeight+"px");
 
+                Log.e("JISC", "HTML: "+html);
                 webView.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
             }
         } else {
@@ -762,22 +767,22 @@ public class Stats3 extends Fragment {
                 c.setTimeInMillis(curr);
 
                 if(DataManager.getInstance().user.isDemo) {
-                    for (int i = 0; i < list.size(); i++) {
-                        if (list.get(i).student_id.equals(id)) {
-                            value_1 = list.get(i).activity_points;
+                    for (int i = 0; i < tempList.size(); i++) {
+                        if (tempList.get(i).student_id.equals(id)) {
+                            value_1 = tempList.get(i).activity_points;
                             vals3.add(value_1);
                         } else {
-                            value_2 = list.get(i).activity_points;
+                            value_2 = tempList.get(i).activity_points;
                             vals4.add(value_2);
                         }
                     }
                 } else {
-                    for (int i = 0; i < list.size(); i++) {
-                        if (list.get(i).student_id.contains(id)) {
-                            value_1 = list.get(i).activity_points;
+                    for (int i = 0; i < tempList.size(); i++) {
+                        if (tempList.get(i).student_id.contains(id)) {
+                            value_1 = tempList.get(i).activity_points;
                             vals3.add(value_1);
                         } else {
-                            value_2 = list.get(i).activity_points;
+                            value_2 = tempList.get(i).activity_points;
                             vals4.add(value_2);
                         }
                     }
@@ -835,22 +840,22 @@ public class Stats3 extends Fragment {
                 c.setTimeInMillis(curr);
 
                 if(DataManager.getInstance().user.isDemo) {
-                    for (int i = 0; i < list.size(); i++) {
-                        if (list.get(i).student_id.equals(id)) {
-                            value_1 = list.get(i).activity_points;
+                    for (int i = 0; i < tempList.size(); i++) {
+                        if (tempList.get(i).student_id.equals(id)) {
+                            value_1 = tempList.get(i).activity_points;
                             vals3.add(value_1);
                         } else {
-                            value_2 = list.get(i).activity_points;
+                            value_2 = tempList.get(i).activity_points;
                             vals4.add(value_2);
                         }
                     }
                 } else {
-                    for (int i = 0; i < list.size(); i++) {
-                        if (list.get(i).student_id.contains(id)) {
-                            value_1 = list.get(i).activity_points;
+                    for (int i = 0; i < tempList.size(); i++) {
+                        if (tempList.get(i).student_id.contains(id)) {
+                            value_1 = tempList.get(i).activity_points;
                             vals3.add(value_1);
                         } else {
-                            value_2 = list.get(i).activity_points;
+                            value_2 = tempList.get(i).activity_points;
                             vals4.add(value_2);
                         }
                     }
