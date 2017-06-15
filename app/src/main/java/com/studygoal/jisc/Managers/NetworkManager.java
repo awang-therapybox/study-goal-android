@@ -498,7 +498,8 @@ public class NetworkManager {
         @Override
         public List<ED> call() throws Exception {
             try {
-                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?"
+//                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?"
+                String apiURL = "http://api.highcharts.com/engagement?"
                         + "scope=" + this.scope
                         + "&compareType=" + this.compareType
                         + "&compareValue=" + this.compareValue
@@ -508,9 +509,8 @@ public class NetworkManager {
 
                 URL url = new URL(apiURL);
 
-                HttpsURLConnection urlConnection;
-                urlConnection = (HttpsURLConnection) url.openConnection();
-                urlConnection.setSSLSocketFactory(context.getSocketFactory());
+                HttpURLConnection urlConnection;
+                urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
 

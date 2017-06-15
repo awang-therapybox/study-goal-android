@@ -28,7 +28,7 @@ public class InstitutionsAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return institutions.size()+2;
+        return institutions.size();
     }
 
     @Override
@@ -47,31 +47,12 @@ public class InstitutionsAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.institution_item, viewGroup, false);
         }
 
-        if(i < institutions.size()) {
-            TextView name = (TextView) view.findViewById(R.id.name);
-            name.setTypeface(DataManager.getInstance().myriadpro_regular);
-            name.setText(institutions.get(i).name);
-            name.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-
-            view.setTag(institutions.get(i));
-        } else if(i == institutions.size()){
-            TextView name = (TextView) view.findViewById(R.id.name);
-            name.setTypeface(DataManager.getInstance().myriadpro_bold);
-            name.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            name.setText(context.getString(R.string.institution_no_listed));
-
-            view.setTag("no institution");
-        }
-        else {
         TextView name = (TextView) view.findViewById(R.id.name);
-        name.setTypeface(DataManager.getInstance().myriadpro_bold);
-        name.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        name.setText(context.getString(R.string.demo_mode));
+        name.setTypeface(DataManager.getInstance().myriadpro_regular);
+        name.setText(institutions.get(i).name);
+        name.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+        view.setTag(institutions.get(i));
 
-        view.setTag("demo");
-    }
-
-
-    return view;
+        return view;
     }
 }
