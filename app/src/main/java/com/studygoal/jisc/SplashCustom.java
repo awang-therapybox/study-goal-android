@@ -2,26 +2,19 @@ package com.studygoal.jisc;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Point;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Display;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
-import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import io.fabric.sdk.android.Fabric;
 
-public class Splash extends AppCompatActivity {
+public class SplashCustom extends AppCompatActivity {
 
-    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-
-
+    // Note: Currently as a DEMO
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +71,7 @@ public class Splash extends AppCompatActivity {
     }
 
     public void jump() {
-        Intent intent = new Intent(Splash.this, LoginActivity.class);
+        Intent intent = new Intent(SplashCustom.this, LoginActivity.class);
         startActivity(intent);
         this.finish();
     }

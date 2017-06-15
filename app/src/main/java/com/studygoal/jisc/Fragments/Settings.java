@@ -1,8 +1,10 @@
 package com.studygoal.jisc.Fragments;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,7 +125,7 @@ public class Settings extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto", "learning.analytics@jisc.ac.uk", null));
+                        "mailto", "support@jisclearninganalytics.freshdesk.com", null));
                 emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Bug/Feature idea " + DataManager.getInstance().institution);
                 emailIntent.putExtra(Intent.EXTRA_TEXT, "+" + getString(R.string.is_this_a_but_or_a_feature) + "\n" +
                         "+"+ getString(R.string.which_part)+"\n" +
@@ -164,6 +167,20 @@ public class Settings extends Fragment {
         mainView.findViewById(R.id.camera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(DataManager.getInstance().user.isDemo) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Settings.this.getActivity());
+                    alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.demo_mode_updateprofileimage) + "</font>"));
+                    alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                    return;
+                }
 
                 final Dialog dialog = new Dialog(getActivity());
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -251,20 +268,41 @@ public class Settings extends Fragment {
 
     public void refresh_image() {
 
-        if (NetworkManager.getInstance().login()) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).into(profile_image);
-                            Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
+        if(DataManager.getInstance().user.isSocial) {
 
-                        }
-                    });
-                }
-            }).start();
+            Integer response = NetworkManager.getInstance().loginSocial(DataManager.getInstance().user.email, DataManager.getInstance().user.password);
+
+            if (response == 200) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).into(profile_image);
+                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
+
+                            }
+                        });
+                    }
+                }).start();
+            }
+        } else {
+            if (NetworkManager.getInstance().login()) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).into(profile_image);
+                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
+
+                            }
+                        });
+                    }
+                }).start();
+            }
         }
     }
 

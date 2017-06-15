@@ -141,88 +141,19 @@ public class Stats2 extends Fragment {
             }
         });
 
-
         mainView.findViewById(R.id.share).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                v.setVisibility(View.GONE);
-                SocialManager.getInstance().shareOnFacebook(((TextView) mainView.findViewById(R.id.activity_points_1)).getText().toString() + " " + ((TextView) mainView.findViewById(R.id.activity_points_1_text)).getText().toString());
-//                mainView.findViewById(R.id.share_layout).setVisibility(View.VISIBLE);
-//                timer = new Timer();
-//                timer.schedule(new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                mainView.findViewById(R.id.share_layout).setVisibility(View.GONE);
-//                                mainView.findViewById(R.id.share).setVisibility(View.VISIBLE);
-//                            }
-//                        });
-//                    }
-//                }, 3000);
+                SocialManager.getInstance().shareOnIntent(((TextView) mainView.findViewById(R.id.activity_points_1)).getText().toString() + " " + ((TextView) mainView.findViewById(R.id.activity_points_1_text)).getText().toString());
             }
         });
 
         mainView.findViewById(R.id.share2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                v.setVisibility(View.GONE);
-                SocialManager.getInstance().shareOnFacebook(((TextView) mainView.findViewById(R.id.activity_points_2)).getText().toString() + " " + ((TextView) mainView.findViewById(R.id.activity_points_2_text)).getText().toString());
-//                mainView.findViewById(R.id.share_layout2).setVisibility(View.VISIBLE);
-//                timer2 = new Timer();
-//                timer2.schedule(new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                mainView.findViewById(R.id.share_layout2).setVisibility(View.GONE);
-//                                mainView.findViewById(R.id.share2).setVisibility(View.VISIBLE);
-//                            }
-//                        });
-//                    }
-//                }, 3000);
+                SocialManager.getInstance().shareOnIntent(((TextView) mainView.findViewById(R.id.activity_points_2)).getText().toString() + " " + ((TextView) mainView.findViewById(R.id.activity_points_2_text)).getText().toString());
             }
         });
-
-            mainView.findViewById(R.id.facebook).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    SocialManager.getInstance().shareOnFacebook(((TextView) mainView.findViewById(R.id.activity_points_1)).getText().toString() + " " + ((TextView) mainView.findViewById(R.id.activity_points_1_text)).getText().toString());
-                }
-            });
-
-            mainView.findViewById(R.id.facebook2).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    SocialManager.getInstance().shareOnFacebook(((TextView) mainView.findViewById(R.id.activity_points_2)).getText().toString() + " " + ((TextView) mainView.findViewById(R.id.activity_points_2_text)).getText().toString());
-                }
-            });
-            mainView.findViewById(R.id.twitter).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    SocialManager.getInstance().shareOnTwitter(((TextView) mainView.findViewById(R.id.activity_points_1)).getText().toString() + " " + ((TextView) mainView.findViewById(R.id.activity_points_1_text)).getText().toString());
-                }
-            });
-            mainView.findViewById(R.id.twitter2).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    SocialManager.getInstance().shareOnTwitter(((TextView) mainView.findViewById(R.id.activity_points_2)).getText().toString() + " " + ((TextView) mainView.findViewById(R.id.activity_points_2_text)).getText().toString());
-                }
-            });
-            mainView.findViewById(R.id.email).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    SocialManager.getInstance().shareOnEmail(((TextView) mainView.findViewById(R.id.activity_points_1)).getText().toString() + " " + ((TextView) mainView.findViewById(R.id.activity_points_1_text)).getText().toString());
-                }
-            });
-            mainView.findViewById(R.id.email2).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    SocialManager.getInstance().shareOnEmail(((TextView) mainView.findViewById(R.id.activity_points_2)).getText().toString() + " " + ((TextView) mainView.findViewById(R.id.activity_points_2_text)).getText().toString());
-                }
-            });
 
         mainView.findViewById(R.id.next).setVisibility(View.INVISIBLE);
 

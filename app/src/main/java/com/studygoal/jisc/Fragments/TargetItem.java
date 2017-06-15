@@ -431,32 +431,7 @@ public class TargetItem extends Fragment {
         mainView.findViewById(R.id.target_reached_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                SocialManager.getInstance().shareOnFacebook(getActivity().getString(R.string.target_reached_2) + " " + finalText);
-
-//                mainView.findViewById(R.id.target_reached_layout).setVisibility(View.GONE);
-//                mainView.findViewById(R.id.share_layout).setVisibility(View.VISIBLE);
-//                mainView.findViewById(R.id.facebook_btn).setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        Snackbar.make(DataManager.getInstance().mainActivity.findViewById(R.id.drawer_layout), R.string.facebook_not_implemented, Snackbar.LENGTH_LONG).show();
-//                    }
-//                });
-//                mainView.findViewById(R.id.twitter_btn).setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-////                            Snackbar.make(DataManager.getInstance().mainActivity.findViewById(R.id.drawer_layout), "Not available in this build", Snackbar.LENGTH_LONG).show();
-//                        SocialManager.getInstance().shareOnTwitter(getActivity().getString(R.string.target_reached_2) + " " + finalText);
-//                    }
-//                });
-//                mainView.findViewById(R.id.mail_btn).setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-////                            Snackbar.make(DataManager.getInstance().mainActivity.findViewById(R.id.drawer_layout), "Not available in this build", Snackbar.LENGTH_LONG).show();
-//                        SocialManager.getInstance().shareOnEmail(getActivity().getString(R.string.target_reached_2) + " " + finalText);
-//                    }
-//                });
-
+                SocialManager.getInstance().shareOnIntent(getActivity().getString(R.string.target_reached_2) + " " + finalText);
             }
         });
 

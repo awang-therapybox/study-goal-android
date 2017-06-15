@@ -1,6 +1,7 @@
 package com.studygoal.jisc.Fragments;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -176,7 +177,20 @@ public class Stats3 extends Fragment {
                     final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
                     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     dialog.setContentView(R.layout.custom_spinner_layout);
-                    dialog.setCancelable(false);
+                    dialog.setCancelable(true);
+                    dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            dialog.dismiss();
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ((MainActivity) getActivity()).hideProgressBar();
+                                }
+                            });
+                        }
+                    });
+
 
                     if (DataManager.getInstance().mainActivity.isLandscape) {
                         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -227,7 +241,20 @@ public class Stats3 extends Fragment {
                     final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
                     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     dialog.setContentView(R.layout.custom_spinner_layout);
-                    dialog.setCancelable(false);
+                    dialog.setCancelable(true);
+                    dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            dialog.dismiss();
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ((MainActivity) getActivity()).hideProgressBar();
+                                }
+                            });
+                        }
+                    });
+
                     if (DataManager.getInstance().mainActivity.isLandscape) {
                         DisplayMetrics displaymetrics = new DisplayMetrics();
                         DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -277,8 +304,6 @@ public class Stats3 extends Fragment {
             }
         };
 
-//        getData();
-
         final TextView description = (TextView) mainView.findViewById(R.id.description);
         description.setTypeface(DataManager.getInstance().myriadpro_regular);
         description.setText(R.string.last_week);
@@ -294,7 +319,20 @@ public class Stats3 extends Fragment {
                 final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.custom_spinner_layout);
-                dialog.setCancelable(false);
+                dialog.setCancelable(true);
+                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        dialog.dismiss();
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ((MainActivity) getActivity()).hideProgressBar();
+                            }
+                        });
+                    }
+                });
+
                 if (DataManager.getInstance().mainActivity.isLandscape) {
                     DisplayMetrics displaymetrics = new DisplayMetrics();
                     DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -313,8 +351,20 @@ public class Stats3 extends Fragment {
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                        String titleText = ((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString();
+
+                        List<Courses> coursesList = new Select().from(Courses.class).execute();
+
+                        for (int j = 0; j < coursesList.size(); j++) {
+                            String courseName = coursesList.get(j).name;
+                            if(courseName.equals(titleText)) {
+                                return;
+                            }
+                        }
+
                         dialog.dismiss();
-                        module.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
+                        module.setText(titleText);
 
                         if(!module.getText().toString().equals(getString(R.string.anymodule))) {
                             compareTo.setOnClickListener(compareToListener);
@@ -322,6 +372,7 @@ public class Stats3 extends Fragment {
                         } else {
                             compareTo.setOnClickListener(null);
                             compareTo.setAlpha(0.5f);
+                            compareTo.setText(getString(R.string.no_one));
                         }
 
                         new Thread(new Runnable() {
@@ -353,7 +404,20 @@ public class Stats3 extends Fragment {
                 final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.custom_spinner_layout);
-                dialog.setCancelable(false);
+                dialog.setCancelable(true);
+                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        dialog.dismiss();
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ((MainActivity) getActivity()).hideProgressBar();
+                            }
+                        });
+                    }
+                });
+
                 if (DataManager.getInstance().mainActivity.isLandscape) {
                     DisplayMetrics displaymetrics = new DisplayMetrics();
                     DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -619,18 +683,21 @@ public class Stats3 extends Fragment {
 
         String compareValue;
         String compareType;
-        if (compareTo.getText().toString().contains("Top")) {
-            compareValue = "10";
-            compareType = "top";
-        } else if (!compareTo.getText().toString().equals(getString(R.string.no_one))
-                && !compareTo.getText().toString().equals(getString(R.string.top10))
+//        if (compareTo.getText().toString().contains("Top")) {
+//            compareValue = "10";
+//            compareType = "top";
+//        } else
+        if (!compareTo.getText().toString().equals(getString(R.string.no_one))
+//                && !compareTo.getText().toString().equals(getString(R.string.top10))
                 && !compareTo.getText().toString().equals(getString(R.string.average))) {
             compareValue = ((Friend) new Select().from(Friend.class).where("name = ?", compareTo.getText().toString()).executeSingle()).jisc_student_id.replace("[", "").replace("]", "").replace("\"", "");
             compareType = "friend";
-        } else if (compareTo.getText().toString().contains("Average")){
+        }
+        else if (compareTo.getText().toString().equals(getString(R.string.average))){
             compareValue = "";
             compareType = "average";
-        } else {
+        }
+        else {
             compareType = "";
             compareValue = "";
         }
@@ -725,27 +792,18 @@ public class Stats3 extends Fragment {
 
                 String day;
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/d");
-                SimpleDateFormat dateFormatD = new SimpleDateFormat("d");
-                SimpleDateFormat dateFormatM = new SimpleDateFormat("MM");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
                 for (int i = 0; i < list.size(); i++) {
                     val1 = val1 + list.get(i).activity_points;
                     if (i == 6 || i == 13 || i == 20 || i == 27){
                         vals1.add(new Entry(xVals.size(), val1));
                         vals2.add(new BarEntry(xVals.size(), val1));
 
-                        day = dateFormat.format(calendar.getTime());
-                        String month1 = dateFormatM.format(calendar.getTime());
-
                         calendar.add(Calendar.DATE, 6);
-                        String month2 = dateFormatM.format(calendar.getTime());
-
-                        if(month1.equals(month2)) {
-                            day += "-"+dateFormatD.format(calendar.getTime());
-                        } else {
-                            day += "-"+dateFormat.format(calendar.getTime());
-                        }
+                        day = dateFormat.format(calendar.getTime());
                         calendar.add(Calendar.DATE, 1);
+
                         xVals.add(day);
                         val1 = 0;
                     }
@@ -787,6 +845,9 @@ public class Stats3 extends Fragment {
 
                 String name = getString(R.string.me);
                 String id = DataManager.getInstance().user.jisc_student_id;
+                if(DataManager.getInstance().user.isDemo) {
+                    id = "demouser";
+                }
 
                 Integer value_1;
                 Integer value_2;
@@ -796,13 +857,25 @@ public class Stats3 extends Fragment {
                 Long curr = c.getTimeInMillis() - 518400000;
                 c.setTimeInMillis(curr);
 
-                for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).student_id.contains(id)) {
-                        value_1 = list.get(i).activity_points;
-                        vals3.add(value_1);
-                    } else {
-                        value_2 = list.get(i).activity_points;
-                        vals4.add(value_2);
+                if(DataManager.getInstance().user.isDemo) {
+                    for (int i = 0; i < list.size(); i++) {
+                        if(list.get(i).student_id.equals(id)) {
+                            value_1 = list.get(i).activity_points;
+                            vals3.add(value_1);
+                        } else {
+                            value_2 = list.get(i).activity_points;
+                            vals4.add(value_2);
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < list.size(); i++) {
+                        if(list.get(i).student_id.equals(id)) {
+                            value_1 = list.get(i).activity_points;
+                            vals3.add(value_1);
+                        } else {
+                            value_2 = list.get(i).activity_points;
+                            vals4.add(value_2);
+                        }
                     }
                 }
 
@@ -838,8 +911,6 @@ public class Stats3 extends Fragment {
 
                 BarData barData = new BarData(barDataSet1);
                 barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                barData.setDrawValues(true);
-                barData.setValueTextColor(0xff000000);
                 barData.addDataSet(barDataSet2);
                 barData.setBarWidth(0.40f);
                 barData.groupBars(0, 0.09f, 0.01f);
@@ -879,6 +950,9 @@ public class Stats3 extends Fragment {
                 String name = getString(R.string.me);
 
                 String id = DataManager.getInstance().user.jisc_student_id;
+                if(DataManager.getInstance().user.isDemo) {
+                    id = "demouser";
+                }
 
                 Integer value_1;
                 Integer value_2;
@@ -888,13 +962,25 @@ public class Stats3 extends Fragment {
                 Long curr = c.getTimeInMillis() - (3 * 518400000);
                 c.setTimeInMillis(curr);
 
-                for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).student_id.contains(id)) {
-                        value_1 = list.get(i).activity_points;
-                        vals3.add(value_1);
-                    } else {
-                        value_2 = list.get(i).activity_points;
-                        vals4.add(value_2);
+                if(DataManager.getInstance().user.isDemo) {
+                    for (int i = 0; i < list.size(); i++) {
+                        if(list.get(i).student_id.equals(id)) {
+                            value_1 = list.get(i).activity_points;
+                            vals3.add(value_1);
+                        } else {
+                            value_2 = list.get(i).activity_points;
+                            vals4.add(value_2);
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < list.size(); i++) {
+                        if(list.get(i).student_id.equals(id)) {
+                            value_1 = list.get(i).activity_points;
+                            vals3.add(value_1);
+                        } else {
+                            value_2 = list.get(i).activity_points;
+                            vals4.add(value_2);
+                        }
                     }
                 }
 
@@ -944,7 +1030,7 @@ public class Stats3 extends Fragment {
 
                 BarData barData = new BarData(barDataSet1);
                 barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-                barData.setDrawValues(true);
+                barData.setDrawValues(false);
                 barData.addDataSet(barDataSet2);
                 barData.setBarWidth(0.40f);
                 barData.groupBars(0, 0.09f, 0.01f);
@@ -984,7 +1070,7 @@ public class Stats3 extends Fragment {
     public BarData getBarData(ArrayList<BarEntry> vals2, String name) {
         BarData barData = new BarData(getBarDataSet(vals2, name));
         barData.setValueTypeface(DataManager.getInstance().myriadpro_regular);
-        barData.setDrawValues(true);
+        barData.setDrawValues(false);
         barData.setValueTextColor(0xff000000);
         barData.setBarWidth(0.70f);
 
@@ -1024,7 +1110,7 @@ public class Stats3 extends Fragment {
             barDataSet.setColor(0xFF3791ee);
             barDataSet.setValueTextColor(0xFF3791ee);
         }
-        barDataSet.setDrawValues(true);
+        barDataSet.setDrawValues(false);
         barDataSet.setValueTextSize(50);
         barDataSet.setValueTextSize(14f);
         return barDataSet;

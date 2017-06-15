@@ -385,7 +385,7 @@ public class NetworkManager {
                 urlConnection.setRequestProperty("Connection", "Keep-Alive");
                 urlConnection.setRequestProperty("Cache-Control", "no-cache");
                 urlConnection.setUseCaches(false);
-                urlConnection.setConnectTimeout(50000);
+                urlConnection.setConnectTimeout(20000);
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
@@ -393,26 +393,20 @@ public class NetworkManager {
                 DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
 
                 wr.writeBytes(crlf + twoHyphens + boundary + crlf);
-
                 String header = "Content-Disposition: form-data; name=\"language\"";
                 wr.writeBytes(header);
                 wr.writeBytes(crlf);
                 wr.writeBytes(crlf);
                 wr.writeBytes(language);
 
-
-                if(DataManager.getInstance().user.isSocial) {
-                    wr.writeBytes(crlf + twoHyphens + boundary + crlf);
-
-                    header = "Content-Disposition: form-data; name=\"is_social\"";
-                    wr.writeBytes(header);
-                    wr.writeBytes(crlf);
-                    wr.writeBytes(crlf);
-                    wr.writeBytes((DataManager.getInstance().user.isStaff ? "yes" : "no"));
-                }
+                wr.writeBytes(crlf + twoHyphens + boundary + crlf);
+                header = "Content-Disposition: form-data; name=\"is_social\"";
+                wr.writeBytes(header);
+                wr.writeBytes(crlf);
+                wr.writeBytes(crlf);
+                wr.writeBytes((DataManager.getInstance().user.isStaff ? "yes" : "no"));
 
                 wr.writeBytes(crlf + twoHyphens + boundary + crlf);
-
                 header = "Content-Disposition: form-data; name=\"student_id\"";
                 wr.writeBytes(header);
                 wr.writeBytes(crlf);
@@ -420,7 +414,7 @@ public class NetworkManager {
                 wr.writeBytes(DataManager.getInstance().user.id);
 
                 wr.writeBytes(crlf + twoHyphens + boundary + crlf);
-                header = "Content-Disposition: attachment; name=\"profile_photo\"; filename=" + DataManager.getInstance().user.id + "_" + System.currentTimeMillis() + ".png" + crlf;
+                header = "Content-Disposition: attachment; name=\"image_data\"; filename=" + DataManager.getInstance().user.id + "_" + System.currentTimeMillis() + ".png" + crlf;
                 wr.writeBytes(header);
 
                 header = "Content-Type: image/png" + crlf + crlf;
@@ -428,13 +422,28 @@ public class NetworkManager {
 
                 Bitmap bm = BitmapFactory.decodeFile(path);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 
                 wr.write(baos.toByteArray());
                 wr.writeBytes(crlf + twoHyphens + boundary + twoHyphens + crlf);
 
                 wr.flush();
                 wr.close();
+
+                if(urlConnection.getResponseCode() != 200) {
+                    BufferedInputStream is = new BufferedInputStream(urlConnection.getErrorStream());
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+
+                    is.close();
+
+                    Log.e("Jisc","error: "+sb.toString());
+                }
 
                 BufferedInputStream is = new BufferedInputStream(urlConnection.getInputStream());
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
@@ -446,8 +455,6 @@ public class NetworkManager {
                 }
 
                 is.close();
-
-                Log.e("Jisc","Image response: "+sb.toString());
 
                 return true;
             } catch (Exception e) {
@@ -2188,7 +2195,6 @@ public class NetworkManager {
                 is.close();
 
                 JSONArray jsonArray = new JSONArray(sb.toString());
-
                 ActiveAndroid.beginTransaction();
                 try {
                     new Delete().from(Feed.class).execute();
@@ -3206,6 +3212,7 @@ public class NetworkManager {
                 new Delete().from(CurrentUser.class).execute();
                 DataManager.getInstance().user = new CurrentUser();
                 DataManager.getInstance().user.id = jsonObject.getInt("id") + "";
+                DataManager.getInstance().user.password = password;
                 DataManager.getInstance().user.jisc_student_id = jsonObject.getString("id");
                 DataManager.getInstance().user.pid = jsonObject.getString("pid");
                 DataManager.getInstance().user.name = jsonObject.getString("name");
@@ -3795,7 +3802,6 @@ public class NetworkManager {
                 is.close();
 
                 JSONArray jsonArray = new JSONArray(sb.toString());
-                Log.e("JISC","Modules: "+jsonArray.toString());
 
                 ActiveAndroid.beginTransaction();
 
@@ -3828,6 +3834,7 @@ public class NetworkManager {
     public boolean addModule(HashMap<String, String> params) {
         language = LinguisticManager.getInstance().getLanguageCode();
         Future<Boolean> future = executorService.submit(new addModule(params));
+        Future<Boolean> future1 = executorService.submit(new getSocialModules());
         try {
             return future.get();
         } catch (Exception e) {
@@ -3913,23 +3920,25 @@ public class NetworkManager {
         }
     }
 
-    private boolean forbidden (int code){
-        if (code == 401){
-            //cookie manager context
-            if (DataManager.getInstance().checkForbidden) {
-//                deleteCache(appContext);
-                CookieManager.getInstance().removeAllCookies(null);
-                DataManager.getInstance().set_jwt("");
-                new Delete().from(CurrentUser.class).execute();
-                DataManager.getInstance().toast = true;
-                DataManager.getInstance().checkForbidden = false;
-                Intent intent = new Intent(DataManager.getInstance().currActivity, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                appContext.startActivity(intent);
-                DataManager.getInstance().currActivity.finish();
-                return false;
-            }
-        }
+    private boolean forbidden (int code) {
+
         return true;
+
+//        if (code == 401){
+//            //cookie manager context
+//            if (DataManager.getInstance().checkForbidden) {
+//                CookieManager.getInstance().removeAllCookies(null);
+//                DataManager.getInstance().set_jwt("");
+//                new Delete().from(CurrentUser.class).execute();
+//                DataManager.getInstance().toast = true;
+//                DataManager.getInstance().checkForbidden = false;
+//                Intent intent = new Intent(DataManager.getInstance().currActivity, LoginActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                appContext.startActivity(intent);
+//                DataManager.getInstance().currActivity.finish();
+//                return false;
+//            }
+//        }
+//        return true;
     }
 }

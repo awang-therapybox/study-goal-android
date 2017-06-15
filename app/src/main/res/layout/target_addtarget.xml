@@ -9,6 +9,7 @@
         android:layout_height="match_parent"
         android:background="@color/background_color">
         <LinearLayout
+            android:id="@+id/content_scroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -158,7 +159,7 @@
                         android:textSize="50sp"
                         android:inputType="number"
                         android:background="@android:color/transparent"
-                        android:maxLength="1"
+                        android:maxLength="2"
                         android:text="0"
                         android:textColor="@color/login_btn_purple"/>
                     <TextView
@@ -352,6 +353,7 @@
         android:id="@+id/add_new_module_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         android:background="#FBFBFB">
 
         <RelativeLayout
