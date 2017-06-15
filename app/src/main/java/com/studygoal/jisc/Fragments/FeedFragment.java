@@ -92,17 +92,38 @@ public class FeedFragment extends Fragment {
         HashMap<String, String> map = new HashMap<>();
         map.put("student_id", DataManager.getInstance().user.id);
         map.put("message", message);
-        if (NetworkManager.getInstance().postFeedMessage(map)) {
-            if (NetworkManager.getInstance().getFeed(DataManager.getInstance().user.id)) {
-                NetworkManager.getInstance().getNewsFeed();
-                adapter.feedList = new Select().from(Feed.class).where("is_hidden = 0").execute();
-                adapter.newsList = new Select().from(News.class).where("read = 0").execute();
-                adapter.notifyDataSetChanged();
+        final AppCompatTextView send_to_picker = (AppCompatTextView) mainView.findViewById(R.id.send_to_picker);
+        if(send_to_picker.getText().toString().equals(getString(R.string.everyone))) {
+
+            map.put("from",DataManager.getInstance().user.id);
+            map.put("is_social","yes");
+
+            if (NetworkManager.getInstance().postNotificationMessage(map)) {
+                if (NetworkManager.getInstance().getFeed(DataManager.getInstance().user.id)) {
+                    NetworkManager.getInstance().getNewsFeed();
+                    adapter.feedList = new Select().from(Feed.class).where("is_hidden = 0").execute();
+                    adapter.newsList = new Select().from(News.class).where("read = 0").execute();
+                    adapter.notifyDataSetChanged();
+                }
+                Snackbar.make(layout, R.string.posted_message, Snackbar.LENGTH_LONG).show();
+            } else {
+                Snackbar.make(layout, R.string.fail_to_post_message, Snackbar.LENGTH_LONG).show();
             }
-            Snackbar.make(layout, R.string.posted_message, Snackbar.LENGTH_LONG).show();
+
         } else {
-            Snackbar.make(layout, R.string.fail_to_post_message, Snackbar.LENGTH_LONG).show();
+            if (NetworkManager.getInstance().postFeedMessage(map)) {
+                if (NetworkManager.getInstance().getFeed(DataManager.getInstance().user.id)) {
+                    NetworkManager.getInstance().getNewsFeed();
+                    adapter.feedList = new Select().from(Feed.class).where("is_hidden = 0").execute();
+                    adapter.newsList = new Select().from(News.class).where("read = 0").execute();
+                    adapter.notifyDataSetChanged();
+                }
+                Snackbar.make(layout, R.string.posted_message, Snackbar.LENGTH_LONG).show();
+            } else {
+                Snackbar.make(layout, R.string.fail_to_post_message, Snackbar.LENGTH_LONG).show();
+            }
         }
+
         mainView.findViewById(R.id.overlay).callOnClick();
     }
 

@@ -2176,6 +2176,69 @@ public class NetworkManager {
         }
     }
 
+    public boolean postNotificationMessage(HashMap<String, String> params) {
+        language = LinguisticManager.getInstance().getLanguageCode();
+        Future<Boolean> future_result = executorService.submit(new postNotificationMessage(params));
+        try {
+            return future_result.get(NETWORK_TIMEOUT, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private class postNotificationMessage implements Callable<Boolean> {
+
+        HashMap<String,String> params;
+
+        postNotificationMessage(HashMap<String, String> params) {
+            params.put("language", language);
+            this.params = params;
+            if(DataManager.getInstance().user.isSocial)
+                this.params.put("is_social",(DataManager.getInstance().user.isSocial?"yes":"no"));
+        }
+
+        @Override
+        public Boolean call() {
+            try {
+                String apiURL = host + "fn_add_push_notification";
+                URL url = new URL(apiURL);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("POST");
+                urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
+                urlConnection.setDoInput(true);
+                urlConnection.setDoOutput(true);
+
+                String urlParameters = "";
+                Iterator it = params.entrySet().iterator();
+                for (int i = 0; it.hasNext(); i++) {
+                    Map.Entry entry = (Map.Entry) it.next();
+                    if (i == 0)
+                        urlParameters += entry.getKey() + "=" + entry.getValue();
+                    else
+                        urlParameters += "&" + entry.getKey() + "=" + entry.getValue();
+                }
+
+                DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+                wr.writeBytes(urlParameters);
+                wr.flush();
+                wr.close();
+
+                int responseCode = urlConnection.getResponseCode();
+                forbidden(responseCode);
+                if (responseCode != 200) {
+                    return false;
+                }
+                System.out.println(urlParameters);
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
     private class getNewsFeed implements Callable<Boolean> {
 
         getNewsFeed() {
