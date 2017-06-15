@@ -123,14 +123,12 @@
             <com.lb.auto_fit_textview.AutoResizeTextView
                 android:id="@+id/main_screen_title"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_centerInParent="true"
                 android:gravity="center"
                 android:text="@string/settings"
                 android:textColor="#FFF"
                 android:textSize="20sp"
-                android:layout_toStartOf="@+id/multiple_button"
-                android:layout_marginStart="50dp"
                 />
         </RelativeLayout>
 
