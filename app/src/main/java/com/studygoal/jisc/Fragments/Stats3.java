@@ -17,6 +17,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -62,10 +63,10 @@ public class Stats3 extends Fragment {
     public LineChart lineChart;
     public BarChart barchart;
     AppCompatTextView module;
-    AppCompatTextView period;
     AppCompatTextView compareTo;
     RelativeLayout chart_layout;
     List<ED> list;
+    String selectedPeriod;
 
     @Override
     public void onResume() {
@@ -78,6 +79,8 @@ public class Stats3 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View mainView = inflater .inflate(R.layout.stats3, container, false);
+
+        selectedPeriod = getString(R.string.last_7_days);
 
         lineChart = (LineChart) mainView.findViewById(R.id.chart);
         barchart = (BarChart) mainView.findViewById(R.id.barchart);
@@ -158,11 +161,6 @@ public class Stats3 extends Fragment {
         module.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
         module.setTypeface(DataManager.getInstance().myriadpro_regular);
         module.setText(R.string.anymodule);
-
-        period = (AppCompatTextView) mainView.findViewById(R.id.period_list);
-        period.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
-        period.setTypeface(DataManager.getInstance().myriadpro_regular);
-        period.setText(R.string.last_7_days);
 
         compareTo = (AppCompatTextView) mainView.findViewById(R.id.compareto);
         compareTo.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
@@ -309,7 +307,6 @@ public class Stats3 extends Fragment {
         description.setText(R.string.last_week);
 
         ((TextView) mainView.findViewById(R.id.module)).setTypeface(DataManager.getInstance().myriadpro_regular);
-        ((TextView) mainView.findViewById(R.id.period)).setTypeface(DataManager.getInstance().myriadpro_regular);
         ((TextView) mainView.findViewById(R.id.compare_to)).setTypeface(DataManager.getInstance().myriadpro_regular);
 
         //Setting the module
@@ -398,78 +395,45 @@ public class Stats3 extends Fragment {
             }
         });
 
-        period.setOnClickListener(new View.OnClickListener() {
+        final TextView last_7d_text_view = (TextView) mainView.findViewById(R.id.last_7d_text_view);
+        final TextView last_30d_text_view = (TextView) mainView.findViewById(R.id.last_30d_text_view);
+        last_7d_text_view.setTypeface(DataManager.getInstance().myriadpro_regular);
+        last_30d_text_view.setTypeface(DataManager.getInstance().myriadpro_regular);
+
+        LinearLayout period_segmented = (LinearLayout) mainView.findViewById(R.id.period_segmented);
+        period_segmented.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Dialog dialog = new Dialog(DataManager.getInstance().mainActivity);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.setContentView(R.layout.custom_spinner_layout);
-                dialog.setCancelable(true);
-                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                if(selectedPeriod.equals(getString(R.string.last_7_days))) {
+                    selectedPeriod = getString(R.string.last_30_days);
+                    last_30d_text_view.setTextColor(Color.parseColor("#ffffff"));
+                    last_30d_text_view.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.circle_background_blue_right));
+
+                    last_7d_text_view.setTextColor(Color.parseColor("#3691ee"));
+                    last_7d_text_view.setBackground(null);
+
+                } else {
+                    selectedPeriod = getString(R.string.last_7_days);
+                    last_30d_text_view.setTextColor(Color.parseColor("#3691ee"));
+                    last_30d_text_view.setBackground(null);
+
+                    last_7d_text_view.setTextColor(Color.parseColor("#ffffff"));
+                    last_7d_text_view.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.circle_background_blue_left));
+                }
+
+                ((MainActivity) getActivity()).showProgressBar(null);
+                new Thread(new Runnable() {
                     @Override
-                    public void onCancel(DialogInterface dialog) {
-                        dialog.dismiss();
+                    public void run() {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                getData();
                                 ((MainActivity) getActivity()).hideProgressBar();
                             }
                         });
                     }
-                });
-
-                if (DataManager.getInstance().mainActivity.isLandscape) {
-                    DisplayMetrics displaymetrics = new DisplayMetrics();
-                    DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-                    int width = (int) (displaymetrics.widthPixels * 0.3);
-
-                    WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-                    params.width = width;
-                    dialog.getWindow().setAttributes(params);
-                }
-
-                ((TextView) dialog.findViewById(R.id.dialog_title)).setTypeface(DataManager.getInstance().oratorstd_typeface);
-                ((TextView) dialog.findViewById(R.id.dialog_title)).setText(R.string.time_period);
-
-                ArrayList<String> items = new ArrayList<>();
-//                items.add(getString(R.string.last_24_hours));
-                items.add(getString(R.string.last_7_days));
-                items.add(getString(R.string.last_30_days));
-                //items.add(getString(R.string.Overall));
-                final ListView listView = (ListView) dialog.findViewById(R.id.dialog_listview);
-                listView.setAdapter(new GenericAdapter(DataManager.getInstance().mainActivity, period.getText().toString(), items));
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        period.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
-//                        if(period.getText().toString().equals(getString(R.string.last_24_hours))) {
-//                            description.setText(R.string.last_day);
-//                        } else
-                        if (period.getText().toString().equals(getString(R.string.last_7_days))) {
-                            description.setText(R.string.last_week_engagement);
-                        } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
-                            description.setText(R.string.last_month_engagement);
-                        } else if (period.getText().toString().equals(getString(R.string.overall))) {
-                            description.setText(R.string.Overall_engagement);
-                        }
-                        dialog.dismiss();
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        getData();
-                                        ((MainActivity) getActivity()).hideProgressBar();
-                                    }
-                                });
-                            }
-                        }).start();
-
-                    }
-                });
-                ((MainActivity) getActivity()).showProgressBar2("");
-                dialog.show();
+                }).start();
             }
         });
 
@@ -492,6 +456,20 @@ public class Stats3 extends Fragment {
             }
         });
 
+        ((MainActivity) getActivity()).showProgressBar(null);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        getData();
+                        ((MainActivity) getActivity()).hideProgressBar();
+                    }
+                });
+            }
+        }).start();
+
         mainView.findViewById(R.id.change_graph_btn).performClick();
 
         return mainView;
@@ -504,7 +482,7 @@ public class Stats3 extends Fragment {
             list = new ArrayList<>();
 
             if (compareTo.getText().toString().equals(getString(R.string.no_one))) {
-                if (period.getText().toString().equals(getString(R.string.last_7_days))) {
+                if (selectedPeriod.equals(getString(R.string.last_7_days))) {
                     for (int i = 0; i < 7; i++) {
                         ED item = new ED();
                         item.day = "" + (i+1);
@@ -519,7 +497,7 @@ public class Stats3 extends Fragment {
                             return s1.day.compareToIgnoreCase(s2.day);
                         }
                     });
-                } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
+                } else if (selectedPeriod.equals(getString(R.string.last_30_days))) {
 
                     for (int i = 0; i < 30; i++) {
                         ED item = new ED();
@@ -535,7 +513,7 @@ public class Stats3 extends Fragment {
                             return s1.day.compareToIgnoreCase(s2.day);
                         }
                     });
-                }  else if (period.getText().toString().equals(getString(R.string.overall))) {
+                }  else if (selectedPeriod.equals(getString(R.string.overall))) {
 
                     try {
 
@@ -571,7 +549,7 @@ public class Stats3 extends Fragment {
                     }
                 }
             } else {
-                if (period.getText().toString().equals(getString(R.string.last_7_days))) {
+                if (selectedPeriod.equals(getString(R.string.last_7_days))) {
                     for (int i = 0; i < 7; i++) {
                         ED item = new ED();
                         item.day = "" + (i+1);
@@ -592,7 +570,7 @@ public class Stats3 extends Fragment {
                             return s1.day.compareToIgnoreCase(s2.day);
                         }
                     });
-                } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
+                } else if (selectedPeriod.equals(getString(R.string.last_30_days))) {
 
                     for (int i = 0; i < 30; i++) {
                         ED item = new ED();
@@ -614,7 +592,7 @@ public class Stats3 extends Fragment {
                             return s1.day.compareToIgnoreCase(s2.day);
                         }
                     });
-                }  else if (period.getText().toString().equals(getString(R.string.overall))) {
+                }  else if (selectedPeriod.equals(getString(R.string.overall))) {
 
                     try {
 
@@ -683,10 +661,7 @@ public class Stats3 extends Fragment {
 
         String compareValue;
         String compareType;
-//        if (compareTo.getText().toString().contains("Top")) {
-//            compareValue = "10";
-//            compareType = "top";
-//        } else
+
         if (!compareTo.getText().toString().equals(getString(R.string.no_one))
 //                && !compareTo.getText().toString().equals(getString(R.string.top10))
                 && !compareTo.getText().toString().equals(getString(R.string.average))) {
@@ -702,7 +677,7 @@ public class Stats3 extends Fragment {
             compareValue = "";
         }
 
-        String scope = DataManager.getInstance().api_values.get(period.getText().toString().toLowerCase()).replace(" ", "_").toLowerCase();
+        String scope = DataManager.getInstance().api_values.get(selectedPeriod.replace(" ", "_").toLowerCase());
 
         list = NetworkManager.getInstance().getEngagementGraph(
                 scope,
@@ -735,7 +710,7 @@ public class Stats3 extends Fragment {
         barchart.invalidate();
 
         if (compareTo.getText().toString().equals(getString(R.string.no_one))) {
-            if (period.getText().toString().equals(getString(R.string.last_7_days))) {
+            if (selectedPeriod.equals(getString(R.string.last_7_days))) {
 
                 final ArrayList<String> xVals = new ArrayList<>();
                 ArrayList<Entry> vals1 = new ArrayList<>();
@@ -775,7 +750,7 @@ public class Stats3 extends Fragment {
                 barchart.setData(getBarData(vals2,name));
                 barchart.invalidate();
 
-            } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
+            } else if (selectedPeriod.equals(getString(R.string.last_30_days))) {
 
                 ArrayList<Entry> vals1 = new ArrayList<>();
                 ArrayList<BarEntry> vals2 = new ArrayList<>();
@@ -830,7 +805,7 @@ public class Stats3 extends Fragment {
                 barchart.invalidate();
             }
         } else {
-            if (period.getText().toString().equals(getString(R.string.last_7_days))) {
+            if (selectedPeriod.equals(getString(R.string.last_7_days))) {
 
                 final ArrayList<String> xVals = new ArrayList<>();
 
@@ -934,7 +909,7 @@ public class Stats3 extends Fragment {
                 barchart.setData(barData);
                 barchart.invalidate();
 
-            } else if (period.getText().toString().equals(getString(R.string.last_30_days))) {
+            } else if (selectedPeriod.equals(getString(R.string.last_30_days))) {
 
                 final ArrayList<String> xVals = new ArrayList<>();
 
