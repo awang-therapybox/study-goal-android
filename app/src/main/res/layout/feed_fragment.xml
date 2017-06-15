@@ -3,56 +3,99 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background_color"/>
+        android:background="@color/background_color" />
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipelayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
     </android.support.v4.widget.SwipeRefreshLayout>
-    <android.support.design.widget.FloatingActionButton
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    <android.support.design.widget.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/floating_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/floating_icon"
-        app:backgroundTint="@color/default_blue"/>
+        app:backgroundTint="@color/default_blue" />
+
     <LinearLayout
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#88000000"
-        android:visibility="gone"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
+
         <com.studygoal.jisc.Utils.EditTextCustom
             android:id="@+id/message"
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_margin="15dp"
-            android:padding="3dp"
+            android:background="#FFF"
             android:gravity="start"
-            android:background="#FFF"/>
-        </LinearLayout>
+            android:padding="3dp" />
+
+        <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:layout_width="280dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            card_view:cardCornerRadius="2dp"
+            card_view:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/send_to"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/send_to"
+                    android:textColor="@color/default_blue"
+                    android:textSize="18sp" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/send_to_picker"
+                    style="@style/AppSpinner"
+                    android:layout_width="180dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="end"
+                    android:text="@string/everyone"
+                    android:textColor="#8a63cc"
+                    android:textSize="18sp" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/tutorial_message"
-        android:visibility="invisible"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textColor="@color/dark_grey"
+            android:text="@string/empty_feed_page_message"
             android:textAlignment="center"
-            android:textSize="22sp"
-            android:text="@string/empty_feed_page_message"/>
+            android:textColor="@color/dark_grey"
+            android:textSize="22sp" />
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>
