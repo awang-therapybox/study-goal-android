@@ -40,6 +40,8 @@ public class CurrentUser extends Model {
     public String overall_activity_points;
     public boolean isDemo;
 
+    public String password;
+
     public CurrentUser() {
         super();
     }

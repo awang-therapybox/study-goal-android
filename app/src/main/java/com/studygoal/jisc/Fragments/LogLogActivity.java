@@ -1,10 +1,13 @@
 package com.studygoal.jisc.Fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -13,17 +16,21 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
@@ -79,6 +86,8 @@ public class LogLogActivity extends Fragment implements View.OnClickListener {
         mainView = inflater.inflate(R.layout.log_fragment_log_activity, container, false);
 
         DataManager.getInstance().reload();
+
+        note = (EditText)mainView.findViewById(R.id.log_activity_edittext_note);
 
         ((TextView)mainView.findViewById(R.id.log_activity_module_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
         ((TextView)mainView.findViewById(R.id.log_activity_text_choose)).setTypeface(DataManager.getInstance().myriadpro_regular);
@@ -140,6 +149,42 @@ public class LogLogActivity extends Fragment implements View.OnClickListener {
             }
         };
 
+        final View contentView = container;
+        contentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            private int mPreviousHeight;
+
+            @Override
+            public void onGlobalLayout() {
+                int newHeight = contentView.getHeight();
+                if (mPreviousHeight != 0) {
+                    if (mPreviousHeight > newHeight) {
+
+                        // Height decreased: keyboard was shown
+                        mainView.findViewById(R.id.content_scroll).setPadding(0, 0, 0, 200);
+
+                        if(note.isFocused()) {
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //Do something after 100ms
+
+                                    ScrollView scrollView = (ScrollView) mainView.findViewById(R.id.log_fragment_container);
+                                    scrollView.scrollTo(0, mainView.findViewById(R.id.content_scroll).getHeight());
+                                }
+                            }, 100);
+                        }
+
+                    } else if (mPreviousHeight < newHeight) {
+                        mainView.findViewById(R.id.content_scroll).setPadding(0, 0, 0, 0);
+                    } else {
+                        // No change
+                    }
+                }
+                mPreviousHeight = newHeight;
+            }
+        });
+
         hours_spent.addTextChangedListener(hoursWatcher);
         minutes_spent.addTextChangedListener(minutesWatcher);
 
@@ -147,7 +192,6 @@ public class LogLogActivity extends Fragment implements View.OnClickListener {
 
         date = ((TextView)mainView.findViewById(R.id.log_activity_text_date));
         date.setTypeface(DataManager.getInstance().myriadpro_regular);
-
 
         chooseActivity = (AppCompatTextView) mainView.findViewById(R.id.log_activity_chooseActivity_textView);
         chooseActivity.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
@@ -159,7 +203,6 @@ public class LogLogActivity extends Fragment implements View.OnClickListener {
         activityType.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
         activityType.setTypeface(DataManager.getInstance().myriadpro_regular);
         activityType.setText(DataManager.getInstance().activity_type.get(0));
-
 
         module = (AppCompatTextView) mainView.findViewById(R.id.log_activity_module_textView);
         module.setSupportBackgroundTintList(ColorStateList.valueOf(0xFF8a63cc));
@@ -174,7 +217,7 @@ public class LogLogActivity extends Fragment implements View.OnClickListener {
 
         mainView.findViewById(R.id.log_activity_save_btn).setOnClickListener(this);
 
-        note = (EditText)mainView.findViewById(R.id.log_activity_edittext_note);
+
         note.setTypeface(DataManager.getInstance().myriadpro_regular);
         note.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View view, MotionEvent event) {
@@ -251,6 +294,13 @@ public class LogLogActivity extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.log_activity_save_btn: {
+
+                View view = getActivity().getCurrentFocus();
+                if(view!=null) {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+
                 if(isInEditMode) {
 
                     if(DataManager.getInstance().user.isDemo) {

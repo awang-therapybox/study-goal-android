@@ -28,6 +28,7 @@ public class FeedFragment extends Fragment {
     public View mainView, tutorial_message;
     FeedAdapter adapter;
     SwipeRefreshLayout layout;
+    Feed editMessage;
 
     public FeedFragment() {}
 
@@ -71,6 +72,11 @@ public class FeedFragment extends Fragment {
         HashMap<String, String> map = new HashMap<>();
         map.put("student_id", DataManager.getInstance().user.id);
         map.put("message", message);
+
+        if(editMessage != null) {
+            map.put("message_id",editMessage.id);
+        }
+
         if(NetworkManager.getInstance().postFeedMessage(map)) {
             if(NetworkManager.getInstance().getFeed(DataManager.getInstance().user.id)) {
                 adapter.feedList = new Select().from(Feed.class).where("is_hidden = 0").execute();
@@ -92,16 +98,28 @@ public class FeedFragment extends Fragment {
         final EditTextCustom myEditText = (EditTextCustom) mainView.findViewById(R.id.message);
         myEditText.fragment = FeedFragment.this;
 
+        editMessage = null;
+
         final View floating_btn = mainView.findViewById(R.id.floating_btn);
         floating_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 DataManager.getInstance().mainActivity.feedFragment = FeedFragment.this;
                 DataManager.getInstance().mainActivity.hideAllButtons();
                 DataManager.getInstance().mainActivity.showCertainButtons(6);
+
                 floating_btn.setVisibility(View.GONE);
                 myEditText.setText("");
-                mainView.findViewById(R.id.message).requestFocus();
+
+                EditTextCustom editTextCustom = (EditTextCustom) mainView.findViewById(R.id.message);
+                editTextCustom.requestFocus();
+
+                if(editMessage != null) {
+                    editTextCustom.setText(editMessage.message);
+                    editTextCustom.setSelection(editMessage.message.length());
+                }
+
                 InputMethodManager keyboard = (InputMethodManager)DataManager.getInstance().mainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
                 keyboard.showSoftInput(mainView.findViewById(R.id.message), 0);
                 mainView.findViewById(R.id.overlay).setVisibility(View.VISIBLE);
@@ -110,6 +128,7 @@ public class FeedFragment extends Fragment {
                     public void onClick(View v) {
                         DataManager.getInstance().mainActivity.hideAllButtons();
                         DataManager.getInstance().mainActivity.showCertainButtons(1);
+                        editMessage = null;
                         mainView.findViewById(R.id.overlay).setVisibility(View.GONE);
                         View view = mainView.findViewById(R.id.message);
                         if (view != null) {
@@ -163,10 +182,14 @@ public class FeedFragment extends Fragment {
 
         NetworkManager.getInstance().getFriends(DataManager.getInstance().user.id);
 
-        adapter = new FeedAdapter(DataManager.getInstance().mainActivity, layout);
+        adapter = new FeedAdapter(DataManager.getInstance().mainActivity, layout, this);
         recyclerView.setAdapter(adapter);
 
         return mainView;
     }
 
+    public void editMessage(Feed item) {
+        this.editMessage = item;
+        mainView.findViewById(R.id.floating_btn).performClick();
+    }
 }

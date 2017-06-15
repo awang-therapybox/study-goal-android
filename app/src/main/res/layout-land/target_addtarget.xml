@@ -185,14 +185,16 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-                                    android:layout_centerInParent="true"
                                     android:layout_margin="15dp">
-                                    <TextView
+                                    <EditText
                                         android:id="@+id/addtarget_text_timer_1"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:textSize="50sp"
-                                        android:text="00"
+                                        android:inputType="number"
+                                        android:background="@android:color/transparent"
+                                        android:maxLength="1"
+                                        android:text="0"
                                         android:textColor="@color/login_btn_purple"/>
                                     <TextView
                                         android:id="@+id/addtarget_text_hours"
@@ -203,11 +205,15 @@
                                         android:layout_marginLeft="5dp"
                                         android:layout_marginRight="5dp"
                                         android:text="@string/hours"/>
-                                    <TextView
+                                    <EditText
                                         android:id="@+id/addtarget_text_timer_3"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:textSize="50sp"
+                                        android:inputType="number"
+                                        android:imeOptions="actionDone"
+                                        android:background="@android:color/transparent"
+                                        android:maxLength="2"
                                         android:text="00"
                                         android:textColor="@color/login_btn_purple"/>
                                     <TextView
@@ -386,5 +392,60 @@
                 android:textColor="#FFF"
                 android:text="@string/save"/>
         </android.support.v7.widget.CardView>
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/add_new_module_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="#FBFBFB">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="80dp"
+            android:background="#FBFBFB">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/round_corner_search">
+                <EditText
+                    android:id="@+id/add_module_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="3dp"
+                    android:layout_centerVertical="true"
+                    android:lines="1"
+                    android:hint="@string/add_module"
+                    android:textColor="@color/dark_grey"
+                    android:imeOptions="actionSearch"
+                    android:background="@null"
+                    />
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/add_module_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/round_corner_blue_fill">
+                <TextView
+                    android:id="@+id/add_module_button_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_module"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="15dp"
+                    android:paddingStart="15dp"
+                    android:textColor="#FFF"
+                    android:layout_centerInParent="true"/>
+            </RelativeLayout>
+        </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>

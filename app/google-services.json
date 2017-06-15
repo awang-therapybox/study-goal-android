@@ -1,25 +1,33 @@
 {
   "project_info": {
-    "project_number": "147677483837",
-    "project_id": "jiscdevtest"
+    "project_number": "172717420956",
+    "project_id": "study-goal"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:147677483837:android:371d04b030661d53",
+        "mobilesdk_app_id": "1:172717420956:android:371d04b030661d53",
         "android_client_info": {
           "package_name": "com.studygoal.jisc"
         }
       },
       "oauth_client": [
         {
-          "client_id": "147677483837-ivatnoj50loitslt2sesq6d1ire22i6l.apps.googleusercontent.com",
+          "client_id": "172717420956-ea64b4rr1o87v122qv42fp8licjnpi3f.apps.googleusercontent.com",
           "client_type": 3
+        },
+        {
+          "client_id": "172717420956-o37plb6jvuta8rusebet6h8gbs9f86j9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.studygoal.jisc",
+            "certificate_hash": "587ad3db9d4656db4e1fc08ae7b65ea5851b2c3b"
+          }
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDbH3j_Q-UE283BE0EIBan5tiiPmwhuiGg"
+          "current_key": "AIzaSyDOcTOcIcH9tfvxiW_mVpMfIRpyouL1vVw"
         }
       ],
       "services": {
