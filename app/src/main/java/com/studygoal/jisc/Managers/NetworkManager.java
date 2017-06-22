@@ -498,8 +498,7 @@ public class NetworkManager {
         @Override
         public List<ED> call() throws Exception {
             try {
-//                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?"
-                String apiURL = "http://api.highcharts.com/engagement?"
+                String apiURL = "https://app.analytics.alpha.jisc.ac.uk/v2/engagement?"
                         + "scope=" + this.scope
                         + "&compareType=" + this.compareType
                         + "&compareValue=" + this.compareValue
