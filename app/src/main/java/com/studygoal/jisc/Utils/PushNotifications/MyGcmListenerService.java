@@ -6,31 +6,28 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
-import com.google.android.gms.gcm.GcmListenerService;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
 import com.studygoal.jisc.MainActivity;
 
-public class MyGcmListenerService extends GcmListenerService {
+import java.util.Map;
 
-    private static final String TAG = "MyGcmListenerService";
+public class MyGcmListenerService extends FirebaseMessagingService {
 
     /**
-     * Called when message is received.
+     * Called when message is received.s
      *
-     * @param from SenderID of the sender.
-     * @param data Data bundle containing message data as key/value pairs.
-     *             For Set of keys use data.keySet().
+     * @param message RemoteMessage of the sender.
      */
     // [START receive_message]
     @Override
-    public void onMessageReceived(String from, Bundle data) {
-        String message = data.getString("message");
-        Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Message: " + message);
+    public void onMessageReceived(RemoteMessage message){
 
+        Map data = message.getData();
+
+        String m = (String) data.get("message");
 
 
         // [START_EXCLUDE]
@@ -45,15 +42,15 @@ public class MyGcmListenerService extends GcmListenerService {
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
-        sendNotification(message);
+        sendNotification(m);
         // [END_EXCLUDE]
     }
     // [END receive_message]
 
     /**
-     * Create and show a simple notification containing the received GCM message.
+     * Create and show a simple notification containing the received FCM message.
      *
-     * @param message GCM message received.
+     * @param message FCM message received.
      */
     private void sendNotification(String message) {
         Intent intent = new Intent(this, MainActivity.class);

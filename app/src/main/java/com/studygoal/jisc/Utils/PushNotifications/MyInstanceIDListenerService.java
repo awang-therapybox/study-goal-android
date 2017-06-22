@@ -1,14 +1,13 @@
 package com.studygoal.jisc.Utils.PushNotifications;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.android.gms.iid.InstanceID;
-import com.google.android.gms.iid.InstanceIDListenerService;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.FirebaseInstanceIdService;
 
-public class MyInstanceIDListenerService extends InstanceIDListenerService {
+public class MyInstanceIDListenerService extends FirebaseInstanceIdService {
 
     private static final String TAG = "MyInstanceIDLS";
 
@@ -20,8 +19,14 @@ public class MyInstanceIDListenerService extends InstanceIDListenerService {
 
     @Override
     public void onTokenRefresh() {
-        // Fetch updated Instance ID token and notify our app's server of any changes (if applicable).
-        Intent intent = new Intent(this, RegistrationIntentService.class);
-        startService(intent);
+
+        // Get updated InstanceID token.
+        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        Log.e(TAG, "Refreshed token: " + refreshedToken);
+        // TODO: Implement this method to send any registration to your app's servers.
+//        sendRegistrationToServer(refreshedToken);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.edit().putString("push_token", refreshedToken).apply();
     }
 }

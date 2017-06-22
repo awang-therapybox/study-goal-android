@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.google.firebase.FirebaseApp;
 import com.studygoal.jisc.Adapters.InstitutionsAdapter;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;

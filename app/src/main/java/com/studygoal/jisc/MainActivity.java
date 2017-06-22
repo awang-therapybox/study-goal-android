@@ -2,12 +2,10 @@ package com.studygoal.jisc;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -16,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -40,8 +39,8 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.lb.auto_fit_textview.AutoResizeTextView;
 import com.studygoal.jisc.Adapters.DrawerAdapter;
 import com.studygoal.jisc.Fragments.AddTarget;
@@ -62,23 +61,16 @@ import com.studygoal.jisc.Models.Module;
 import com.studygoal.jisc.Models.ReceivedRequest;
 import com.studygoal.jisc.Models.RunningActivity;
 import com.studygoal.jisc.Utils.CircleTransform;
-import com.studygoal.jisc.Utils.PushNotifications.RegistrationIntentService;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Locale;
 
-import static com.studygoal.jisc.Managers.DataManager.UPDATE_DEVICE;
-
 public class MainActivity extends FragmentActivity {
-
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     public DrawerLayout drawer;
     public RelativeLayout friend, settings, addTarget, send, timer, back;
@@ -117,6 +109,7 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         isLandscape = DataManager.getInstance().isLandscape;
         DataManager.getInstance().checkForbidden = true;
         super.onCreate(savedInstanceState);
@@ -484,8 +477,6 @@ public class MainActivity extends FragmentActivity {
                                 getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_staff", "").apply();
                                 getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", "").apply();
 
-                                unregisterReceiver(updateDevice);
-
                                 new Delete().from(CurrentUser.class).execute();
                                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                                 startActivity(intent);
@@ -504,32 +495,10 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
-        this.registerReceiver(this.updateDevice, new IntentFilter(UPDATE_DEVICE));
-        sendBroadcast(new Intent(UPDATE_DEVICE));
-        
-        if (checkPlayServices()) {
-            Intent intent = new Intent(this, RegistrationIntentService.class);
-            startService(intent);
-        }
-    }
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-    private boolean checkPlayServices() {
-        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (apiAvailability.isUserResolvableError(resultCode)) {
-                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
-                        .show();
-            }
-            return false;
-        }
-        return true;
-        
-    }
-
-    BroadcastReceiver updateDevice = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
+        if(sharedPreferences.contains("push_token")
+                && sharedPreferences.getString("push_token","").length() > 0) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -537,7 +506,8 @@ public class MainActivity extends FragmentActivity {
                 }
             }).start();
         }
-    };
+
+    }
 
     @Override
     public void onDestroy() {
