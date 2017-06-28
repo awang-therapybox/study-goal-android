@@ -588,10 +588,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     public void onBackPressed() {
 
-        if (webView.getVisibility() == View.VISIBLE) {
-            webView.setVisibility(View.INVISIBLE);
-            webView.loadUrl("about:blank");
-            hideProgressBar();
+        if (loginStep3.getVisibility() == View.VISIBLE) {
+            loginStep3.setVisibility(View.GONE);
+
+            loginContent.setVisibility(View.VISIBLE);
+            loginStep1.setVisibility(View.VISIBLE);
         } else {
             super.onBackPressed();
         }
