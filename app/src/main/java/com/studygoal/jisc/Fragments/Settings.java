@@ -106,6 +106,7 @@ public class Settings extends Fragment {
                 break;
             }
         }
+
         home_value.setText(selected_value.toUpperCase());
 
         TextView trophies = (TextView) mainView.findViewById(R.id.trophies);
@@ -306,27 +307,4 @@ public class Settings extends Fragment {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if (requestCode == 103) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");
-                DataManager.getInstance().mainActivity.startActivityForResult(intent, 101);
-            }
-        } else if (requestCode == 102) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                ContentValues values = new ContentValues();
-
-                values.put(MediaStore.Images.Media.TITLE, "New Picture");
-                values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
-
-                imageUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                DataManager.getInstance().mainActivity.startActivityForResult(intent, 100);
-            }
-        }
-    }
 }

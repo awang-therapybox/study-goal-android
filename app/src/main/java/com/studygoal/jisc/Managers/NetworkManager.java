@@ -2,10 +2,10 @@ package com.studygoal.jisc.Managers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
@@ -457,6 +457,7 @@ public class NetworkManager {
                 wr.writeBytes(crlf);
                 wr.writeBytes(language);
 
+
                 wr.writeBytes(crlf + twoHyphens + boundary + crlf);
                 header = "Content-Disposition: form-data; name=\"is_social\"";
                 wr.writeBytes(header);
@@ -466,6 +467,7 @@ public class NetworkManager {
 
 
                 wr.writeBytes(crlf + twoHyphens + boundary + crlf);
+
                 header = "Content-Disposition: form-data; name=\"student_id\"";
                 wr.writeBytes(header);
                 wr.writeBytes(crlf);
@@ -565,9 +567,8 @@ public class NetworkManager {
 
                 URL url = new URL(apiURL);
 
-                HttpsURLConnection urlConnection;
-                urlConnection = (HttpsURLConnection) url.openConnection();
-                urlConnection.setSSLSocketFactory(context.getSocketFactory());
+                HttpURLConnection urlConnection;
+                urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
 
@@ -753,6 +754,7 @@ public class NetworkManager {
                     if (responseCode == 204) {
                         new Delete().from(TrophyMy.class).execute();
                     } else
+                        Log.e("getMyTrophies", "Code: " + responseCode);
                     return false;
                 }
 
@@ -825,9 +827,14 @@ public class NetworkManager {
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
                 if (responseCode != 200) {
+
+                    Log.e("getAllTrophies", apiURL);
+
                     if (responseCode == 204) {
+                        Log.i("getAllTrophies", "No records found");
                         new Delete().from(Trophy.class).execute();
-                    }
+                    } else
+                        Log.e("getAllTrophies", "Code: " + responseCode);
                     return false;
                 }
 
@@ -2417,7 +2424,6 @@ public class NetworkManager {
                 is.close();
 
                 JSONArray jsonArray = new JSONArray(sb.toString());
-
                 ActiveAndroid.beginTransaction();
                 try {
                     new Delete().from(Feed.class).execute();

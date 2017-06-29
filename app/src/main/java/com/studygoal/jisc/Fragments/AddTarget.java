@@ -110,18 +110,32 @@ public class AddTarget extends Fragment implements View.OnClickListener {
             @Override
             public void afterTextChanged(Editable s) {
 
+                int maxValue = 8;
+                if(every.getText().toString().equals(getActivity().getString(R.string.day))) {
+                    maxValue = 8;
+                } else if(every.getText().toString().equals(getActivity().getString(R.string.week))) {
+                    maxValue = 40;
+                } else if(every.getText().toString().equals(getActivity().getString(R.string.month))) {
+                    maxValue = 99;
+                }
+
+                Log.e("Jisc","Max: "+maxValue);
+
                 if(s.toString().length() != 0) {
                     int value = Integer.parseInt(s.toString());
-                    if (value < 0 || value > 8) {
-                        hours.setText("");
-                        hours.setSelection(hours.getText().length());
+                    if(value < 0)
+                    {
+                        hours.setText("0");
                     }
+                    if (value > maxValue) {
+                        hours.setText(""+maxValue);
+                    }
+                    hours.setSelection(hours.getText().length());
                 }
             }
         };
 
         because = ((EditText)mainView.findViewById(R.id.addtarget_edittext_because));
-
         TextWatcher minutesWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -416,6 +430,7 @@ public class AddTarget extends Fragment implements View.OnClickListener {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         every.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
+                        hours.setText(hours.getText().toString());
                         dialog.dismiss();
                     }
                 });

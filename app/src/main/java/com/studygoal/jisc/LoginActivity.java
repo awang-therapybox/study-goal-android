@@ -6,57 +6,90 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatTextView;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.activeandroid.ActiveAndroid;
-import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
-import com.google.firebase.FirebaseApp;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.studygoal.jisc.Adapters.InstitutionsAdapter;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
-import com.studygoal.jisc.Models.ActivityHistory;
-import com.studygoal.jisc.Models.Attainment;
-import com.studygoal.jisc.Models.CourseAttendant;
-import com.studygoal.jisc.Models.Courses;
-import com.studygoal.jisc.Models.CurrentUser;
-import com.studygoal.jisc.Models.Feed;
-import com.studygoal.jisc.Models.Friend;
 import com.studygoal.jisc.Models.Institution;
-import com.studygoal.jisc.Models.Mark;
-import com.studygoal.jisc.Models.Module;
-import com.studygoal.jisc.Models.PendingRequest;
-import com.studygoal.jisc.Models.ReceivedRequest;
-import com.studygoal.jisc.Models.RunningActivity;
-import com.studygoal.jisc.Models.StretchTarget;
-import com.studygoal.jisc.Models.Targets;
-import com.studygoal.jisc.Models.TrophyMy;
 import com.studygoal.jisc.Utils.Utils;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterAuthClient;
+import com.twitter.sdk.android.core.models.ImageValue;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.UUID;
 
-public class LoginActivity extends Activity {
+import io.fabric.sdk.android.Fabric;
 
-    private TextView choose_institution;
+public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+
+    private static final String TWITTER_KEY = "M0NKXVGquYoclGTcG81u49hka";
+    private static final String TWITTER_SECRET = "CCpca8rm2GuJFkuHmTdTiwBsTcWdv7Ybi5Qqi7POIA6BvCObY6";
+    TwitterAuthClient mTwitterAuthClient;
+
+    CallbackManager callbackManager;
+
+    int socialType;
+
+    String email;
+    String socialID;
+
     private WebView webView;
+
+    RelativeLayout loginContent;
+
+    LinearLayout loginStep1;
+    LinearLayout loginStep3;
+    ImageView login_next_button;
+
+    boolean isStaff;
+    boolean rememberMe;
+
+    Institution selectedInstitution;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +98,11 @@ public class LoginActivity extends Activity {
         DataManager.getInstance().context = getApplicationContext();
         DataManager.getInstance().init();
         DataManager.getInstance().currActivity = this;
+
+        isStaff = false;
+        rememberMe = false;
+        selectedInstitution = null;
+
         if (getResources().getBoolean(R.bool.landscape_only)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             DataManager.getInstance().isLandscape = true;
@@ -75,12 +113,9 @@ public class LoginActivity extends Activity {
 
         setContentView(R.layout.activity_login);
 
-        //Init the database; Might be moved to a Splash screen if there is to be one
         ActiveAndroid.initialize(this);
         DataManager.getInstance().context = this;
         DataManager.getInstance().loadFonts();
-
-        webView = (WebView) findViewById(R.id.webview);
 
         if (DataManager.getInstance().toast) {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -110,76 +145,124 @@ public class LoginActivity extends Activity {
 
         DataManager.getInstance().guid = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("guid", "");
 
-        webView.setVisibility(View.INVISIBLE);
-        choose_institution = (TextView) findViewById(R.id.choose_institution);
+        loginContent = (RelativeLayout) findViewById(R.id.login_content);
+        loginStep1 = (LinearLayout) findViewById(R.id.login_step_1);
+        loginStep3 = (LinearLayout) findViewById(R.id.login_step_3);
 
-        ((TextView) findViewById(R.id.choose_institution)).setTypeface(DataManager.getInstance().myriadpro_regular);
-        choose_institution.setTypeface(DataManager.getInstance().myriadpro_regular);
+        login_next_button = (ImageView)findViewById(R.id.login_next_button);
+        login_next_button.setVisibility(View.GONE);
+        loginContent.setVisibility(View.VISIBLE);
+        loginStep1.setVisibility(View.VISIBLE);
+        loginStep3.setVisibility(View.GONE);
 
-        //Downloading institutions
-        if (NetworkManager.getInstance().downloadInstitutions()) {
-            final View institution_layout = findViewById(R.id.institutions);
-            institution_layout.setOnClickListener(null);
+        ((TextView) findViewById(R.id.login_logo_text)).setTypeface(Typeface.createFromAsset(getAssets(), "fonts/mmrtext.ttf"));
+        ((TextView) findViewById(R.id.login_step_1_imastudent)).setTypeface(DataManager.getInstance().myriadpro_bold);
+        ((TextView) findViewById(R.id.login_step_1_imastaff)).setTypeface(DataManager.getInstance().myriadpro_bold);
 
-            final AppCompatTextView appCompatTextView = (AppCompatTextView) findViewById(R.id.appCompatTextView);
-            appCompatTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
-                    alphaAnimation.setDuration(800);
-                    alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
+        login_next_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginContent.setVisibility(View.GONE);
+                loginStep1.setVisibility(View.GONE);
+                loginStep3.setVisibility(View.VISIBLE);
+            }
+        });
 
-                        }
+        findViewById(R.id.login_step_1_imastudent).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LoginActivity.this.isStaff = false;
 
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            institution_layout.setVisibility(View.VISIBLE);
-                        }
+                login_next_button.setVisibility(View.VISIBLE);
 
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
+                findViewById(R.id.login_step_1_imastudent).setBackgroundResource(R.drawable.round_corners_transparent_2_selected);
+                ((TextView) findViewById(R.id.login_step_1_imastudent)).setTextColor(Color.parseColor("#ff5000"));
 
-                        }
-                    });
-                    institution_layout.startAnimation(alphaAnimation);
+                findViewById(R.id.login_step_1_imastaff).setBackgroundResource(R.drawable.round_corners_transparent_2);
+                ((TextView) findViewById(R.id.login_step_1_imastaff)).setTextColor(Color.parseColor("#ffffff"));
+            }
+        });
+
+        findViewById(R.id.login_step_1_imastaff).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LoginActivity.this.isStaff = true;
+
+                login_next_button.setVisibility(View.VISIBLE);
+
+                findViewById(R.id.login_step_1_imastudent).setBackgroundResource(R.drawable.round_corners_transparent_2);
+                ((TextView) findViewById(R.id.login_step_1_imastudent)).setTextColor(Color.parseColor("#ffffff"));
+
+                findViewById(R.id.login_step_1_imastaff).setBackgroundResource(R.drawable.round_corners_transparent_2_selected);
+                ((TextView) findViewById(R.id.login_step_1_imastaff)).setTextColor(Color.parseColor("#ff5000"));
+            }
+        });
+
+        ((CheckBox) findViewById(R.id.login_check_rememberme)).setTypeface(DataManager.getInstance().myriadpro_regular);
+
+        findViewById(R.id.login_check_rememberme).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LoginActivity.this.rememberMe = true;
+
+//                loginContent.setVisibility(View.GONE);
+//                loginStep1.setVisibility(View.GONE);
+//                loginStep3.setVisibility(View.VISIBLE);
+            }
+        });
+
+        ((TextView) findViewById(R.id.login_searchinstitution_title)).setTypeface(DataManager.getInstance().myriadpro_bold);
+        ((EditText) findViewById(R.id.search_field)).setTypeface(DataManager.getInstance().myriadpro_regular);
+        ((TextView) findViewById(R.id.login_institutionnotlisted)).setTypeface(DataManager.getInstance().myriadpro_bold);
+        ((TextView) findViewById(R.id.login_signinwith)).setTypeface(DataManager.getInstance().myriadpro_bold);
+        ((TextView) findViewById(R.id.login_demomode)).setTypeface(DataManager.getInstance().myriadpro_bold);
+
+        findViewById(R.id.login_demomode).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0ODgzNjU2NzcsImp0aSI6IjFtbjhnU3YrWk9mVzJlYXV1NmVrN0Rzbm1MUjA0dDRyT0V0SEQ5Z1BGdk09IiwiaXNzIjoiaHR0cDpcL1wvc3AuZGF0YVwvYXV0aCIsIm5iZiI6MTQ4ODM2NTY2NywiZXhwIjoxNjYyNTY0NTY2NywiZGF0YSI6eyJlcHBuIjoiIiwicGlkIjoiZGVtb3VzZXJAZGVtby5hYy51ayIsImFmZmlsaWF0aW9uIjoic3R1ZGVudEBkZW1vLmFjLnVrIn19.xM6KkBFvHW7vtf6dF-X4f_6G3t_KGPVNylN_rMJROsh1MXIg9sK5j77L0Jzg1JR8fhXZf-0jFMnZz6FMotAeig";
+//                String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0ODg0NDkxNzksImp0aSI6IjdnOHFHVWlDKzRIdTdyN2ZUcTBOcldjaUpGTzByR1wvdUhpZVhvN0NBSjZvPSIsImlzcyI6Imh0dHA6XC9cL3NwLmRhdGFcL2F1dGgiLCJuYmYiOjE0ODg0NDkxNjksImV4cCI6MTQ5MjU5NjM2OSwiZGF0YSI6eyJlcHBuIjoiIiwicGlkIjoiczE1MTI0OTNAZ2xvcy5hYy51ayIsImFmZmlsaWF0aW9uIjoic3RhZmZAZ2xvcy5hYy51ayJ9fQ.xO_Yk6ZgTWgg0UHVXglFKD1tMP2wq98b8IU4alaGQvjtlYcjoz5W8gZbAX0Gcktl0nDs_bkvsB1g5OaYkkY6yg";
+                DataManager.getInstance().set_jwt(token);
+
+                if (NetworkManager.getInstance().checkIfUserRegistered()) {
+                    if (NetworkManager.getInstance().login()) {
+                        DataManager.getInstance().institution = "1";
+                        DataManager.getInstance().user.isDemo = true;
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        LoginActivity.this.finish();
+                    }
                 }
-            });
+            }
+        });
 
-            final List<Institution> institutionList = new Select().from(Institution.class).orderBy("name").execute();
-            final InstitutionsAdapter institutionsAdapter = new InstitutionsAdapter(LoginActivity.this);
-            institutionsAdapter.institutions = new Select().from(Institution.class).where("name LIKE ?", "%" + "" + "%").orderBy("name ASC").execute();
+        webView = (WebView) findViewById(R.id.webview);
+        webView.setVisibility(View.INVISIBLE);
+        webView.setWebViewClient(new WebViewClient() {
+            public void onPageFinished(WebView view, String url) {
+                if (url.contains("?{")) {
+                    webView.setVisibility(View.INVISIBLE);
+                    String json = url.split("\\?")[1];
+                    try {
+                        JSONObject jsonObject = new JSONObject(java.net.URLDecoder.decode(json, "UTF-8"));
 
-            final ListView list = (ListView) findViewById(R.id.list);
-            list.setAdapter(institutionsAdapter);
+                        // Token can be replaced here for testing individuals.
+                        String token = jsonObject.getString("jwt");
+                        DataManager.getInstance().set_jwt(token);
 
-            String jwt = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("jwt","");
-            String is_checked = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("is_checked","");
-            String is_staff = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("is_staff","");
-            String is_institution = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("is_institution","");
-            if(is_checked.equals("yes") && jwt.length() > 0 ) {
-                try {
-                    String jwtDecoded = Utils.jwtDecoded(jwt);
-                    JSONObject json = new JSONObject(jwtDecoded);
+                        if(LoginActivity.this.rememberMe) {
+                            getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("jwt", DataManager.getInstance().get_jwt()).apply();
+                            getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_checked", "yes").apply();
+                            if(LoginActivity.this.isStaff) {
+                                getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_staff", "yes").apply();
+                            }
+                        }
 
-                    Long expiration = Long.parseLong(json.optString("exp"));
-                    Long timestamp = System.currentTimeMillis()/1000;
-
-                    if(expiration < timestamp) {
-                        // it is expired
-                        getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("jwt", "").apply();
-                        getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_checked", "").apply();
-                        getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_staff", "").apply();
-                        getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", "").apply();
-                    } else {
-                        //continue with login process
-                        DataManager.getInstance().set_jwt(jwt);
-
-                        if(is_staff.equals("yes")) {
+                        if(LoginActivity.this.isStaff) {
                             if (NetworkManager.getInstance().checkIfStaffRegistered()) {
                                 if (NetworkManager.getInstance().loginStaff()) {
-                                    DataManager.getInstance().institution = is_institution;
+                                    DataManager.getInstance().institution = selectedInstitution.name;
+                                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", DataManager.getInstance().institution).apply();
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                     startActivity(intent);
                                     LoginActivity.this.finish();
@@ -192,7 +275,8 @@ public class LoginActivity extends Activity {
                         } else {
                             if (NetworkManager.getInstance().checkIfUserRegistered()) {
                                 if (NetworkManager.getInstance().login()) {
-                                    DataManager.getInstance().institution = is_institution;
+                                    DataManager.getInstance().institution = selectedInstitution.name;
+                                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", DataManager.getInstance().institution).apply();
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                     startActivity(intent);
                                     LoginActivity.this.finish();
@@ -201,237 +285,314 @@ public class LoginActivity extends Activity {
                                 }
 
                             } else {
-                                //TODO:REGISTER
+                                //TODO: register student
+                                webView.loadUrl("https://sp.data.alpha.jisc.ac.uk/Shibboleth.sso/Login?entityID=https://" + selectedInstitution.url +
+                                        "&target=https://sp.data.alpha.jisc.ac.uk/secure/register/form.php?u=" + DataManager.getInstance().get_jwt());
+                                webView.setVisibility(View.VISIBLE);
                             }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        webView.setVisibility(View.INVISIBLE);
+                        hideProgressBar();
                     }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
+        });
 
-            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+        final InstitutionsAdapter institutionsAdapter = new InstitutionsAdapter(LoginActivity.this);
+        ListView list = (ListView) findViewById(R.id.list);
+        list.setAdapter(institutionsAdapter);
 
-                    resetDatabase();
-                    if(view.getTag().equals("no institution")) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if(NetworkManager.getInstance().downloadInstitutions()) {
+                    institutionsAdapter.institutions = new Select().from(Institution.class).orderBy("name").execute();
+                    institutionsAdapter.notifyDataSetChanged();
+                } else {
+                    LoginActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LoginActivity.this);
+                            alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.no_internet) + "</font>"));
+                            alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            AlertDialog alertDialog = alertDialogBuilder.create();
+                            alertDialog.show();
+                            DataManager.getInstance().toast = false;
+                        }
+                    });
+                }
+            }
+        }).start();
 
-                        Intent newIntent = new Intent(LoginActivity.this, SocialActivity.class);
-                        LoginActivity.this.startActivity(newIntent);
-                        LoginActivity.this.finish();
-                        return;
-                    }
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                    if(view.getTag().equals("demo")) {
-                        String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0ODgzNjU2NzcsImp0aSI6IjFtbjhnU3YrWk9mVzJlYXV1NmVrN0Rzbm1MUjA0dDRyT0V0SEQ5Z1BGdk09IiwiaXNzIjoiaHR0cDpcL1wvc3AuZGF0YVwvYXV0aCIsIm5iZiI6MTQ4ODM2NTY2NywiZXhwIjoxNjYyNTY0NTY2NywiZGF0YSI6eyJlcHBuIjoiIiwicGlkIjoiZGVtb3VzZXJAZGVtby5hYy51ayIsImFmZmlsaWF0aW9uIjoic3R1ZGVudEBkZW1vLmFjLnVrIn19.xM6KkBFvHW7vtf6dF-X4f_6G3t_KGPVNylN_rMJROsh1MXIg9sK5j77L0Jzg1JR8fhXZf-0jFMnZz6FMotAeig";
-                        
-                        DataManager.getInstance().set_jwt(token);
+                showProgressBar();
 
+                if (getCurrentFocus() != null) {
+                    InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                }
+
+                webView.loadUrl("about:blank");
+
+                LoginActivity.this.selectedInstitution = (Institution) view.getTag();
+
+                String url = "https://sp.data.alpha.jisc.ac.uk/Shibboleth.sso/Login?entityID=https://" +
+                        selectedInstitution.url + "&target=https://sp.data.alpha.jisc.ac.uk/secure/auth.php?u=" +
+                        DataManager.getInstance().guid;
+
+                if(LoginActivity.this.rememberMe) {
+                    url += "&lt=true";
+                }
+
+                webView.setVisibility(View.VISIBLE);
+                webView.clearCache(true);
+                webView.getSettings().setJavaScriptEnabled(true);
+                webView.loadUrl(url);
+            }
+        });
+
+        EditText editText = (EditText) findViewById(R.id.search_field);
+        editText.setTypeface(DataManager.getInstance().myriadpro_regular);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                institutionsAdapter.institutions = new Select()
+                        .from(Institution.class)
+                        .where("name LIKE ?", "%" + s.toString() + "%")
+                        .orderBy("name ASC")
+                        .execute();
+                institutionsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        //check if REMEMBER ME is active
+        String jwt = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("jwt","");
+        String is_checked = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("is_checked","");
+        String is_staff = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("is_staff","");
+        String is_institution = getSharedPreferences("jisc", Context.MODE_PRIVATE).getString("is_institution","");
+        if(is_checked.equals("yes") && jwt.length() > 0 ) {
+            try {
+                String jwtDecoded = Utils.jwtDecoded(jwt);
+                JSONObject json = new JSONObject(jwtDecoded);
+
+                Long expiration = Long.parseLong(json.optString("exp"));
+                Long timestamp = System.currentTimeMillis()/1000;
+
+                if(expiration < timestamp) {
+                    // it is expired
+                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("jwt", "").apply();
+                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_checked", "").apply();
+                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_staff", "").apply();
+                    getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", "").apply();
+                } else {
+                    //continue with login process
+                    DataManager.getInstance().set_jwt(jwt);
+
+                    if(is_staff.equals("yes")) {
+                        if (NetworkManager.getInstance().checkIfStaffRegistered()) {
+                            if (NetworkManager.getInstance().loginStaff()) {
+                                DataManager.getInstance().institution = is_institution;
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                LoginActivity.this.finish();
+                            } else {
+                                //TODO: complete login staff workflow
+                            }
+                        } else {
+                            //TODO: register staff workflow
+                        }
+                    } else {
                         if (NetworkManager.getInstance().checkIfUserRegistered()) {
                             if (NetworkManager.getInstance().login()) {
-                                DataManager.getInstance().institution = "1";
-                                DataManager.getInstance().user.isDemo = true;
+                                DataManager.getInstance().institution = is_institution;
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
                                 LoginActivity.this.finish();
                             } else {
                                 //TODO: Need more information about the register flow so i can deal with other situations
                             }
+
+                        } else {
+                            //TODO: register student worflow
                         }
-                        return;
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        final GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        ImageView login_with_google = (ImageView)findViewById(R.id.login_with_google);
+        login_with_google.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                socialType = 3;
+
+                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                startActivityForResult(signInIntent, 5005);
+            }
+        });
+
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
+
+        mTwitterAuthClient= new TwitterAuthClient();
+        ImageView login_with_twitter = (ImageView)findViewById(R.id.login_with_twitter);
+        login_with_twitter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                socialType = 2;
+                socialID = "";
+                email = "";
+
+                mTwitterAuthClient.authorize(LoginActivity.this, new Callback<TwitterSession>() {
+                    @Override
+                    public void success(Result<TwitterSession> twitterSessionResult) {
+                        // Success
+                        socialID = ""+twitterSessionResult.data.getUserId();
+                        mTwitterAuthClient.requestEmail(twitterSessionResult.data, new Callback<String>() {
+                            @Override
+                            public void success(Result<String> result) {
+                                email = result.data;
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        loginSocial();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void failure(TwitterException exception) {
+                                android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(LoginActivity.this);
+                                alertDialogBuilder.setMessage(R.string.facebook_error_email);
+                                alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                android.support.v7.app.AlertDialog alertDialog = alertDialogBuilder.create();
+                                alertDialog.show();
+                            }
+                        });
                     }
 
-                    showProgressBar();
-
-                    if (getCurrentFocus() != null) {
-                        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    @Override
+                    public void failure(TwitterException e) {
+                        e.printStackTrace();
                     }
+                });
+            }
+        });
 
-                    webView.loadUrl("about:blank");
+        callbackManager = CallbackManager.Factory.create();
 
-                    final Institution institution = (Institution) view.getTag();
-                    final CheckBox checkBoxLogged = (CheckBox) findViewById(R.id.choose_keeplogged);
+        ImageView login_with_facebook = (ImageView)findViewById(R.id.login_with_facebook);
+        login_with_facebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                socialType = 1;
+                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("email"));
+            }
+        });
 
-                    String url = "https://sp.data.alpha.jisc.ac.uk/Shibboleth.sso/Login?entityID=https://" +
-                            institution.url + "&target=https://sp.data.alpha.jisc.ac.uk/secure/auth.php?u=" +
-                            DataManager.getInstance().guid;
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                // App code
+                if(!loginResult.getRecentlyGrantedPermissions().contains("email")) {
+                    android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(LoginActivity.this);
+                    alertDialogBuilder.setMessage(R.string.facebook_error_email);
+                    alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    android.support.v7.app.AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                    return;
+                }
 
-                    if(checkBoxLogged.isChecked()) {
-                        url += "&lt=true";
-                    }
+                GraphRequest request = GraphRequest.newMeRequest(
+                        loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                Log.e("LoginActivity", response.toString());
 
-                    webView.setVisibility(View.VISIBLE);
-                    webView.clearCache(true);
-                    webView.getSettings().setJavaScriptEnabled(true);
-                    webView.setWebViewClient(new WebViewClient() {
-                        public void onPageFinished(WebView view, String url) {
-                            if (url.contains("?{")) {
-                                webView.setVisibility(View.INVISIBLE);
-                                String json = url.split("\\?")[1];
                                 try {
-                                    JSONObject jsonObject = new JSONObject(java.net.URLDecoder.decode(json, "UTF-8"));
+                                    socialID = object.getString("id");
+                                    email = object.getString("email");
 
-                                    // Token can be replaced here for testing individuals.
-                                    String token = jsonObject.getString("jwt");
-                                    DataManager.getInstance().set_jwt(token);
-
-                                    CheckBox checkBox = (CheckBox) findViewById(R.id.choose_staff);
-
-                                    if(checkBoxLogged.isChecked()) {
-                                        getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("jwt", DataManager.getInstance().get_jwt()).apply();
-                                        getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_checked", "yes").apply();
-                                        if(checkBox.isChecked()) {
-                                            getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_staff", "yes").apply();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            loginSocial();
                                         }
-                                    }
-
-                                    if(checkBox.isChecked()) {
-                                        if (NetworkManager.getInstance().checkIfStaffRegistered()) {
-                                            if (NetworkManager.getInstance().loginStaff()) {
-                                                DataManager.getInstance().institution = institutionList.get(position).name;
-                                                getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", DataManager.getInstance().institution).apply();
-                                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                                startActivity(intent);
-                                                LoginActivity.this.finish();
-                                            } else {
-                                                //TODO: complete login staff workflow
-                                            }
-                                        } else {
-                                            //TODO: register staff
-                                        }
-                                    } else {
-                                        if (NetworkManager.getInstance().checkIfUserRegistered()) {
-                                            if (NetworkManager.getInstance().login()) {
-                                                DataManager.getInstance().institution = institutionList.get(position).name;
-                                                getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("is_institution", DataManager.getInstance().institution).apply();
-                                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                                startActivity(intent);
-                                                LoginActivity.this.finish();
-                                            } else {
-                                                //TODO: Need more information about the register flow so i can deal with other situations
-                                            }
-
-                                        } else {
-                                            //TODO:REGISTER
-                                            webView.loadUrl("https://sp.data.alpha.jisc.ac.uk/Shibboleth.sso/Login?entityID=https://" + institutionList.get(position).url +
-                                                "&target=https://sp.data.alpha.jisc.ac.uk/secure/register/form.php?u=" + DataManager.getInstance().get_jwt());
-
-                                            webView.setVisibility(View.VISIBLE);
-                                        }
-                                    }
-                                } catch (Exception e) {
+                                    });
+                                } catch (JSONException e) {
                                     e.printStackTrace();
-                                    webView.setVisibility(View.INVISIBLE);
-                                    hideProgressBar();
                                 }
                             }
-                        }
-                    });
-                    webView.loadUrl(url);
+                        });
 
-                    AlphaAnimation animation = new AlphaAnimation(1, 0);
-                    animation.setDuration(400);
-                    animation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-                            choose_institution.setText(institution.name);
-                        }
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,email");
+                request.setParameters(parameters);
+                request.executeAsync();
+            }
 
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            institution_layout.setVisibility(View.INVISIBLE);
+            @Override
+            public void onCancel() {
+            }
 
-                        }
+            @Override
+            public void onError(FacebookException exception) {
+            }
+        });
 
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                    institution_layout.startAnimation(animation);
-
-                }
-            });
-
-            EditText editText = (EditText) findViewById(R.id.search_field);
-            editText.setTypeface(DataManager.getInstance().myriadpro_regular);
-            editText.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                    institutionsAdapter.institutions = new Select()
-                            .from(Institution.class)
-                            .where("name LIKE ?", "%" + s.toString() + "%")
-                            .orderBy("name ASC")
-                            .execute();
-                    institutionsAdapter.notifyDataSetChanged();
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-
-                }
-            });
-            findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (getCurrentFocus() != null) {
-                        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-                    }
-                    AlphaAnimation animation = new AlphaAnimation(1, 0);
-                    animation.setDuration(400);
-                    animation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            institution_layout.setVisibility(View.INVISIBLE);
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-                        }
-                    });
-                    institution_layout.startAnimation(animation);
-                }
-            });
-        } else {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-            alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.no_internet) + "</font>"));
-            alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-            DataManager.getInstance().toast = false;
-        }
     }
 
     @Override
     public void onBackPressed() {
-        final View institution_layout = findViewById(R.id.institutions);
 
-        if (webView.getVisibility() == View.VISIBLE) {
-            webView.setVisibility(View.INVISIBLE);
-            webView.loadUrl("about:blank");
-            hideProgressBar();
-        } else  if(findViewById(R.id.institutions).getVisibility() == View.VISIBLE) {
-            findViewById(R.id.institutions).setVisibility(View.INVISIBLE);
+        if (loginStep3.getVisibility() == View.VISIBLE) {
+            loginStep3.setVisibility(View.GONE);
 
+            loginContent.setVisibility(View.VISIBLE);
+            loginStep1.setVisibility(View.VISIBLE);
         } else {
             super.onBackPressed();
         }
@@ -446,28 +607,77 @@ public class LoginActivity extends Activity {
         findViewById(R.id.blackout).setVisibility(View.INVISIBLE);
     }
 
-    public void resetDatabase() {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(socialType == 1) {
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        } else if (socialType == 2) {
+            mTwitterAuthClient.onActivityResult(requestCode, resultCode, data);
+        } else if (socialType == 3) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        }
+    }
 
-        ActiveAndroid.beginTransaction();
+    private void handleSignInResult(GoogleSignInResult result) {
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
 
-        new Delete().from(CurrentUser.class).execute();
-        new Delete().from(Module.class).execute();
-        new Delete().from(ActivityHistory.class).execute();
-        new Delete().from(com.studygoal.jisc.Models.Activity.class).execute();
-        new Delete().from(Targets.class).execute();
-        new Delete().from(StretchTarget.class).execute();
-        new Delete().from(Feed.class).execute();
-        new Delete().from(Friend.class).execute();
-        new Delete().from(RunningActivity.class).execute();
-        new Delete().from(CourseAttendant.class).execute();
-        new Delete().from(PendingRequest.class).execute();
-        new Delete().from(ReceivedRequest.class).execute();
-        new Delete().from(Mark.class).execute();
-        new Delete().from(TrophyMy.class).execute();
-        new Delete().from(Attainment.class).execute();
-        new Delete().from(Courses.class).execute();
+            email = acct.getEmail();
+            socialID = acct.getId();
 
-        ActiveAndroid.setTransactionSuccessful();
-        ActiveAndroid.endTransaction();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    loginSocial();
+                }
+            });
+
+        } else {
+            Log.e("JISC", "handleSignInResult:" + result.getStatus().getResolution());
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.e("JISC","connection result: "+connectionResult);
+    }
+
+    void loginSocial() {
+
+        Integer response = NetworkManager.getInstance().loginSocial(email,socialID);
+
+        if(response == 200) {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            LoginActivity.this.finish();
+            return;
+        }
+
+        if (response == 403) {
+            android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(LoginActivity.this);
+            alertDialogBuilder.setMessage(R.string.social_login_error);
+            alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            android.support.v7.app.AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        } else {
+            android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(LoginActivity.this);
+            alertDialogBuilder.setMessage(R.string.something_went_wrong);
+            alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            android.support.v7.app.AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
     }
 }
