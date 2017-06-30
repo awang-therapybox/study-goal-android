@@ -135,7 +135,6 @@ public class TargetAdapter extends BaseAdapter {
         try {
             Glide.with(DataManager.getInstance().mainActivity).load(LinguisticManager.getInstance().images.get(item.activity)).into((ImageView) convertView.findViewById(R.id.activity_icon));
         } catch (Exception e) {
-            Log.e("Warning", item.activity);
         }
 
         TextView textView = (TextView) convertView.findViewById(R.id.target_item_text);

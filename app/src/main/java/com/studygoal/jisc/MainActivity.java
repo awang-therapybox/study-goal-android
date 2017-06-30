@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -13,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -36,6 +38,8 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.lb.auto_fit_textview.AutoResizeTextView;
 import com.studygoal.jisc.Adapters.DrawerAdapter;
 import com.studygoal.jisc.Fragments.AddTarget;
@@ -104,6 +108,7 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         isLandscape = DataManager.getInstance().isLandscape;
         DataManager.getInstance().checkForbidden = true;
         super.onCreate(savedInstanceState);
@@ -459,7 +464,9 @@ public class MainActivity extends FragmentActivity {
                         dialog.findViewById(R.id.dialog_ok).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+
                                 dialog.dismiss();
+
                                 android.webkit.CookieManager.getInstance().removeAllCookies(null);
                                 DataManager.getInstance().checkForbidden = false;
                                 DataManager.getInstance().set_jwt("");
@@ -486,6 +493,24 @@ public class MainActivity extends FragmentActivity {
                 }
             }
         });
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if(sharedPreferences.contains("push_token")
+                && sharedPreferences.getString("push_token","").length() > 0) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    NetworkManager.getInstance().updateDeviceDetails();
+                }
+            }).start();
+        }
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     public void setTitle(String title) {

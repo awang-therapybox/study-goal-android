@@ -1,7 +1,9 @@
 {
   "project_info": {
     "project_number": "172717420956",
-    "project_id": "study-goal"
+    "firebase_url": "https://study-goal.firebaseio.com",
+    "project_id": "study-goal",
+    "storage_bucket": "study-goal.appspot.com"
   },
   "client": [
     {
@@ -12,6 +14,10 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "172717420956-e1ulocgbcd0k9lj0otssf2ul9vfh6ohn.apps.googleusercontent.com",
+          "client_type": 3
+        },
         {
           "client_id": "172717420956-ea64b4rr1o87v122qv42fp8licjnpi3f.apps.googleusercontent.com",
           "client_type": 3
@@ -35,11 +41,23 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172717420956-e1ulocgbcd0k9lj0otssf2ul9vfh6ohn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "172717420956-qrqlhm946bqf2134qo3buut1bd342bq8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.therapybox.studentapp"
+              }
+            }
+          ]
         },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }

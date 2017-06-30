@@ -18,22 +18,9 @@
 
         <LinearLayout
             android:id="@+id/bottom_wrapper"
-            android:layout_width="wrap_content"
+            android:layout_width="60dp"
             android:weightSum="1"
             android:layout_height="match_parent">
-
-            <RelativeLayout
-                android:id="@+id/edit"
-                android:layout_width="60dp"
-                android:layout_height="match_parent"
-                android:background="@color/default_blue">
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:src="@drawable/edit_image"
-                    android:layout_centerInParent="true"/>
-            </RelativeLayout>
-
             <RelativeLayout
                 android:id="@+id/delete"
                 android:layout_width="60dp"
@@ -81,16 +68,17 @@
                     android:layout_marginBottom="10dp"
                     android:layout_marginTop="10dp"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/temp_profile"/>
+                    android:src="@drawable/temp_profile"
+                    android:visibility="gone"/>
                 <TextView
                     android:id="@+id/feed_item_feed"
-                    android:layout_toEndOf="@+id/feed_item_profile"
+                    android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:textColor="@color/dark_grey"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="15dp"
                     android:maxLines="4"
                     android:ellipsize="end"
                     android:layout_marginEnd="15dp"/>
@@ -177,7 +165,8 @@
                     android:id="@+id/feed_item_option"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_alignParentEnd="true">
+                    android:layout_alignParentEnd="true"
+                    android:visibility="gone">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="6dp"
@@ -189,6 +178,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="10dp"
+                    android:visibility="gone"
                     android:layout_alignParentEnd="true">
                     <ImageView
                         android:layout_width="30dp"

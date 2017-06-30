@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -26,7 +25,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.plus.Plus;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
 import com.twitter.sdk.android.Twitter;
@@ -199,7 +197,6 @@ public class SocialActivity extends AppCompatActivity implements GoogleApiClient
                         new GraphRequest.GraphJSONObjectCallback() {
                             @Override
                             public void onCompleted(JSONObject object, GraphResponse response) {
-                                Log.e("LoginActivity", response.toString());
 
                                 try {
                                     socialID = object.getString("id");
@@ -262,14 +259,11 @@ public class SocialActivity extends AppCompatActivity implements GoogleApiClient
             });
 
         } else {
-            Log.e("JISC","Handle: "+result.getStatus().getStatusCode());
-            Log.e("JISC", "handleSignInResult:" + result.getStatus().getResolution());
         }
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.e("JISC","connection result: "+connectionResult);
     }
 
     @Override
