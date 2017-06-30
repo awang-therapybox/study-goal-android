@@ -64,7 +64,12 @@ public class ActivityPointsAdapter extends BaseAdapter {
 
         if(position > 0) {
             ActivityPoints activityPoints = DataManager.getInstance().user.points.get(position-1);
-            activity_title.setText(activityPoints.key);
+
+            String[] words = activityPoints.id.split("/");
+            String id = words[words.length - 1];
+            id = id.substring(0, 1).toUpperCase() + id.substring(1).toLowerCase();
+
+            activity_title.setText(id);
             count_title.setText(activityPoints.points);
             points_title.setText(activityPoints.points);
         }
