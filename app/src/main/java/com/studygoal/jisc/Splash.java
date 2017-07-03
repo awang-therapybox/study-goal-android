@@ -11,6 +11,7 @@ import android.view.Display;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
+import com.google.firebase.FirebaseApp;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
 import com.twitter.sdk.android.Twitter;
@@ -20,8 +21,6 @@ import io.fabric.sdk.android.Fabric;
 public class Splash extends AppCompatActivity {
 
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

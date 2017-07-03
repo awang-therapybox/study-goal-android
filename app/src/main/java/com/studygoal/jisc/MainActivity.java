@@ -2,17 +2,19 @@ package com.studygoal.jisc;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -23,7 +25,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -37,6 +38,8 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.lb.auto_fit_textview.AutoResizeTextView;
 import com.studygoal.jisc.Adapters.DrawerAdapter;
 import com.studygoal.jisc.Fragments.AddTarget;
@@ -61,11 +64,9 @@ import com.studygoal.jisc.Utils.CircleTransform;
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends FragmentActivity {
@@ -107,6 +108,7 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         isLandscape = DataManager.getInstance().isLandscape;
         DataManager.getInstance().checkForbidden = true;
         super.onCreate(savedInstanceState);
@@ -460,7 +462,9 @@ public class MainActivity extends FragmentActivity {
                         dialog.findViewById(R.id.dialog_ok).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+
                                 dialog.dismiss();
+
                                 android.webkit.CookieManager.getInstance().removeAllCookies(null);
                                 DataManager.getInstance().checkForbidden = false;
                                 DataManager.getInstance().set_jwt("");
@@ -487,6 +491,24 @@ public class MainActivity extends FragmentActivity {
                 }
             }
         });
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if(sharedPreferences.contains("push_token")
+                && sharedPreferences.getString("push_token","").length() > 0) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    NetworkManager.getInstance().updateDeviceDetails();
+                }
+            }).start();
+        }
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     public void setTitle(String title) {
@@ -542,16 +564,23 @@ public class MainActivity extends FragmentActivity {
 
 
     public void showProgressBar(@Nullable String text) {
-        blackout.setVisibility(View.VISIBLE);
-        blackout.requestLayout();
-        blackout.setOnClickListener(null);
+        if(blackout != null) {
+            blackout.setVisibility(View.VISIBLE);
+            blackout.requestLayout();
+            blackout.setOnClickListener(null);
+        }
     }
 
     public void showProgressBar2(@Nullable String text) {
-        blackout.setVisibility(View.VISIBLE);
-        blackout.findViewById(R.id.progressbar).setVisibility(View.GONE);
-        blackout.requestLayout();
-        blackout.setOnClickListener(null);
+        if(blackout != null) {
+            blackout.setVisibility(View.VISIBLE);
+
+            if(blackout.findViewById(R.id.progress_bar) != null)
+                blackout.findViewById(R.id.progressbar).setVisibility(View.GONE);
+
+            blackout.requestLayout();
+            blackout.setOnClickListener(null);
+        }
     }
 
     public void hideProgressBar() {
@@ -658,18 +687,37 @@ public class MainActivity extends FragmentActivity {
 
     private void savebitmap(Bitmap bmp) {
         String extStorageDirectory = Environment.getExternalStorageDirectory().toString();
-        OutputStream outStream = null;
-        // String temp = null;
+        OutputStream outStream;
+
         File file = new File(extStorageDirectory, "temp.png");
         if (file.exists()) {
             file.delete();
             file = new File(extStorageDirectory, "temp.png");
-
         }
 
         try {
+
+            int w = bmp.getWidth();
+            int h = bmp.getHeight();
+            int nw;
+            int nh;
+
+            if(w >= 500 && h >= 500) {
+                if(w > h) {
+                    nw = 500;
+                    nh = (500 * h/w);
+                } else {
+                    nh = 500;
+                    nw = (500 * w/h);
+                }
+            } else {
+                nw = w;
+                nh = h;
+            }
+
             outStream = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+            bmp = Bitmap.createScaledBitmap(bmp,nw,nh,false);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
             outStream.flush();
             outStream.close();
 
@@ -715,10 +763,16 @@ public class MainActivity extends FragmentActivity {
                 final String imagePath = getRealPathFromURI(MainActivity.this, intent.getData());
                 showProgressBar(null);
 
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+                savebitmap(bitmap);
+
+                final String imagePath1 = Environment.getExternalStorageDirectory().toString() + "/temp.png";
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        if (NetworkManager.getInstance().updateProfileImage(imagePath)) {
+                        if (NetworkManager.getInstance().updateProfileImage(imagePath1)) {
                             MainActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -726,6 +780,8 @@ public class MainActivity extends FragmentActivity {
                                     hideProgressBar();
                                 }
                             });
+                        } else {
+
                         }
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override

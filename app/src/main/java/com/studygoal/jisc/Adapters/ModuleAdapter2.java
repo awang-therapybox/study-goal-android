@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModuleAdapter2 extends BaseAdapter {
-    public ArrayList<String> moduleList;
-    public ArrayList<String> coursesList;
+    private ArrayList<String> moduleList;
+    private ArrayList<String> coursesList;
     LayoutInflater inflater;
-    String selected;
+    private String selected;
 
     public ModuleAdapter2(Context context, String selected) {
         this.selected = selected;
@@ -28,12 +28,15 @@ public class ModuleAdapter2 extends BaseAdapter {
         this.coursesList = new ArrayList<>();
         List<Module> moduleList = new Select().from(Module.class).execute();
         List<Courses> coursesList = new Select().from(Courses.class).execute();
+
         for (int j = 0; j < coursesList.size(); j++) {
             this.coursesList.add(coursesList.get(j).name);
         }
+
         for (int i = 0; i < moduleList.size(); i++) {
             this.moduleList.add(moduleList.get(i).name);
         }
+
         this.moduleList.add(0, context.getString(R.string.anymodule));
         this.moduleList.addAll(1, this.coursesList);
         inflater = LayoutInflater.from(context);
@@ -62,9 +65,16 @@ public class ModuleAdapter2 extends BaseAdapter {
 
         TextView textView = (TextView) convertView.findViewById(R.id.dialog_item_name);
         textView.setTypeface(DataManager.getInstance().myriadpro_regular);
-        if (!coursesList.contains(moduleList.get(position)) && position != 0){
+        textView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+
+        String titleString = moduleList.get(position);
+
+        if (!coursesList.contains(titleString) && position != 0){
             textView.setText(" -" + moduleList.get(position));
-        }else {
+        } else if(coursesList.contains(titleString)) {
+            textView.setText(moduleList.get(position));
+            textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        } else {
             textView.setText(moduleList.get(position));
         }
 

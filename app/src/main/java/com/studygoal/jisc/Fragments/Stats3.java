@@ -188,6 +188,7 @@ public class Stats3 extends Fragment {
                             });
                         }
                     });
+
                     if (DataManager.getInstance().mainActivity.isLandscape) {
                         DisplayMetrics displaymetrics = new DisplayMetrics();
                         DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -265,6 +266,7 @@ public class Stats3 extends Fragment {
                         });
                     }
                 });
+
                 if (DataManager.getInstance().mainActivity.isLandscape) {
                     DisplayMetrics displaymetrics = new DisplayMetrics();
                     DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -283,8 +285,20 @@ public class Stats3 extends Fragment {
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                        String titleText = ((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString();
+
+                        List<Courses> coursesList = new Select().from(Courses.class).execute();
+
+                        for (int j = 0; j < coursesList.size(); j++) {
+                            String courseName = coursesList.get(j).name;
+                            if(courseName.equals(titleText)) {
+                                return;
+                            }
+                        }
+
                         dialog.dismiss();
-                        module.setText(((TextView) view.findViewById(R.id.dialog_item_name)).getText().toString());
+                        module.setText(titleText);
 
                         if(!module.getText().toString().equals(getString(R.string.anymodule))) {
                             compareTo.setOnClickListener(compareToListener);
@@ -337,6 +351,7 @@ public class Stats3 extends Fragment {
                         });
                     }
                 });
+
                 if (DataManager.getInstance().mainActivity.isLandscape) {
                     DisplayMetrics displaymetrics = new DisplayMetrics();
                     DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -609,18 +624,21 @@ public class Stats3 extends Fragment {
 
         String compareValue;
         String compareType;
-        if (compareTo.getText().toString().contains("Top")) {
-            compareValue = "10";
-            compareType = "top";
-        } else if (!compareTo.getText().toString().equals(getString(R.string.no_one))
-                && !compareTo.getText().toString().equals(getString(R.string.top10))
+//        if (compareTo.getText().toString().contains("Top")) {
+//            compareValue = "10";
+//            compareType = "top";
+//        } else
+        if (!compareTo.getText().toString().equals(getString(R.string.no_one))
+//                && !compareTo.getText().toString().equals(getString(R.string.top10))
                 && !compareTo.getText().toString().equals(getString(R.string.average))) {
             compareValue = ((Friend) new Select().from(Friend.class).where("name = ?", compareTo.getText().toString()).executeSingle()).jisc_student_id.replace("[", "").replace("]", "").replace("\"", "");
             compareType = "friend";
-        } else if (compareTo.getText().toString().contains("Average")){
+        }
+        else if (compareTo.getText().toString().equals(getString(R.string.average))){
             compareValue = "";
             compareType = "average";
-        } else {
+        }
+        else {
             compareType = "";
             compareValue = "";
         }
@@ -715,6 +733,7 @@ public class Stats3 extends Fragment {
                 String day;
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
                 for (int i = 0; i < tempList.size(); i++) {
                     val1 = val1 + tempList.get(i).activity_points;
                     if (i == 6 || i == 13 || i == 20 || i == 27){

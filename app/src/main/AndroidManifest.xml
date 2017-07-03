@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -32,18 +33,20 @@
             android:value="learninganalitycs31.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="46" />
+            android:value="51" />
         <meta-data
             android:name="AA_MODELS"
-            android:value="com.studygoal.jisc.Models.Institution, com.studygoal.jisc.Models.CurrentUser, com.studygoal.jisc.Models.Module,                          com.studygoal.jisc.Models.ActivityHistory, com.studygoal.jisc.Models.Activity, com.studygoal.jisc.Models.Targets,                                       com.studygoal.jisc.Models.StretchTarget, com.studygoal.jisc.Models.Feed, com.studygoal.jisc.Models.Friend,             com.studygoal.jisc.Models.RunningActivity, com.studygoal.jisc.Models.CourseAttendant, com.studygoal.jisc.Models.PendingRequest,             com.studygoal.jisc.Models.ReceivedRequest, com.studygoal.jisc.Models.Mark, com.studygoal.jisc.Models.Trophy, com.studygoal.jisc.Models.TrophyMy,             com.studygoal.jisc.Models.Attainment , com.studygoal.jisc.Models.Courses" />
+            android:value="com.studygoal.jisc.Models.Institution, com.studygoal.jisc.Models.CurrentUser, com.studygoal.jisc.Models.Module, com.studygoal.jisc.Models.ActivityHistory, com.studygoal.jisc.Models.Activity, com.studygoal.jisc.Models.Targets, com.studygoal.jisc.Models.StretchTarget, com.studygoal.jisc.Models.Feed, com.studygoal.jisc.Models.Friend, com.studygoal.jisc.Models.RunningActivity, com.studygoal.jisc.Models.CourseAttendant, com.studygoal.jisc.Models.PendingRequest, com.studygoal.jisc.Models.ReceivedRequest, com.studygoal.jisc.Models.Mark, com.studygoal.jisc.Models.Trophy, com.studygoal.jisc.Models.TrophyMy, com.studygoal.jisc.Models.Attainment , com.studygoal.jisc.Models.Courses, com.studygoal.jisc.Models.News" />
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
 
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name"
@@ -56,15 +59,41 @@
         <activity android:name=".Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".SplashCustom">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="jisc" android:host="studygoal" />
+            </intent-filter>
+        </activity>
+
         <activity android:name=".ForgotPassword" />
-        <activity android:name=".SocialActivity"/>
+
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="21d350a22cfbb1eb4c5ca00b104aab7d33fc6d2a" />
+            android:value="aabe6f656cd29919a8d107f1347dc2c158eff1d7" />
+
+        <service
+            android:name="com.studygoal.jisc.Utils.PushNotifications.MyGcmListenerService"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="com.studygoal.jisc.Utils.PushNotifications.MyInstanceIDListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
