@@ -132,13 +132,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             DataManager.getInstance().toast = false;
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                NetworkManager.getInstance().getAllTrophies();
-            }
-        }).start();
-
         if (!getSharedPreferences("jisc", Context.MODE_PRIVATE).contains("guid")) {
             getSharedPreferences("jisc", Context.MODE_PRIVATE).edit().putString("guid", UUID.randomUUID().toString().toUpperCase()).apply();
         }
@@ -303,33 +296,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         final InstitutionsAdapter institutionsAdapter = new InstitutionsAdapter(LoginActivity.this);
         ListView list = (ListView) findViewById(R.id.list);
         list.setAdapter(institutionsAdapter);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if(NetworkManager.getInstance().downloadInstitutions()) {
-                    institutionsAdapter.institutions = new Select().from(Institution.class).orderBy("name").execute();
-                    institutionsAdapter.notifyDataSetChanged();
-                } else {
-                    LoginActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LoginActivity.this);
-                            alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.no_internet) + "</font>"));
-                            alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                            AlertDialog alertDialog = alertDialogBuilder.create();
-                            alertDialog.show();
-                            DataManager.getInstance().toast = false;
-                        }
-                    });
-                }
-            }
-        }).start();
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -583,6 +549,52 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
+        refreshData();
+    }
+
+    public void refreshData() {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                NetworkManager.getInstance().getAllTrophies();
+            }
+        }).start();
+
+        final InstitutionsAdapter adapter = (InstitutionsAdapter) ((ListView) findViewById(R.id.list)).getAdapter();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if(NetworkManager.getInstance().downloadInstitutions()) {
+                    LoginActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.institutions = new Select().from(Institution.class).orderBy("name").execute();
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                } else {
+                    LoginActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LoginActivity.this);
+                            alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.no_internet) + "</font>"));
+                            alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    refreshData();
+                                    dialog.dismiss();
+                                }
+                            });
+                            AlertDialog alertDialog = alertDialogBuilder.create();
+                            alertDialog.show();
+                            DataManager.getInstance().toast = false;
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 
     @Override
