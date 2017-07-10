@@ -130,21 +130,28 @@ public class CheckInFragment extends Fragment {
                         }
 
                         if (!gps_enabled && !network_enabled) {
-                            final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-                            dialog.setMessage(getActivity().getResources().getString(R.string.gps_network_not_enabled));
-                            dialog.setPositiveButton(getActivity().getResources().getString(R.string.open_location_settings), new DialogInterface.OnClickListener() {
+
+                            CheckInFragment.this.getActivity().runOnUiThread(new Runnable() {
                                 @Override
-                                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                                    Intent myIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                    getActivity().startActivity(myIntent);
+                                public void run() {
+                                    final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                                    dialog.setMessage(getActivity().getResources().getString(R.string.gps_network_not_enabled));
+                                    dialog.setPositiveButton(getActivity().getResources().getString(R.string.open_location_settings), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                                            Intent myIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                            getActivity().startActivity(myIntent);
+                                        }
+                                    });
+                                    dialog.setNegativeButton(getActivity().getString(R.string.ok), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                                        }
+                                    });
+                                    dialog.show();
                                 }
                             });
-                            dialog.setNegativeButton(getActivity().getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                                }
-                            });
-                            dialog.show();
+
                             return;
                         }
 
