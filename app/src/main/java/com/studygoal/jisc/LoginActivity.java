@@ -161,33 +161,36 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
-        findViewById(R.id.login_step_1_imastudent).setOnClickListener(new View.OnClickListener() {
+
+        final TextView tvStudent = (TextView) findViewById(R.id.login_step_1_imastudent);
+        final TextView tvStaff = (TextView) findViewById(R.id.login_step_1_imastaff);
+        tvStudent.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 LoginActivity.this.isStaff = false;
 
                 login_next_button.setVisibility(View.VISIBLE);
 
-                findViewById(R.id.login_step_1_imastudent).setBackgroundResource(R.drawable.round_corners_transparent_2_selected);
-                ((TextView) findViewById(R.id.login_step_1_imastudent)).setTextColor(Color.parseColor("#ff5000"));
+                tvStudent.setBackgroundResource(R.drawable.round_corners_transparent_2_selected);
+                tvStudent.setTextColor(Color.parseColor("#ffffff"));
 
-                findViewById(R.id.login_step_1_imastaff).setBackgroundResource(R.drawable.round_corners_transparent_2);
-                ((TextView) findViewById(R.id.login_step_1_imastaff)).setTextColor(Color.parseColor("#ffffff"));
+                tvStaff.setBackgroundResource(R.drawable.round_corners_transparent_2);
+                tvStaff.setTextColor(Color.parseColor("#ffffff"));
             }
         });
 
-        findViewById(R.id.login_step_1_imastaff).setOnClickListener(new View.OnClickListener() {
+        tvStaff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LoginActivity.this.isStaff = true;
 
                 login_next_button.setVisibility(View.VISIBLE);
 
-                findViewById(R.id.login_step_1_imastudent).setBackgroundResource(R.drawable.round_corners_transparent_2);
-                ((TextView) findViewById(R.id.login_step_1_imastudent)).setTextColor(Color.parseColor("#ffffff"));
+                tvStudent.setBackgroundResource(R.drawable.round_corners_transparent_2);
+                tvStudent.setTextColor(Color.parseColor("#ffffff"));
 
-                findViewById(R.id.login_step_1_imastaff).setBackgroundResource(R.drawable.round_corners_transparent_2_selected);
-                ((TextView) findViewById(R.id.login_step_1_imastaff)).setTextColor(Color.parseColor("#ff5000"));
+                tvStaff.setBackgroundResource(R.drawable.round_corners_transparent_2_selected);
+                tvStaff.setTextColor(Color.parseColor("#ffffff"));
             }
         });
 
