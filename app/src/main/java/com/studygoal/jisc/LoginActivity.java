@@ -69,27 +69,27 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     private static final String TWITTER_KEY = "M0NKXVGquYoclGTcG81u49hka";
     private static final String TWITTER_SECRET = "CCpca8rm2GuJFkuHmTdTiwBsTcWdv7Ybi5Qqi7POIA6BvCObY6";
-    TwitterAuthClient mTwitterAuthClient;
+    private TwitterAuthClient mTwitterAuthClient;
 
-    CallbackManager callbackManager;
+    private CallbackManager callbackManager;
 
-    int socialType;
+    private int socialType;
 
-    String email;
-    String socialID;
+    private String email;
+    private String socialID;
 
     private WebView webView;
 
-    RelativeLayout loginContent;
+    private RelativeLayout loginContent;
 
-    LinearLayout loginStep1;
-    LinearLayout loginStep3;
-    ImageView login_next_button;
+    private LinearLayout loginStep1;
+    private LinearLayout loginStep3;
+    private ImageView login_next_button;
 
-    boolean isStaff;
-    boolean rememberMe;
+    private boolean isStaff;
+    private boolean rememberMe;
 
-    Institution selectedInstitution;
+    private Institution selectedInstitution;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -485,6 +485,15 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
+
+        TextView backToFirstPage = (TextView) findViewById(R.id.back_to_firstpage);
+        backToFirstPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
         callbackManager = CallbackManager.Factory.create();
 
         ImageView login_with_facebook = (ImageView)findViewById(R.id.login_with_facebook);
@@ -612,6 +621,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             super.onBackPressed();
         }
     }
+
+
 
     public void showProgressBar() {
         findViewById(R.id.blackout).setVisibility(View.VISIBLE);

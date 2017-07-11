@@ -456,6 +456,7 @@
     <string name="login_search_institution">SEARCH INSTITUTION</string>
     <string name="login_institution_not_listed">Institution not listed?</string>
     <string name="login_institution_signinwith">Sign in with</string>
+    <string name="login_back_to_first_page">Back to first page</string>
     <string name="check_in">Check-in</string>
     <string name="send_pin_title">Send PIN</string>
     <string name="alert_invalid_pin">Oops. PIN wasn\'t recognised. Please try again.</string>
