@@ -437,4 +437,7 @@
     <string name="attainment_info">IMPORTANT: All marks / grades indicated with \'**\' are subject to moderation and confirmation by a Board of Examiners. These marks / grades are therefore provisional and subject to change.</string>
     <string name="everyone">Everyone</string>
     <string name="send_to">Send to</string>
+    <string name="gps_network_not_enabled">Turn on location services to use this feature.</string>
+    <string name="open_location_settings">Take me to settings</string>
+
 </resources>
