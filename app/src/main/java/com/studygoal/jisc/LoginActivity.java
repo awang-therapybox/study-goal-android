@@ -333,14 +333,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         EditText editText = (EditText) findViewById(R.id.search_field);
         editText.setTypeface(DataManager.getInstance().myriadpro_regular);
         editText.addTextChangedListener(new TextWatcher() {
+
+            LinearLayout region = (LinearLayout) findViewById(R.id.social_login_region_ll);
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                region.setVisibility(View.GONE);
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 institutionsAdapter.institutions = new Select()
                         .from(Institution.class)
                         .where("name LIKE ?", "%" + s.toString() + "%")
@@ -351,6 +353,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             @Override
             public void afterTextChanged(Editable s) {
+                if (s.toString().isEmpty()) {
+                    region.setVisibility(View.VISIBLE);
+                }
             }
         });
 
