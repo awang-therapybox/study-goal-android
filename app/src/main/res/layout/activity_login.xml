@@ -191,6 +191,7 @@
             android:background="@drawable/round_corners_transparent_3" />
 
         <LinearLayout
+            android:id="@+id/social_login_region_ll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -258,8 +259,8 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="10dp"
                 android:text="@string/login_back_to_first_page"
-                android:textColor="#FFF"
                 android:textAlignment="center"
+                android:textColor="#FFF"
                 android:textSize="15sp" />
 
         </LinearLayout>

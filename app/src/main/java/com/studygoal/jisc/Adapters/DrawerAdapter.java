@@ -32,8 +32,8 @@ public class DrawerAdapter extends BaseAdapter {
         if(DataManager.getInstance().user.isSocial) {
             values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
         } else {
-//            values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.check_in), con.getString(R.string.stats), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
-            values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.stats), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
+            values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.check_in), con.getString(R.string.stats), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
+//            values = new String[] {"0", con.getString(R.string.feed), con.getString(R.string.stats), con.getString(R.string.log), con.getString(R.string.target), con.getString(R.string.logout)};
         }
 
     }
