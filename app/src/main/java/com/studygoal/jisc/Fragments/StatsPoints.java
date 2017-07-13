@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.studygoal.jisc.Adapters.ActivityPointsAdapter;
+import com.studygoal.jisc.MainActivity;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.LinguisticManager;
 import com.studygoal.jisc.Managers.NetworkManager;
@@ -27,18 +28,21 @@ import com.studygoal.jisc.R;
 
 public class StatsPoints extends Fragment {
 
-    View mainView;
-    SwipeRefreshLayout layout;
-    boolean isThisWeek;
-    ActivityPointsAdapter adapter;
-    TextView activity_points_value;
+    private View mainView;
+    private TextView activity_points_value;
+
+    private ActivityPointsAdapter adapter;
+
+    private boolean isThisWeek = true;
 
     @Override
     public void onResume() {
         super.onResume();
-        DataManager.getInstance().mainActivity.setTitle(DataManager.getInstance().mainActivity.getString(R.string.points));
-        DataManager.getInstance().mainActivity.hideAllButtons();
-        DataManager.getInstance().mainActivity.showCertainButtons(5);
+
+        MainActivity a = DataManager.getInstance().mainActivity;
+        a.setTitle(getString(R.string.points));
+        a.hideAllButtons();
+        a.showCertainButtons(5);
 
         refreshView();
     }
@@ -48,50 +52,54 @@ public class StatsPoints extends Fragment {
         mainView = inflater.inflate(R.layout.stats_points, container, false);
 
         ListView activity_points_list_view = (ListView) mainView.findViewById(R.id.activity_points_list_view);
-        adapter = new ActivityPointsAdapter(getActivity());
+        adapter = new ActivityPointsAdapter(getContext());
         activity_points_list_view.setAdapter(adapter);
 
-        activity_points_value = (TextView)mainView.findViewById(R.id.activity_points_value);
+        activity_points_value = (TextView) mainView.findViewById(R.id.activity_points_value);
+        SegmentClickListener l = new SegmentClickListener();
+        mainView.findViewById(R.id.segment_button_this_week).setOnClickListener(l);
+        mainView.findViewById(R.id.segment_button_overall).setOnClickListener(l);
 
-        isThisWeek = true;
+        showAlertDialog();
 
-        View.OnClickListener segmentClickListener = new View.OnClickListener() {
+        return mainView;
+    }
+
+    private void refreshView() {
+        DataManager.getInstance().mainActivity.showProgressBar(null);
+
+        new Thread(new Runnable() {
             @Override
-            public void onClick(View v) {
-
-                isThisWeek = !isThisWeek;
-
-                TextView segment_button_this_week = (TextView) mainView.findViewById(R.id.segment_button_this_week);
-                TextView segment_button_overall = (TextView) mainView.findViewById(R.id.segment_button_overall);
-
-                if (isThisWeek) {
-                    Drawable activeDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.round_corners_segmented_active);
-                    segment_button_this_week.setBackground(activeDrawable);
-                    segment_button_this_week.setTextColor(Color.WHITE);
-
-                    segment_button_overall.setBackground(null);
-                    segment_button_overall.setBackgroundColor(Color.TRANSPARENT);
-                    segment_button_overall.setTextColor(Color.parseColor("#3792ef"));
-                } else {
-                    Drawable activeDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.round_corners_segmented_active_right);
-                    segment_button_overall.setBackground(activeDrawable);
-                    segment_button_overall.setTextColor(Color.WHITE);
-
-                    segment_button_this_week.setBackground(null);
-                    segment_button_this_week.setBackgroundColor(Color.TRANSPARENT);
-                    segment_button_this_week.setTextColor(Color.parseColor("#3792ef"));
-                }
-
-                StatsPoints.this.refreshView();
+            public void run() {
+                NetworkManager.getInstance().getStudentActivityPoint(isThisWeek?"7d":"overall");
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        call_refresh();
+                    }
+                });
             }
-        };
-        mainView.findViewById(R.id.segment_button_this_week).setOnClickListener(segmentClickListener);
-        mainView.findViewById(R.id.segment_button_overall).setOnClickListener(segmentClickListener);
+        }).start();
+    }
 
+    private void call_refresh() {
+        DataManager.getInstance().mainActivity.hideProgressBar();
+
+        adapter.notifyDataSetChanged();
+
+        int sum = 0;
+        for(ActivityPoints p: DataManager.getInstance().user.points) {
+            sum += Integer.parseInt(p.points);
+        }
+        activity_points_value.setText(String.valueOf(sum));
+    }
+
+    private void showAlertDialog() {
         final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-        if (DataManager.getInstance().user.isStaff && preferences.getBoolean("stats_alert", true)) {
-
-            android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(getActivity());
+        boolean isStaff = DataManager.getInstance().user.isStaff;
+        boolean isStatsAlert = preferences.getBoolean("stats_alert", true);
+        if (isStaff && isStatsAlert) {
+            android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(getContext());
             alertDialogBuilder.setMessage(R.string.statistics_admin_view);
             alertDialogBuilder.setPositiveButton("Don't show again", new DialogInterface.OnClickListener() {
                 @Override
@@ -110,39 +118,35 @@ public class StatsPoints extends Fragment {
             android.app.AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         }
-
-        return mainView;
     }
 
-    public void refreshView() {
+    private class SegmentClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            isThisWeek = !isThisWeek;
 
-        DataManager.getInstance().mainActivity.showProgressBar(null);
+            TextView segment_button_this_week = (TextView) mainView.findViewById(R.id.segment_button_this_week);
+            TextView segment_button_overall = (TextView) mainView.findViewById(R.id.segment_button_overall);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                NetworkManager.getInstance().getStudentActivityPoint(isThisWeek?"7d":"overall");
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        call_refresh();
-                    }
-                });
+            if (isThisWeek) {
+                Drawable activeDrawable = ContextCompat.getDrawable(getContext(), R.drawable.round_corners_segmented_active);
+                segment_button_this_week.setBackground(activeDrawable);
+                segment_button_this_week.setTextColor(Color.WHITE);
+
+                segment_button_overall.setBackground(null);
+                segment_button_overall.setBackgroundColor(Color.TRANSPARENT);
+                segment_button_overall.setTextColor(Color.parseColor("#3792ef"));
+            } else {
+                Drawable activeDrawable = ContextCompat.getDrawable(getContext(), R.drawable.round_corners_segmented_active_right);
+                segment_button_overall.setBackground(activeDrawable);
+                segment_button_overall.setTextColor(Color.WHITE);
+
+                segment_button_this_week.setBackground(null);
+                segment_button_this_week.setBackgroundColor(Color.TRANSPARENT);
+                segment_button_this_week.setTextColor(Color.parseColor("#3792ef"));
             }
-        }).start();
-    }
 
-    private void call_refresh() {
-
-        DataManager.getInstance().mainActivity.hideProgressBar();
-
-        adapter.notifyDataSetChanged();
-
-        int value = 0;
-        for(ActivityPoints activityPoints: DataManager.getInstance().user.points) {
-            value += Integer.parseInt(activityPoints.points);
+            StatsPoints.this.refreshView();
         }
-
-        activity_points_value.setText(""+value);
     }
 }
