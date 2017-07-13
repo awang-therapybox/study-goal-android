@@ -1,5 +1,6 @@
 package com.studygoal.jisc.Fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -12,9 +13,13 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.studygoal.jisc.Adapters.ActivityPointsAdapter;
@@ -26,9 +31,13 @@ import com.studygoal.jisc.Managers.SocialManager;
 import com.studygoal.jisc.Models.ActivityPoints;
 import com.studygoal.jisc.R;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 public class StatsPoints extends Fragment {
 
     private View mainView;
+    private WebView piChartWebView;
     private TextView activity_points_value;
 
     private ActivityPointsAdapter adapter;
@@ -50,19 +59,45 @@ public class StatsPoints extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mainView = inflater.inflate(R.layout.stats_points, container, false);
+        activity_points_value = (TextView) mainView.findViewById(R.id.activity_points_value);
+        piChartWebView = (WebView) mainView.findViewById(R.id.pi_chart_web_view);
 
         ListView activity_points_list_view = (ListView) mainView.findViewById(R.id.activity_points_list_view);
         adapter = new ActivityPointsAdapter(getContext());
         activity_points_list_view.setAdapter(adapter);
 
-        activity_points_value = (TextView) mainView.findViewById(R.id.activity_points_value);
         SegmentClickListener l = new SegmentClickListener();
         mainView.findViewById(R.id.segment_button_this_week).setOnClickListener(l);
         mainView.findViewById(R.id.segment_button_overall).setOnClickListener(l);
 
         showAlertDialog();
 
+        loadWebView();
+
         return mainView;
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private void loadWebView() {
+        WebSettings s = piChartWebView.getSettings();
+        s.setJavaScriptEnabled(true);
+
+        try {
+            InputStream is = getContext().getAssets().open("stats_points_pi_chart.html");
+            int size = 0;
+            size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+
+            String html = new String(buffer);
+            // TODO: str = str.replace("old string", "new string");
+
+            piChartWebView.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void refreshView() {
@@ -98,6 +133,7 @@ public class StatsPoints extends Fragment {
         final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
         boolean isStaff = DataManager.getInstance().user.isStaff;
         boolean isStatsAlert = preferences.getBoolean("stats_alert", true);
+
         if (isStaff && isStatsAlert) {
             android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(getContext());
             alertDialogBuilder.setMessage(R.string.statistics_admin_view);
