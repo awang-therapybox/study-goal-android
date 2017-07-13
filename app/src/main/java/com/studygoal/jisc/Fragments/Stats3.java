@@ -191,7 +191,6 @@ public class Stats3 extends Fragment {
                         }
                     });
 
-
                     if (DataManager.getInstance().mainActivity.isLandscape) {
                         DisplayMetrics displaymetrics = new DisplayMetrics();
                         DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -417,7 +416,7 @@ public class Stats3 extends Fragment {
                         });
                     }
                 });
-
+                
                 if (DataManager.getInstance().mainActivity.isLandscape) {
                     DisplayMetrics displaymetrics = new DisplayMetrics();
                     DataManager.getInstance().mainActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
