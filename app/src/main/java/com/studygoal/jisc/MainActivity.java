@@ -295,13 +295,14 @@ public class MainActivity extends FragmentActivity {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.main_fragment, new FeedFragment())
                     .commit();
-        }
-        if (DataManager.getInstance().home_screen.toLowerCase().equals("feed")) {
+        } else if (DataManager.getInstance().home_screen.toLowerCase().equals("feed")) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.main_fragment, new FeedFragment())
                     .commit();
         } else if (DataManager.getInstance().home_screen.toLowerCase().equals("stats")) {
-
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_fragment, new Stats3())
+                    .commit();
         } else if (DataManager.getInstance().home_screen.toLowerCase().equals("log")) {
             logFragment = new LogActivityHistory();
             getSupportFragmentManager().beginTransaction()
