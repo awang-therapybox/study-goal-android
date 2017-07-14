@@ -10,14 +10,19 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,8 +43,9 @@ public class StatsPoints extends Fragment {
 
     private View mainView;
     private WebView piChartWebView;
+    private LinearLayout upperContainer;
     private TextView activity_points_value;
-
+    private Switch pieChartSwitch;
     private ActivityPointsAdapter adapter;
 
     private boolean isThisWeek = true;
@@ -61,7 +67,15 @@ public class StatsPoints extends Fragment {
         mainView = inflater.inflate(R.layout.stats_points, container, false);
         activity_points_value = (TextView) mainView.findViewById(R.id.activity_points_value);
         piChartWebView = (WebView) mainView.findViewById(R.id.pi_chart_web_view);
+        upperContainer = (LinearLayout) mainView.findViewById(R.id.activity_points_container);
+        pieChartSwitch = (Switch) mainView.findViewById(R.id.pie_chart_switch);
 
+        pieChartSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                upperContainer.setVisibility(isChecked? View.VISIBLE : View.INVISIBLE);
+                piChartWebView.setVisibility(isChecked? View.INVISIBLE : View.VISIBLE);
+            }
+        });
         ListView activity_points_list_view = (ListView) mainView.findViewById(R.id.activity_points_list_view);
         adapter = new ActivityPointsAdapter(getContext());
         activity_points_list_view.setAdapter(adapter);
@@ -86,18 +100,26 @@ public class StatsPoints extends Fragment {
             InputStream is = getContext().getAssets().open("stats_points_pi_chart.html");
             int size = 0;
             size = is.available();
-            byte[] buffer = new byte[size];
+            final byte[] buffer = new byte[size];
             is.read(buffer);
             is.close();
 
-            String html = new String(buffer);
-            // TODO: str = str.replace("old string", "new string");
+            piChartWebView.post(new Runnable() {
+                @Override
+                public void run() {
+                    double d = getActivity().getResources().getDisplayMetrics().density;
+                    int h = (int) (piChartWebView.getHeight() / d) - 20;
+                    int w = (int) (piChartWebView.getWidth() / d) - 20;
 
-            piChartWebView.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
+                    String html = new String(buffer);
+                    html = html.replace("280px", w + "px");
+                    html = html.replace("220px", h + "px");
+                    piChartWebView.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private void refreshView() {
@@ -185,4 +207,5 @@ public class StatsPoints extends Fragment {
             StatsPoints.this.refreshView();
         }
     }
+
 }

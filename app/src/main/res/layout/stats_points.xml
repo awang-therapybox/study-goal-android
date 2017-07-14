@@ -6,7 +6,7 @@
 
     <WebView
         android:id="@+id/pi_chart_web_view"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
@@ -95,7 +95,7 @@
         android:layout_marginBottom="15dp"/>
 
     <Switch
-        android:id="@+id/switch5"
+        android:id="@+id/pie_chart_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/activity_points_container"
