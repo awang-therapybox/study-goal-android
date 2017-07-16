@@ -69,13 +69,13 @@ public class StatsPoints extends Fragment {
         piChartWebView = (WebView) mainView.findViewById(R.id.pi_chart_web_view);
         upperContainer = (LinearLayout) mainView.findViewById(R.id.activity_points_container);
         pieChartSwitch = (Switch) mainView.findViewById(R.id.pie_chart_switch);
-
         pieChartSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 upperContainer.setVisibility(isChecked? View.VISIBLE : View.INVISIBLE);
                 piChartWebView.setVisibility(isChecked? View.INVISIBLE : View.VISIBLE);
             }
         });
+
         ListView activity_points_list_view = (ListView) mainView.findViewById(R.id.activity_points_list_view);
         adapter = new ActivityPointsAdapter(getContext());
         activity_points_list_view.setAdapter(adapter);
@@ -85,8 +85,6 @@ public class StatsPoints extends Fragment {
         mainView.findViewById(R.id.segment_button_overall).setOnClickListener(l);
 
         showAlertDialog();
-
-        loadWebView();
 
         return mainView;
     }
@@ -111,15 +109,40 @@ public class StatsPoints extends Fragment {
                     int h = (int) (piChartWebView.getHeight() / d) - 20;
                     int w = (int) (piChartWebView.getWidth() / d) - 20;
 
-                    String html = new String(buffer);
-                    html = html.replace("280px", w + "px");
-                    html = html.replace("220px", h + "px");
-                    piChartWebView.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
+                    /* data: [{
+                        name: 'Computer',
+                                y: 56.33
+                    }, {
+                        name: 'English',
+                                y: 24.03
+                    }] */
+
+                    String data = "";
+                    for(ActivityPoints p: DataManager.getInstance().user.points) {
+                        data += "{";
+                        data += "name:"+ "\'" + removeExtraString(p.id) + "\',";
+                        data += "y:"+ p.points;
+                        data += "},";
+                    }
+
+                    String rawhtml = new String(buffer);
+                    rawhtml = rawhtml.replace("280px", w + "px");
+                    rawhtml = rawhtml.replace("220px", h + "px");
+                    rawhtml = rawhtml.replace("RELACE_DATA", data);
+                    piChartWebView.loadDataWithBaseURL("", rawhtml, "text/html", "UTF-8", "");
                 }
             });
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String removeExtraString(String s) {
+        s = s.replace("https://brindlewaye.com/xAPITerms/verbs/", "");
+        s = s.replace("loggedin/", "loggedin");
+        s = s.replace("http://adlnet.gov/expapi/verbs/", "");
+        s = s.replace("http://id.tincanapi.com/verb/", "");
+        return s;
     }
 
     private void refreshView() {
@@ -133,6 +156,7 @@ public class StatsPoints extends Fragment {
                     @Override
                     public void run() {
                         call_refresh();
+                        loadWebView();
                     }
                 });
             }
