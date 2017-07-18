@@ -4,35 +4,44 @@
     android:layout_height="match_parent"
     android:background="@color/background_color">
 
+    <WebView
+        android:id="@+id/pi_chart_web_view"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:gravity="center" />
+
     <LinearLayout
         android:id="@+id/activity_points_container"
         android:layout_width="250dp"
         android:layout_height="250dp"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:background="@drawable/circle_purple"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="20dp"
+        android:background="@drawable/circle_purple"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="invisible">
 
         <TextView
             android:id="@+id/activity_points_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:text=""
             android:textColor="#ffffff"
             android:textSize="30sp"
-            android:textStyle="bold"
-            android:text=""/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/activity_points_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:textSize="18sp"
             android:layout_marginTop="5dp"
-            android:text="@string/activity_points"/>
+            android:gravity="center"
+            android:text="@string/activity_points"
+            android:textColor="#ffffff"
+            android:textSize="18sp" />
 
     </LinearLayout>
 
@@ -84,5 +93,12 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="15dp"/>
+
+    <Switch
+        android:id="@+id/pie_chart_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/activity_points_container"
+        android:layout_toEndOf="@+id/activity_points_container" />
 
 </RelativeLayout>
