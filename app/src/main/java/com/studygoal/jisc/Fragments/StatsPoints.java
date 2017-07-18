@@ -128,7 +128,7 @@ public class StatsPoints extends Fragment {
                     String rawhtml = new String(buffer);
                     rawhtml = rawhtml.replace("280px", w + "px");
                     rawhtml = rawhtml.replace("220px", h + "px");
-                    rawhtml = rawhtml.replace("RELACE_DATA", data);
+                    rawhtml = rawhtml.replace("REPLACE_DATA", data);
                     piChartWebView.loadDataWithBaseURL("", rawhtml, "text/html", "UTF-8", "");
                 }
             });
@@ -223,5 +223,4 @@ public class StatsPoints extends Fragment {
             StatsPoints.this.refreshView();
         }
     }
-
 }
