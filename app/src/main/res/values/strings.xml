@@ -110,6 +110,9 @@
     <string name="attainment">Attainment</string>
     <string name="points">Points</string>
     <string name="activity_points">Activity Points</string>
+    <string name="leader_board">Leader Board</string>
+    <string name="events_attended">EventsAttended</string>
+    <string name="attendance">Attendance</string>
     <string name="this_week">This Week</string>
     <string name="period">Period</string>
     <string name="compare_to">Compare to</string>

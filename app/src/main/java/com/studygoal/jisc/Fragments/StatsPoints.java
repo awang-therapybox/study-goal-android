@@ -120,7 +120,7 @@ public class StatsPoints extends Fragment {
                     String data = "";
                     for(ActivityPoints p: DataManager.getInstance().user.points) {
                         data += "{";
-                        data += "name:"+ "\'" + removeExtraString(p.id) + "\',";
+                        data += "name:"+ "\'" + p.activity + "\',";
                         data += "y:"+ p.points;
                         data += "},";
                     }
@@ -128,7 +128,7 @@ public class StatsPoints extends Fragment {
                     String rawhtml = new String(buffer);
                     rawhtml = rawhtml.replace("280px", w + "px");
                     rawhtml = rawhtml.replace("220px", h + "px");
-                    rawhtml = rawhtml.replace("RELACE_DATA", data);
+                    rawhtml = rawhtml.replace("REPLACE_DATA", data);
                     piChartWebView.loadDataWithBaseURL("", rawhtml, "text/html", "UTF-8", "");
                 }
             });
@@ -136,15 +136,7 @@ public class StatsPoints extends Fragment {
             e.printStackTrace();
         }
     }
-
-    private String removeExtraString(String s) {
-        s = s.replace("https://brindlewaye.com/xAPITerms/verbs/", "");
-        s = s.replace("loggedin/", "loggedin");
-        s = s.replace("http://adlnet.gov/expapi/verbs/", "");
-        s = s.replace("http://id.tincanapi.com/verb/", "");
-        return s;
-    }
-
+    
     private void refreshView() {
         DataManager.getInstance().mainActivity.showProgressBar(null);
 
@@ -231,5 +223,4 @@ public class StatsPoints extends Fragment {
             StatsPoints.this.refreshView();
         }
     }
-
 }

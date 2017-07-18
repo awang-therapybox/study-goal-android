@@ -1150,6 +1150,11 @@ public class NetworkManager {
                             activityPoints.key = key;
                             activityPoints.points = hash.getString("points");
 
+                            String[] words = activityPoints.id.split("/");
+                            String id = words[words.length - 1];
+                            id = id.substring(0, 1).toUpperCase() + id.substring(1).toLowerCase();
+                            activityPoints.activity = id;
+
                             DataManager.getInstance().user.points.add(activityPoints);
                         }
                     }
