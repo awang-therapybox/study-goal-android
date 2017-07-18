@@ -381,6 +381,7 @@
 
     <string name="select_source">Select source</string>
     <string name="report_feature_bug">Report Feature/Bug</string>
+    <string name="privacy_statement">Privacy statement</string>
     <string name="send_friend_request">Send Friend Request</string>
     <string name="please_search_for_friend">Search for friend by email address</string>
     <string name="friend_request_sent">Friend request sent</string>

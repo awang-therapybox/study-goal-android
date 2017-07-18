@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,11 +39,10 @@ import java.util.ArrayList;
 
 public class Settings extends Fragment {
 
-    TextView home_value;
-    TextView language_value;
-    ImageView profile_image;
-    public Uri imageUri;
-
+    private TextView home_value;
+    private TextView language_value;
+    private ImageView profile_image;
+//    Uri imageUri;
     @Override
     public void onResume() {
         super.onResume();
@@ -74,97 +74,59 @@ public class Settings extends Fragment {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Typeface font = DataManager.getInstance().myriadpro_regular;
+        View.OnClickListener onClickListener = new SettingsOnClickListener();
+
         View mainView = inflater.inflate(R.layout.settings_home, container, false);
         TextView friends = (TextView) mainView.findViewById(R.id.friends);
-        friends.setTypeface(DataManager.getInstance().myriadpro_regular);
+        friends.setTypeface(font);
+
         TextView friends_value = (TextView) mainView.findViewById(R.id.friends_value);
-        friends_value.setTypeface(DataManager.getInstance().myriadpro_regular);
+        friends_value.setTypeface(font);
         friends_value.setText(new Select().from(Friend.class).count() + "");
 
-        final TextView home = (TextView) mainView.findViewById(R.id.home);
-        home.setTypeface(DataManager.getInstance().myriadpro_regular);
+        TextView home = (TextView) mainView.findViewById(R.id.home);
+        home.setTypeface(font);
         home_value = (TextView) mainView.findViewById(R.id.home_value);
-        home_value.setTypeface(DataManager.getInstance().myriadpro_regular);
-
-        String selected_value = "";
-        switch (DataManager.getInstance().home_screen.toLowerCase()) {
-            case "feed": {
-                selected_value = getActivity().getString(R.string.feed);
-                break;
-            }
-            case "stats": {
-                selected_value = getActivity().getString(R.string.stats);
-                break;
-            }
-            case "log": {
-                selected_value = getActivity().getString(R.string.log);
-                break;
-            }
-            case "target": {
-                selected_value = getActivity().getString(R.string.target);
-                break;
-            }
-        }
-
-        home_value.setText(selected_value.toUpperCase());
+        home_value.setTypeface(font);
 
         TextView trophies = (TextView) mainView.findViewById(R.id.trophies);
-        trophies.setTypeface(DataManager.getInstance().myriadpro_regular);
+        trophies.setTypeface(font);
         TextView trophies_value = (TextView) mainView.findViewById(R.id.trophies_value);
-        trophies_value.setTypeface(DataManager.getInstance().myriadpro_regular);
+        trophies_value.setTypeface(font);
         trophies_value.setText(new Select().from(TrophyMy.class).count() + "");//);
 
         TextView language = (TextView) mainView.findViewById(R.id.language);
-        language.setTypeface(DataManager.getInstance().myriadpro_regular);
+        language.setTypeface(font);
         language_value = (TextView) mainView.findViewById(R.id.language_value);
-        language_value.setTypeface(DataManager.getInstance().myriadpro_regular);
-
-        ((TextView)mainView.findViewById(R.id.email_text)).setTypeface(DataManager.getInstance().myriadpro_regular);
-
-        mainView.findViewById(R.id.email_layout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto", "support@jisclearninganalytics.freshdesk.com", null));
-                emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Bug/Feature idea " + DataManager.getInstance().institution);
-                emailIntent.putExtra(Intent.EXTRA_TEXT, "+" + getString(R.string.is_this_a_but_or_a_feature) + "\n" +
-                        "+"+ getString(R.string.which_part)+"\n" +
-                        "+"+ getString(R.string.further_detail));
-                startActivity(Intent.createChooser(emailIntent, "Send email..."));
-            }
-        });
-
+        language_value.setTypeface(font);
         language_value.setText(DataManager.getInstance().language.toLowerCase().equals("english")?getString(R.string.english).toUpperCase():getString(R.string.welsh).toUpperCase());
 
-        mainView.findViewById(R.id.friends_layout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DataManager.getInstance().mainActivity.getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_fragment, new Friends())
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
+        ((TextView)mainView.findViewById(R.id.email_text)).setTypeface(font);
 
-        mainView.findViewById(R.id.trophies_layout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DataManager.getInstance().mainActivity.getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_fragment, new Trophies())
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
+        TextView privacy = (TextView) mainView.findViewById(R.id.privacy_text);
+        privacy.setTypeface(font);
 
+        mainView.findViewById(R.id.email_layout).setOnClickListener(onClickListener);
+        mainView.findViewById(R.id.friends_layout).setOnClickListener(onClickListener);
+        mainView.findViewById(R.id.trophies_layout).setOnClickListener(onClickListener);
+        mainView.findViewById(R.id.home_layout).setOnClickListener(onClickListener);
+        mainView.findViewById(R.id.language_layout).setOnClickListener(onClickListener);
+        mainView.findViewById(R.id.privacy_layout).setOnClickListener(onClickListener);
+
+        /** Upper Region */
         TextView name = (TextView) mainView.findViewById(R.id.name);
-        name.setTypeface(DataManager.getInstance().myriadpro_regular);
+        name.setTypeface(font);
         name.setText(DataManager.getInstance().user.name);
-
         TextView email = (TextView) mainView.findViewById(R.id.email);
-        email.setTypeface(DataManager.getInstance().myriadpro_regular);
+        email.setTypeface(font);
         email.setText(DataManager.getInstance().user.email + " | Student ID : " + DataManager.getInstance().user.jisc_student_id);
-
         mainView.findViewById(R.id.camera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,108 +158,46 @@ public class Settings extends Fragment {
                 list.add(DataManager.getInstance().mainActivity.getString(R.string.library));
 
                 listView.setAdapter(new GenericAdapter(getActivity(), home_value.getText().toString().toUpperCase(), list));
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        if (position == 0) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                                    (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                                            ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                                            ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
-
-                                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
-                                            102);
-                            } else {
-                                ContentValues values = new ContentValues();
-                                values.put(MediaStore.Images.Media.TITLE, "New Picture");
-                                values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
-
-                                imageUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                DataManager.getInstance().mainActivity.startActivityForResult(intent, 100);
-                            }
-                        } else {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                                    (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                                            ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
-
-                                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 103);
-                            } else {
-                                Intent intent = new Intent(Intent.ACTION_PICK);
-                                intent.setType("image/*");
-                                DataManager.getInstance().mainActivity.startActivityForResult(intent, 101);
-                            }
-                        }
-                        dialog.dismiss();
-                    }
-                });
+                listView.setOnItemClickListener(new SettingsOnItemClickListener(dialog));
                 dialog.show();
             }
         });
 
-        mainView.findViewById(R.id.home_layout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DataManager.getInstance().mainActivity.getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_fragment, new HomeScreen())
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
-
-        mainView.findViewById(R.id.language_layout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DataManager.getInstance().mainActivity.getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_fragment, new LanguageScreen())
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
-
         profile_image = (ImageView) mainView.findViewById(R.id.profile_picture);
-
         Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).into(profile_image);
         return mainView;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
     public void refresh_image() {
+        final DataManager manager = DataManager.getInstance();
 
-        if(DataManager.getInstance().user.isSocial) {
+        if(manager.user.isSocial) {
+            Integer response = NetworkManager.getInstance().loginSocial(manager.user.email, manager.user.password);
+            if (response != 200) { return; }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    manager.mainActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Glide.with(manager.mainActivity).load(NetworkManager.getInstance().host + manager.user.profile_pic).into(profile_image);
+                            Glide.with(manager.mainActivity).load(NetworkManager.getInstance().host + manager.user.profile_pic).transform(new CircleTransform(manager.mainActivity)).into(manager.mainActivity.adapter.profile_pic);
 
-            Integer response = NetworkManager.getInstance().loginSocial(DataManager.getInstance().user.email, DataManager.getInstance().user.password);
+                        }
+                    });
+                }
+            }).start();
 
-            if (response == 200) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).into(profile_image);
-                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
-
-                            }
-                        });
-                    }
-                }).start();
-            }
         } else {
             if (NetworkManager.getInstance().login()) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                        manager.mainActivity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).into(profile_image);
-                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
+                                Glide.with(manager.mainActivity).load(NetworkManager.getInstance().host + manager.user.profile_pic).into(profile_image);
+                                Glide.with(manager.mainActivity).load(NetworkManager.getInstance().host + manager.user.profile_pic).transform(new CircleTransform(manager.mainActivity)).into(manager.mainActivity.adapter.profile_pic);
 
                             }
                         });
@@ -306,5 +206,95 @@ public class Settings extends Fragment {
             }
         }
     }
+
+
+    private class SettingsOnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            int id = v.getId();
+            if (id == R.id.email_layout) {
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto", "support@jisclearninganalytics.freshdesk.com", null));
+                emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Bug/Feature idea " + DataManager.getInstance().institution);
+                emailIntent.putExtra(Intent.EXTRA_TEXT, "+" + getString(R.string.is_this_a_but_or_a_feature) + "\n" +
+                        "+"+ getString(R.string.which_part)+"\n" +
+                        "+"+ getString(R.string.further_detail));
+                startActivity(Intent.createChooser(emailIntent, "Send email..."));
+            } else if (id == R.id.friends_layout) {
+                DataManager.getInstance().mainActivity.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_fragment, new Friends())
+                        .addToBackStack(null)
+                        .commit();
+            } else if (id == R.id.trophies_layout) {
+                DataManager.getInstance().mainActivity.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_fragment, new Trophies())
+                        .addToBackStack(null)
+                        .commit();
+            } else if (id == R.id.home_layout) {
+                DataManager.getInstance().mainActivity.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_fragment, new HomeScreen())
+                        .addToBackStack(null)
+                        .commit();
+
+            } else if (id == R.id.language_layout) {
+                DataManager.getInstance().mainActivity.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_fragment, new LanguageScreen())
+                        .addToBackStack(null)
+                        .commit();
+            } else if (id == R.id.privacy_layout) {
+                DataManager.getInstance().mainActivity.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_fragment, new PrivacyWebViewFragment())
+                        .addToBackStack(null)
+                        .commit();
+
+            }
+        }
+    }
+
+    private class SettingsOnItemClickListener implements AdapterView.OnItemClickListener {
+
+        private Dialog dialog;
+
+        SettingsOnItemClickListener(Dialog dialog){
+            this.dialog = dialog;
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if (position == 0) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
+
+                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
+                            102);
+                } else {
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
+                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+
+                    // imageUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    DataManager.getInstance().mainActivity.startActivityForResult(intent, 100);
+                }
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
+
+                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 103);
+                } else {
+                    Intent intent = new Intent(Intent.ACTION_PICK);
+                    intent.setType("image/*");
+                    DataManager.getInstance().mainActivity.startActivityForResult(intent, 101);
+                }
+            }
+
+            dialog.dismiss();
+        }
+    }
+
 
 }
