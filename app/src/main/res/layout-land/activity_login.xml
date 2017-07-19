@@ -225,7 +225,7 @@
                 <ImageView
                     android:id="@+id/login_with_facebook"
                     android:layout_width="0dp"
-                    android:layout_height="55dp"
+                    android:layout_height="35dp"
                     android:layout_weight="1"
                     android:paddingEnd="7dp"
                     android:paddingStart="7dp"
@@ -234,7 +234,7 @@
                 <ImageView
                     android:id="@+id/login_with_twitter"
                     android:layout_width="0dp"
-                    android:layout_height="55dp"
+                    android:layout_height="35dp"
                     android:layout_weight="0"
                     android:paddingEnd="7dp"
                     android:paddingStart="7dp"
@@ -243,13 +243,24 @@
                 <ImageView
                     android:id="@+id/login_with_google"
                     android:layout_width="0dp"
-                    android:layout_height="55dp"
+                    android:layout_height="35dp"
                     android:layout_weight="1"
                     android:paddingEnd="7dp"
                     android:paddingStart="7dp"
                     android:src="@drawable/gp_icon" />
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/back_to_firstpage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:text="@string/login_back_to_first_page"
+                android:textAlignment="center"
+                android:textColor="#FFF"
+                android:textSize="15sp" />
 
         </LinearLayout>
 

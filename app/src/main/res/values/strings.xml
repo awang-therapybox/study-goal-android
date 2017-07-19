@@ -410,6 +410,7 @@
     <string name="login_search_institution">SEARCH INSTITUTION</string>
     <string name="login_institution_not_listed">Institution not listed?</string>
     <string name="login_institution_signinwith">Sign in with</string>
+    <string name="login_back_to_first_page">Back to first page</string>
     <string name="check_in">Check-in</string>
     <string name="send_pin_title">Send PIN</string>
     <string name="alert_invalid_pin">Oops. PIN wasn\'t recognised. Please try again.</string>
@@ -428,6 +429,7 @@
     <string name="demo_mode_edittarget">Targets can\’t be edited in demo mode.</string>
     <string name="demo_mode_changeappsettings">Demo mode only. You can\’t change the settings.</string>
     <string name="demo_mode_deletefeedlog">You can\’t delete items from feed in demo mode.</string>
+    <string name="demo_mode_updateprofileimage">You can\’t update your profile image in demo mode.</string>
     <string name="social_login_error">This email is already registered in our system. Please try again with a different social platform!</string>
     <string name="add_module">Add Module</string>
     <string name="module_name_invalid">Please add a valid Module Name</string>

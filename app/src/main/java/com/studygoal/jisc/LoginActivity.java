@@ -69,27 +69,27 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     private static final String TWITTER_KEY = "M0NKXVGquYoclGTcG81u49hka";
     private static final String TWITTER_SECRET = "CCpca8rm2GuJFkuHmTdTiwBsTcWdv7Ybi5Qqi7POIA6BvCObY6";
-    TwitterAuthClient mTwitterAuthClient;
+    private TwitterAuthClient mTwitterAuthClient;
 
-    CallbackManager callbackManager;
+    private CallbackManager callbackManager;
 
-    int socialType;
+    private int socialType;
 
-    String email;
-    String socialID;
+    private String email;
+    private String socialID;
 
     private WebView webView;
 
-    RelativeLayout loginContent;
+    private RelativeLayout loginContent;
 
-    LinearLayout loginStep1;
-    LinearLayout loginStep3;
-    ImageView login_next_button;
+    private LinearLayout loginStep1;
+    private LinearLayout loginStep3;
+    private ImageView login_next_button;
 
-    boolean isStaff;
-    boolean rememberMe;
+    private boolean isStaff;
+    private boolean rememberMe;
 
-    Institution selectedInstitution;
+    private Institution selectedInstitution;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,33 +161,36 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
-        findViewById(R.id.login_step_1_imastudent).setOnClickListener(new View.OnClickListener() {
+
+        final TextView tvStudent = (TextView) findViewById(R.id.login_step_1_imastudent);
+        final TextView tvStaff = (TextView) findViewById(R.id.login_step_1_imastaff);
+        tvStudent.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 LoginActivity.this.isStaff = false;
 
                 login_next_button.setVisibility(View.VISIBLE);
 
-                findViewById(R.id.login_step_1_imastudent).setBackgroundResource(R.drawable.round_corners_transparent_2_selected);
-                ((TextView) findViewById(R.id.login_step_1_imastudent)).setTextColor(Color.parseColor("#ff5000"));
+                tvStudent.setBackgroundResource(R.drawable.round_corners_transparent_2_selected);
+                tvStudent.setTextColor(Color.parseColor("#ffffff"));
 
-                findViewById(R.id.login_step_1_imastaff).setBackgroundResource(R.drawable.round_corners_transparent_2);
-                ((TextView) findViewById(R.id.login_step_1_imastaff)).setTextColor(Color.parseColor("#ffffff"));
+                tvStaff.setBackgroundResource(R.drawable.round_corners_transparent_2);
+                tvStaff.setTextColor(Color.parseColor("#ffffff"));
             }
         });
 
-        findViewById(R.id.login_step_1_imastaff).setOnClickListener(new View.OnClickListener() {
+        tvStaff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LoginActivity.this.isStaff = true;
 
                 login_next_button.setVisibility(View.VISIBLE);
 
-                findViewById(R.id.login_step_1_imastudent).setBackgroundResource(R.drawable.round_corners_transparent_2);
-                ((TextView) findViewById(R.id.login_step_1_imastudent)).setTextColor(Color.parseColor("#ffffff"));
+                tvStudent.setBackgroundResource(R.drawable.round_corners_transparent_2);
+                tvStudent.setTextColor(Color.parseColor("#ffffff"));
 
-                findViewById(R.id.login_step_1_imastaff).setBackgroundResource(R.drawable.round_corners_transparent_2_selected);
-                ((TextView) findViewById(R.id.login_step_1_imastaff)).setTextColor(Color.parseColor("#ff5000"));
+                tvStaff.setBackgroundResource(R.drawable.round_corners_transparent_2_selected);
+                tvStaff.setTextColor(Color.parseColor("#ffffff"));
             }
         });
 
@@ -330,14 +333,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         EditText editText = (EditText) findViewById(R.id.search_field);
         editText.setTypeface(DataManager.getInstance().myriadpro_regular);
         editText.addTextChangedListener(new TextWatcher() {
+
+            LinearLayout region = (LinearLayout) findViewById(R.id.social_login_region_ll);
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                region.setVisibility(View.GONE);
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 institutionsAdapter.institutions = new Select()
                         .from(Institution.class)
                         .where("name LIKE ?", "%" + s.toString() + "%")
@@ -348,6 +353,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             @Override
             public void afterTextChanged(Editable s) {
+                if (s.toString().isEmpty()) {
+                    region.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -482,6 +490,15 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
+
+        TextView backToFirstPage = (TextView) findViewById(R.id.back_to_firstpage);
+        backToFirstPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
         callbackManager = CallbackManager.Factory.create();
 
         ImageView login_with_facebook = (ImageView)findViewById(R.id.login_with_facebook);
@@ -609,6 +626,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             super.onBackPressed();
         }
     }
+
+
 
     public void showProgressBar() {
         findViewById(R.id.blackout).setVisibility(View.VISIBLE);
