@@ -48,6 +48,9 @@ import com.studygoal.jisc.Fragments.LogNewActivity;
 import com.studygoal.jisc.Fragments.Settings;
 import com.studygoal.jisc.Fragments.Stats3;
 import com.studygoal.jisc.Fragments.StatsAttainment;
+import com.studygoal.jisc.Fragments.StatsAttedance;
+import com.studygoal.jisc.Fragments.StatsEventAttendance;
+import com.studygoal.jisc.Fragments.StatsLeaderBoard;
 import com.studygoal.jisc.Fragments.StatsPoints;
 import com.studygoal.jisc.Fragments.TargetFragment;
 import com.studygoal.jisc.Managers.DataManager;
@@ -366,25 +369,31 @@ public class MainActivity extends FragmentActivity {
                 String selection = adapter.values[selectedPosition];
                 Fragment destination = null;
 
-                if(selection.equals(MainActivity.this.getString(R.string.feed))) {
+                if(selection.equals(getString(R.string.feed))) {
                     destination = new FeedFragment();
-                } else if(selection.equals(MainActivity.this.getString(R.string.check_in))) {
+                } else if(selection.equals(getString(R.string.check_in))) {
                     destination = new CheckInFragment();
-                } else if(selection.equals(MainActivity.this.getString(R.string.attainment))) {
+                } else if(selection.equals(getString(R.string.attainment))) {
                     destination = new StatsAttainment();
-                } else if(selection.equals(MainActivity.this.getString(R.string.friends))) {
+                } else if(selection.equals(getString(R.string.friends))) {
                     destination = new Friends();
-                } else if(selection.equals(MainActivity.this.getString(R.string.settings))) {
+                } else if(selection.equals(getString(R.string.settings))) {
                     destination = new Settings();
-                } else if(selection.equals(MainActivity.this.getString(R.string.graphs))) {
+                } else if(selection.equals(getString(R.string.graphs))) {
                     destination = new Stats3();
-                } else if(selection.equals(MainActivity.this.getString(R.string.points))) {
+                } else if(selection.equals(getString(R.string.points))) {
                     destination = new StatsPoints();
-                } else if(selection.equals(MainActivity.this.getString(R.string.log))) {
+                } else if(selection.equals(getString(R.string.log))) {
                     logFragment = new LogActivityHistory();
                     destination = logFragment;
-                } else if(selection.equals(MainActivity.this.getString(R.string.target))) {
+                } else if(selection.equals(getString(R.string.target))) {
                     destination = new TargetFragment();
+                } else if (selection.equals(getString(R.string.leader_board))) {
+                    destination = new StatsLeaderBoard();
+                } else if (selection.equals(getString(R.string.events_attended))) {
+                    destination = new StatsEventAttendance();
+                } else if (selection.equals(getString(R.string.attendance))) {
+                    destination = new StatsAttedance();
                 }
 
                 getSupportFragmentManager().beginTransaction()

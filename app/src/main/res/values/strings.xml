@@ -111,7 +111,7 @@
     <string name="points">Points</string>
     <string name="activity_points">Activity Points</string>
     <string name="leader_board">Leader Board</string>
-    <string name="events_attended">EventsAttended</string>
+    <string name="events_attended">Events Attended</string>
     <string name="attendance">Attendance</string>
     <string name="this_week">This Week</string>
     <string name="period">Period</string>
@@ -126,6 +126,9 @@
     <string name="Overall">Overall</string>
     <string name="anymodule">All Activity</string>
     <string name="last_7_days">Last 7 days</string>
+    <string name="last_7_days_short">7d</string>
+    <string name="last_28_days_short">28d</string>
+    <string name="all_days">All</string>
     <string name="no_one">No One</string>
     <string name="top10">Top 10</string>
     <string name="average">Average</string>
