@@ -467,7 +467,7 @@ public class MainActivity extends FragmentActivity {
 
                                 dialog.dismiss();
 
-                                android.webkit.CookieManager.getInstance().removeAllCookies(null);
+                                android.webkit.CookieManager.getInstance().removeAllCookie();
                                 DataManager.getInstance().checkForbidden = false;
                                 DataManager.getInstance().set_jwt("");
 
