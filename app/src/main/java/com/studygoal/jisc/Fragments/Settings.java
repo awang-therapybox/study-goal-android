@@ -173,18 +173,17 @@ public class Settings extends Fragment {
 
     public void refresh_image() {
         final DataManager manager = DataManager.getInstance();
-
-        if(DataManager.getInstance().user.isSocial) {
-            Integer response = NetworkManager.getInstance().loginSocial(DataManager.getInstance().user.email, DataManager.getInstance().user.password);
+        if(manager.user.isSocial) {
+            Integer response = NetworkManager.getInstance().loginSocial(manager.user.email, manager.user.password);
             if (response != 200) { return; }
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                        manager.mainActivity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().no_https_host + DataManager.getInstance().user.profile_pic).into(profile_image);
-                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().no_https_host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
+                                Glide.with(manager.mainActivity).load(NetworkManager.getInstance().no_https_host + manager.user.profile_pic).into(profile_image);
+                                Glide.with(manager.mainActivity).load(NetworkManager.getInstance().no_https_host + manager.user.profile_pic).transform(new CircleTransform(manager.mainActivity)).into(manager.mainActivity.adapter.profile_pic);
                             }
                         });
                     }
@@ -197,8 +196,8 @@ public class Settings extends Fragment {
                         manager.mainActivity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().no_https_host + DataManager.getInstance().user.profile_pic).into(profile_image);
-                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().no_https_host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
+                                Glide.with(manager.mainActivity).load(NetworkManager.getInstance().no_https_host + manager.user.profile_pic).into(profile_image);
+                                Glide.with(manager.mainActivity).load(NetworkManager.getInstance().no_https_host + manager.user.profile_pic).transform(new CircleTransform(manager.mainActivity)).into(manager.mainActivity.adapter.profile_pic);
                             }
                         });
                     }
@@ -245,7 +244,6 @@ public class Settings extends Fragment {
                         .replace(R.id.main_fragment, new PrivacyWebViewFragment())
                         .addToBackStack(null)
                         .commit();
-
             }
         }
     }
@@ -270,8 +268,8 @@ public class Settings extends Fragment {
                                            102);
                     } else {
                         dispatchTakePictureIntent();
-                        //                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        //                                DataManager.getInstance().mainActivity.startActivityForResult(intent, 100);
+                        // Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        // DataManager.getInstance().mainActivity.startActivityForResult(intent, 100);
                     }
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
