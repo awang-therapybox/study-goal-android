@@ -11,9 +11,11 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +30,7 @@ import android.widget.TextView;
 import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
 import com.studygoal.jisc.Adapters.GenericAdapter;
+import com.studygoal.jisc.MainActivity;
 import com.studygoal.jisc.Managers.DataManager;
 import com.studygoal.jisc.Managers.NetworkManager;
 import com.studygoal.jisc.Models.Friend;
@@ -35,6 +38,8 @@ import com.studygoal.jisc.Models.TrophyMy;
 import com.studygoal.jisc.R;
 import com.studygoal.jisc.Utils.CircleTransform;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Settings extends Fragment {
@@ -42,7 +47,7 @@ public class Settings extends Fragment {
     private TextView home_value;
     private TextView language_value;
     private ImageView profile_image;
-//    Uri imageUri;
+
     @Override
     public void onResume() {
         super.onResume();
@@ -70,7 +75,6 @@ public class Settings extends Fragment {
             }
         }
         home_value.setText(selected_value.toUpperCase());
-
     }
 
     @Override
@@ -95,12 +99,12 @@ public class Settings extends Fragment {
         home.setTypeface(font);
         home_value = (TextView) mainView.findViewById(R.id.home_value);
         home_value.setTypeface(font);
-
+    
         TextView trophies = (TextView) mainView.findViewById(R.id.trophies);
         trophies.setTypeface(font);
         TextView trophies_value = (TextView) mainView.findViewById(R.id.trophies_value);
         trophies_value.setTypeface(font);
-        trophies_value.setText(new Select().from(TrophyMy.class).count() + "");//);
+        trophies_value.setText(new Select().from(TrophyMy.class).count() + "");
 
         TextView language = (TextView) mainView.findViewById(R.id.language);
         language.setTypeface(font);
@@ -130,7 +134,6 @@ public class Settings extends Fragment {
         mainView.findViewById(R.id.camera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if(DataManager.getInstance().user.isDemo) {
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Settings.this.getActivity());
                     alertDialogBuilder.setTitle(Html.fromHtml("<font color='#3791ee'>" + getString(R.string.demo_mode_updateprofileimage) + "</font>"));
@@ -164,30 +167,28 @@ public class Settings extends Fragment {
         });
 
         profile_image = (ImageView) mainView.findViewById(R.id.profile_picture);
-        Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).into(profile_image);
+        refresh_image();
         return mainView;
     }
 
     public void refresh_image() {
         final DataManager manager = DataManager.getInstance();
 
-        if(manager.user.isSocial) {
-            Integer response = NetworkManager.getInstance().loginSocial(manager.user.email, manager.user.password);
+        if(DataManager.getInstance().user.isSocial) {
+            Integer response = NetworkManager.getInstance().loginSocial(DataManager.getInstance().user.email, DataManager.getInstance().user.password);
             if (response != 200) { return; }
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    manager.mainActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Glide.with(manager.mainActivity).load(NetworkManager.getInstance().host + manager.user.profile_pic).into(profile_image);
-                            Glide.with(manager.mainActivity).load(NetworkManager.getInstance().host + manager.user.profile_pic).transform(new CircleTransform(manager.mainActivity)).into(manager.mainActivity.adapter.profile_pic);
-
-                        }
-                    });
-                }
-            }).start();
-
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DataManager.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().no_https_host + DataManager.getInstance().user.profile_pic).into(profile_image);
+                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().no_https_host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
+                            }
+                        });
+                    }
+                }).start();
         } else {
             if (NetworkManager.getInstance().login()) {
                 new Thread(new Runnable() {
@@ -196,9 +197,8 @@ public class Settings extends Fragment {
                         manager.mainActivity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Glide.with(manager.mainActivity).load(NetworkManager.getInstance().host + manager.user.profile_pic).into(profile_image);
-                                Glide.with(manager.mainActivity).load(NetworkManager.getInstance().host + manager.user.profile_pic).transform(new CircleTransform(manager.mainActivity)).into(manager.mainActivity.adapter.profile_pic);
-
+                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().no_https_host + DataManager.getInstance().user.profile_pic).into(profile_image);
+                                Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().no_https_host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
                             }
                         });
                     }
@@ -206,7 +206,6 @@ public class Settings extends Fragment {
             }
         }
     }
-
 
     private class SettingsOnClickListener implements View.OnClickListener {
         @Override
@@ -263,38 +262,67 @@ public class Settings extends Fragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (position == 0) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                        (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
-
-                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
-                            102);
-                } else {
-                    ContentValues values = new ContentValues();
-                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
-                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
-
-                    // imageUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    DataManager.getInstance().mainActivity.startActivityForResult(intent, 100);
-                }
+                    (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                     ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                     ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
+                        
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
+                                           102);
+                    } else {
+                        dispatchTakePictureIntent();
+                        //                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        //                                DataManager.getInstance().mainActivity.startActivityForResult(intent, 100);
+                    }
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                        (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
-
-                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 103);
-                } else {
-                    Intent intent = new Intent(Intent.ACTION_PICK);
-                    intent.setType("image/*");
-                    DataManager.getInstance().mainActivity.startActivityForResult(intent, 101);
-                }
+                    (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                     ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
+                        
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 103);
+                    } else {
+                        Intent intent = new Intent(Intent.ACTION_PICK);
+                        intent.setType("image/*");
+                        DataManager.getInstance().mainActivity.startActivityForResult(intent, 101);
+                    }
             }
-
             dialog.dismiss();
         }
     }
 
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                System.out.print(ex);
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(
+                        getContext(),
+                        "com.studygoal.jisc",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                DataManager.getInstance().mainActivity.startActivityForResult(takePictureIntent, MainActivity.CAMERA_REQUEST_CODE);
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                "temp",         /* prefix */
+                ".png",         /* suffix */
+                storageDir      /* directory */
+        );
+        // Save a file: path for use with ACTION_VIEW intents
+        DataManager.getInstance().selfie_url = image.getAbsolutePath();
+        return image;
+    }
 
 }

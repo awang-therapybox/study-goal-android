@@ -74,7 +74,8 @@ public class NetworkManager {
     private Context appContext;
     private ExecutorService executorService;
 
-    public String host = "http://stuapp.analytics.alpha.jisc.ac.uk/";
+    public String no_https_host = "http://stuapp.analytics.alpha.jisc.ac.uk/";
+    public String host = "https://stuapp.analytics.alpha.jisc.ac.uk/";
 
     public static NetworkManager getInstance() {
         return ourInstance;
@@ -95,7 +96,9 @@ public class NetworkManager {
             // (could be from a resource or ByteArrayInputStream or ...)
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             // From https://www.washington.edu/itconnect/security/ca/load-der.crt
-            InputStream caInput = new BufferedInputStream(appContext.getAssets().open("cert/certificate.crt"));
+            InputStream cert = appContext.getAssets().open("cert/certificate.crt");
+//            InputStream cert = appContext.getAssets().open("cert/stuapp.analytics.alpha.jisc.ac.uk.crt");
+            InputStream caInput = new BufferedInputStream(cert);
             Certificate ca;
             try {
                 ca = cf.generateCertificate(caInput);
@@ -137,11 +140,12 @@ public class NetworkManager {
     public void updateDeviceDetails() {
         try {
             URL url = new URL(host + "fn_register_device");
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestMethod("POST");
             urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
             urlConnection.setDoInput(true);
             urlConnection.setDoOutput(true);
+            urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
             HashMap<String,String> params = new HashMap<>();
             params.put("student_id",DataManager.getInstance().user.id);
@@ -219,9 +223,10 @@ public class NetworkManager {
                     + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization","Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("DELETE");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -284,9 +289,12 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
+
+
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
                 if (responseCode != 200) {
@@ -374,11 +382,12 @@ public class NetworkManager {
         public String call() {
             try {
                 URL url = new URL(host + "fn_forgot_password");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -437,7 +446,7 @@ public class NetworkManager {
             try {
                 URL url = new URL(host + api);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
                 urlConnection.setRequestProperty("Connection", "Keep-Alive");
@@ -447,6 +456,7 @@ public class NetworkManager {
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
 
@@ -483,7 +493,7 @@ public class NetworkManager {
 
                 Bitmap bm = BitmapFactory.decodeFile(path);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                bm.compress(Bitmap.CompressFormat.JPEG, 30, baos);
 
                 wr.write(baos.toByteArray());
                 wr.writeBytes(crlf + twoHyphens + boundary + twoHyphens + crlf);
@@ -567,10 +577,11 @@ public class NetworkManager {
 
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection;
-                urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection;
+                urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -744,9 +755,10 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -821,8 +833,9 @@ public class NetworkManager {
                 String apiURL = host + api + "?language=" + language;
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -970,9 +983,10 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -1054,9 +1068,10 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -1138,7 +1153,6 @@ public class NetworkManager {
 
                 HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
-
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
                 urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
@@ -1219,9 +1233,10 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -1289,11 +1304,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_change_app_settings";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
 
                 String urlParameters = "";
@@ -1354,11 +1370,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_post_message";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -1417,11 +1434,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_hide_feed";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("PUT");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -1479,11 +1497,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_accept_friend_request";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -1541,10 +1560,11 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("DELETE");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setDoInput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -1587,10 +1607,11 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("DELETE");
                 urlConnection.setDoInput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -1633,10 +1654,11 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("DELETE");
                 urlConnection.setDoInput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -1679,11 +1701,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_change_friend_settings";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -1741,11 +1764,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_send_friend_request";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -1811,10 +1835,10 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
-
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
                 if (responseCode != 200) {
@@ -1953,9 +1977,10 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -2100,9 +2125,10 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -2208,11 +2234,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_add_push_notification";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -2257,9 +2284,10 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"&is_social=yes");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 if (responseCode != 200) {
@@ -2330,10 +2358,10 @@ public class NetworkManager {
                 String apiURL = host + "fn_update_notifications_read_status";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
-
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
 
@@ -2400,9 +2428,10 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -2477,9 +2506,10 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -2559,11 +2589,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_add_stretch_target";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
 
                 String urlParameters = "";
@@ -2623,11 +2654,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_unhide_friend";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -2685,11 +2717,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_hide_friend";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -2747,11 +2780,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_delete_target";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -2809,11 +2843,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_edit_target";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -2871,11 +2906,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_add_target";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -2933,9 +2969,10 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -3023,10 +3060,11 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("DELETE");
                 urlConnection.setDoInput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -3069,11 +3107,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_edit_activity_log";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("PUT");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -3131,11 +3170,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_add_activity_log";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
@@ -3204,11 +3244,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_staff_login";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "language=" + LinguisticManager.getInstance().getLanguageCode();
 
@@ -3289,11 +3330,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_login";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "language=" + LinguisticManager.getInstance().getLanguageCode();
 
@@ -3378,9 +3420,9 @@ public class NetworkManager {
                 String apiURL = host + "fn_social_login";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
-
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
 
@@ -3777,9 +3819,10 @@ public class NetworkManager {
                         + ((DataManager.getInstance().user.isSocial)?"&is_social=yes":"");
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.addRequestProperty("Authorization", "Bearer " + DataManager.getInstance().get_jwt());
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -3969,9 +4012,10 @@ public class NetworkManager {
                 String apiURL = host + "fn_get_modules?student_id="+DataManager.getInstance().user.jisc_student_id+"&language="+language;
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 int responseCode = urlConnection.getResponseCode();
                 forbidden(responseCode);
@@ -4057,11 +4101,12 @@ public class NetworkManager {
                 String apiURL = host + "fn_add_module";
                 URL url = new URL(apiURL);
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.addRequestProperty("Authorization", DataManager.getInstance().get_jwt());
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
+                urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
                 String urlParameters = "";
                 Iterator it = params.entrySet().iterator();
