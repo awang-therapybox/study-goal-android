@@ -73,7 +73,7 @@ public class DrawerAdapter extends BaseAdapter {
             if(DataManager.getInstance().user.profile_pic.equals(""))
                 Glide.with(context).load(R.drawable.profilenotfound2).transform(new CircleTransform(context)).into((ImageView) convertView.findViewById(R.id.imageView));
             else
-                Glide.with(context).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(context)).into((ImageView) convertView.findViewById(R.id.imageView));
+                Glide.with(context).load(NetworkManager.getInstance().no_https_host+ DataManager.getInstance().user.profile_pic).transform(new CircleTransform(context)).into((ImageView) convertView.findViewById(R.id.imageView));
         } else {
             convertView = inflater.inflate(R.layout.nav_item, parent, false);
             TextView textView;

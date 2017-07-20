@@ -74,6 +74,7 @@ public class NetworkManager {
     private Context appContext;
     private ExecutorService executorService;
 
+    public String no_https_host = "http://stuapp.analytics.alpha.jisc.ac.uk/";
     public String host = "https://stuapp.analytics.alpha.jisc.ac.uk/";
 
     public static NetworkManager getInstance() {
@@ -492,7 +493,7 @@ public class NetworkManager {
 
                 Bitmap bm = BitmapFactory.decodeFile(path);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                bm.compress(Bitmap.CompressFormat.JPEG, 30, baos);
 
                 wr.write(baos.toByteArray());
                 wr.writeBytes(crlf + twoHyphens + boundary + twoHyphens + crlf);
