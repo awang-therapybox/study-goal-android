@@ -38,8 +38,6 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.lb.auto_fit_textview.AutoResizeTextView;
 import com.studygoal.jisc.Adapters.DrawerAdapter;
 import com.studygoal.jisc.Fragments.AddTarget;
@@ -71,6 +69,8 @@ import java.util.Locale;
 
 public class MainActivity extends FragmentActivity {
 
+    public static final int CAMERA_REQUEST_CODE = 100;
+
     public DrawerLayout drawer;
     public RelativeLayout friend, settings, addTarget, send, timer, back;
     Settings settings_fragment;
@@ -86,11 +86,6 @@ public class MainActivity extends FragmentActivity {
     protected void onResume() {
         super.onResume();
         DataManager.getInstance().checkForbidden = true;
-
-        try {
-            Glide.with(DataManager.getInstance().mainActivity).load(NetworkManager.getInstance().host + DataManager.getInstance().user.profile_pic).transform(new CircleTransform(DataManager.getInstance().mainActivity)).into(DataManager.getInstance().mainActivity.adapter.profile_pic);
-        } catch (Exception ignored) {
-        }
     }
 
     public void refreshDrawer() {
@@ -467,7 +462,7 @@ public class MainActivity extends FragmentActivity {
 
                                 dialog.dismiss();
 
-                                android.webkit.CookieManager.getInstance().removeAllCookies(null);
+                                android.webkit.CookieManager.getInstance().removeAllCookie();
                                 DataManager.getInstance().checkForbidden = false;
                                 DataManager.getInstance().set_jwt("");
 
@@ -732,16 +727,16 @@ public class MainActivity extends FragmentActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
-        if (requestCode == 100) {
-            Bitmap photo = (Bitmap)intent.getExtras().get("data");
-            savebitmap(photo);
-
-            final String imagePath = Environment.getExternalStorageDirectory().toString() + "/temp.png";
+        if (requestCode == CAMERA_REQUEST_CODE) {
+            // Bitmap photo = (Bitmap)intent.getExtras().get("data");
+            // savebitmap(photo);
+            // final String imagePath = Environment.getExternalStorageDirectory().toString() + "/temp.jpg";
+            final String url = DataManager.getInstance().selfie_url;
             showProgressBar(null);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    if (NetworkManager.getInstance().updateProfileImage(imagePath)) {
+                    if (NetworkManager.getInstance().updateProfileImage(url)) {
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -758,6 +753,7 @@ public class MainActivity extends FragmentActivity {
                     });
                 }
             }).start();
+
         } else if (requestCode == 101) {
 
             if (intent != null) {
