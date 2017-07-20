@@ -74,7 +74,7 @@ public class NetworkManager {
     private Context appContext;
     private ExecutorService executorService;
 
-    public String host = "http://stuapp.analytics.alpha.jisc.ac.uk/";
+    public String host = "https://stuapp.analytics.alpha.jisc.ac.uk/";
 
     public static NetworkManager getInstance() {
         return ourInstance;
